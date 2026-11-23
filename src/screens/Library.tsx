@@ -1,20 +1,154 @@
 import React, { useState } from 'react';
-import { Pressable, TextInput, View } from 'react-native';
-import { Icon } from '../components/Icon';
+import { Linking, Pressable, TextInput, View } from 'react-native';
+import { Icon, IconName } from '../components/Icon';
 import { MascotSays } from '../components/Mascot';
 import { SheetTable } from '../components/sheet';
 import { BigButton, Card, ExampleView, exampleSpeech, Kicker, ListenButton, Screen, TopBar, Txt } from '../components/ui';
 import { lessonById, lessonsInStage, STAGES } from '../content';
 import { glossarySorted } from '../content/glossary';
+import { REFERENCE } from '../content/reference';
+import { RESOURCES } from '../content/resources';
+import { STUDY_GUIDES } from '../content/studyguides';
 import { Lesson, Step } from '../content/types';
 import { focusItems } from '../engine';
 import { Go } from '../nav';
 import { useApp } from '../state';
 import { radius, space, type } from '../theme';
 
+type Section = 'notes' | 'guides' | 'reference' | 'glossary' | 'resources';
+const SECTIONS: { id: Section; label: string; icon: IconName }[] = [
+  { id: 'notes', label: 'Lesson notes', icon: 'book' },
+  { id: 'guides', label: 'Study guides', icon: 'bulb' },
+  { id: 'reference', label: 'Quick reference', icon: 'code' },
+  { id: 'glossary', label: 'Glossary', icon: 'text' },
+  { id: 'resources', label: 'Free resources', icon: 'link' },
+];
+
+function GuideList({ go }: { go: Go }) {
+  const { state, colors } = useApp();
+  return (
+    <>
+      <MascotSays mood="happy" size={110}>
+        <Txt>A calm read for each stage: the big ideas in one place. Great before a boss level, or just to refresh.</Txt>
+      </MascotSays>
+      {STUDY_GUIDES.map((g) => {
+        const st = STAGES.find((s) => s.n === g.stage);
+        const reached = lessonsInStage(g.stage).some((l) => state.completed.includes(l.id));
+        return (
+          <BigButton
+            key={g.stage}
+            label={g.title}
+            sub={`Stage ${g.stage} · ${st?.title}${reached ? '' : ' · a sneak peek'}`}
+            icon="bulb"
+            onPress={() => go({ name: 'study', stage: g.stage })}
+          />
+        );
+      })}
+      <Txt v="small" color={colors.textMuted}>Tip: tap Listen on any guide to hear it while you relax.</Txt>
+    </>
+  );
+}
+
+function ReferenceList() {
+  const { colors } = useApp();
+  const [open, setOpen] = useState<string | null>('sheets');
+  return (
+    <>
+      {REFERENCE.map((g) => {
+        const isOpen = open === g.id;
+        return (
+          <Card key={g.id}>
+            <Pressable
+              onPress={() => setOpen(isOpen ? null : g.id)}
+              accessibilityRole="button"
+              accessibilityLabel={`${g.title}. ${g.items.length} entries. ${isOpen ? 'Hide' : 'Show'}`}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}
+            >
+              <Icon name={g.icon} size={30} color={colors.accent} />
+              <View style={{ flexGrow: 1, flexShrink: 1 }}>
+                <Txt v="h2">{g.title}</Txt>
+                <Txt v="small" color={colors.textMuted}>{g.items.length} entries</Txt>
+              </View>
+              <Icon name={isOpen ? 'up' : 'down'} size={26} color={colors.accent} />
+            </Pressable>
+            {isOpen
+              ? g.items.map((it) => (
+                  <View key={it.name} style={{ borderLeftWidth: 4, borderLeftColor: colors.brand, paddingLeft: 12, gap: 2, marginTop: space.xs }}>
+                    <Txt bold color={colors.accent}>{it.name}</Txt>
+                    <Txt bold style={{ fontFamily: 'monospace' }}>{it.syntax}</Txt>
+                    <Txt>{it.does}</Txt>
+                    {it.example ? <Txt v="small" color={colors.textMuted} style={{ fontFamily: 'monospace' }}>e.g. {it.example}</Txt> : null}
+                  </View>
+                ))
+              : null}
+            {isOpen ? <ListenButton text={`${g.title}. ` + g.items.map((it) => `${it.name}: ${it.does}`).join('. ')} /> : null}
+          </Card>
+        );
+      })}
+    </>
+  );
+}
+
+function ResourceList() {
+  const { colors } = useApp();
+  const topics = Array.from(new Set(RESOURCES.map((r) => r.topic)));
+  return (
+    <>
+      <MascotSays mood="wave" size={110}>
+        <Txt>Free, trusted places to practice more. They open in your browser.</Txt>
+      </MascotSays>
+      {topics.map((t) => (
+        <View key={t} style={{ gap: space.sm }}>
+          <Txt v="h2" color={colors.accent}>{t}</Txt>
+          {RESOURCES.filter((r) => r.topic === t).map((r) => (
+            <BigButton key={r.url} label={r.title} sub={r.what} icon="link" a11y={`${r.title}. ${r.what}. Opens in your browser`} onPress={() => Linking.openURL(r.url).catch(() => {})} />
+          ))}
+        </View>
+      ))}
+    </>
+  );
+}
+
+/** A stage study guide as a calm reading page. */
+export function StudyScreen({ stage, go }: { stage: number; go: Go }) {
+  const { colors } = useApp();
+  const g = STUDY_GUIDES.find((x) => x.stage === stage)!;
+  const st = STAGES.find((s) => s.n === stage);
+  const speech = `${g.title}. ${g.intro} ` + g.sections.map((s) => `${s.heading}. ${s.body.join(' ')}`).join(' ') + ` Key takeaways: ${g.takeaways.join('. ')}.`;
+  return (
+    <Screen>
+      <TopBar onBack={() => go({ name: 'library' })} backLabel="Learn" />
+      <Card tone="hero">
+        <Kicker icon="bulb">Study guide · Stage {stage} · {st?.title}</Kicker>
+        <Txt v="h1">{g.title}</Txt>
+        <Txt>{g.intro}</Txt>
+      </Card>
+      <ListenButton text={speech} />
+      {g.sections.map((s) => (
+        <View key={s.heading} style={{ gap: space.sm }}>
+          <Txt v="h2" color={colors.accent}>{s.heading}</Txt>
+          {s.body.map((p) => (
+            <Txt key={p}>{p}</Txt>
+          ))}
+        </View>
+      ))}
+      <Card>
+        <Kicker icon="star">Key takeaways</Kicker>
+        {g.takeaways.map((t) => (
+          <View key={t} style={{ flexDirection: 'row', gap: 10 }}>
+            <Icon name="check" size={24} color={colors.good} />
+            <Txt style={{ flexShrink: 1 }}>{t}</Txt>
+          </View>
+        ))}
+      </Card>
+      <BigButton label="Back to Learn" icon="back" variant="primary" onPress={() => go({ name: 'library' })} />
+    </Screen>
+  );
+}
+
 export function LibraryScreen({ go }: { go: Go }) {
   const { state, colors } = useApp();
-  const [tab, setTab] = useState<'notes' | 'glossary'>('notes');
+  const [tab, setTab] = useState<Section>('notes');
   const [open, setOpen] = useState<number | null>(null);
   const [q, setQ] = useState('');
   const [stage, setStage] = useState<number | null>(null);
@@ -30,12 +164,21 @@ export function LibraryScreen({ go }: { go: Go }) {
 
   return (
     <Screen>
-      <Txt v="h1">Library</Txt>
-      <View style={{ flexDirection: 'row', gap: space.sm }}>
-        <BigButton label="Lesson notes" icon="book" style={{ flex: 1 }} state={tab === 'notes' ? 'selected' : 'normal'} onPress={() => setTab('notes')} />
-        <BigButton label="Glossary" icon="text" style={{ flex: 1 }} state={tab === 'glossary' ? 'selected' : 'normal'} onPress={() => setTab('glossary')} />
+      <Txt v="h1">Learn</Txt>
+      <Txt color={colors.textMuted}>Your study corner: notes, guides, quick reference, a glossary and free resources.</Txt>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
+        {SECTIONS.map((x) => (
+          <BigButton
+            key={x.id}
+            label={x.label}
+            icon={x.icon}
+            style={{ flexGrow: 1, flexBasis: 150 }}
+            state={tab === x.id ? 'selected' : 'normal'}
+            a11y={`${x.label}${tab === x.id ? ', selected' : ''}`}
+            onPress={() => setTab(x.id)}
+          />
+        ))}
       </View>
-
       {tab === 'notes' ? (
         <>
           <MascotSays mood="think" size={110}>
@@ -71,7 +214,7 @@ export function LibraryScreen({ go }: { go: Go }) {
             );
           })}
         </>
-      ) : (
+      ) : tab === 'glossary' ? (
         <>
           <TextInput
             value={q}
@@ -136,6 +279,12 @@ export function LibraryScreen({ go }: { go: Go }) {
           {terms.length > limit ? <BigButton label={`Show more (${terms.length - limit} left)`} icon="down" onPress={() => setLimit(limit + 25)} /> : null}
           {!terms.length ? <Txt>No terms match. Try a shorter word.</Txt> : null}
         </>
+      ) : tab === 'guides' ? (
+        <GuideList go={go} />
+      ) : tab === 'reference' ? (
+        <ReferenceList />
+      ) : (
+        <ResourceList />
       )}
     </Screen>
   );

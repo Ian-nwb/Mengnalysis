@@ -10,7 +10,7 @@ export type Tab = 'home' | 'path' | 'library' | 'meng' | 'settings';
 const TABS: { id: Tab; label: string; icon: IconName }[] = [
   { id: 'home', label: 'Today', icon: 'home' },
   { id: 'path', label: 'Path', icon: 'map' },
-  { id: 'library', label: 'Library', icon: 'book' },
+  { id: 'library', label: 'Learn', icon: 'book' },
   { id: 'meng', label: 'Meng', icon: 'paw' },
   { id: 'settings', label: 'Me', icon: 'user' },
 ];

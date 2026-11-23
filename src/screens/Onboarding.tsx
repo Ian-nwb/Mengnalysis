@@ -10,7 +10,7 @@ import { space } from '../theme';
 import { ReminderPicker, TextSizePicker } from './Settings';
 
 const TOUR: { icon: IconName; title: string; text: string }[] = [
-  { icon: 'home', title: 'Five tabs', text: 'At the bottom: Today (your daily dose), Path (your journey), Library (lesson notes and a glossary of every term), Meng (my corner) and Me (settings and help).' },
+  { icon: 'home', title: 'Five tabs', text: 'At the bottom: Today (your daily dose), Path (your journey), Learn (notes, study guides, quick reference, a glossary and free resources), Meng (my corner) and Me (settings and help).' },
   { icon: 'coffee', title: "Today's dose", text: 'Each day: a quick warm-up, then one new lesson. About 5 minutes. Tap Start on Home.' },
   { icon: 'flame', title: 'Your streak', text: 'Come back every day to grow your flame. Miss one day? Your weekly streak freeze has your back.' },
   { icon: 'bolt', title: 'Lite days', text: 'Busy or tired? A 2-minute review still keeps your streak alive.' },
@@ -19,6 +19,7 @@ const TOUR: { icon: IconName; title: string; text: string }[] = [
   { icon: 'sheet', title: 'Cheat sheets', text: "Beat a stage's boss level to unlock a one-page cheat sheet you can save as a PDF." },
   { icon: 'sheet', title: 'Real formulas', text: 'In spreadsheet lessons you type real formulas. Tap the buttons to build them, then press Check formula.' },
   { icon: 'fish', title: "Meng's corner", text: 'Every lesson earns treats. Share snacks and toys with me in Meng\'s corner. Tap me anytime to say hi!' },
+  { icon: 'music', title: 'Study music', text: 'Cozy original tunes play softly while you learn. Pick a track or turn it off in Me → Music.' },
   { icon: 'speaker', title: 'Listen anytime', text: 'Tap Listen on any screen and I\'ll read it to you. Charts too!' },
 ];
 

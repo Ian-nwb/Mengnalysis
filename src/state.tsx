@@ -17,6 +17,9 @@ export type Settings = {
   animations: boolean;
   haptics: boolean;
   boldOutlines: boolean;
+  music: boolean;
+  musicTrack: string;
+  musicVolume: number;
   textScale: number;
   autoRead: boolean;
   speechRate: number;
@@ -84,6 +87,9 @@ export const defaultState: AppState = {
     animations: true,
     haptics: true,
     boldOutlines: false,
+    music: true,
+    musicTrack: 'cozy',
+    musicVolume: 0.25,
     textScale: 1,
     autoRead: false,
     speechRate: 0.95,

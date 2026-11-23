@@ -11,7 +11,7 @@ import { Screen, TabsContext, TopBar, Txt } from './components/ui';
 import { lessonById } from './content';
 import { addBugs, addLessonCards, addTreats, bossOf, dayStr, levelFor, markDayDone, newLessonsToday, refreshFreezes, tickPet, XP } from './engine';
 import { MengScreen } from './screens/Meng';
-import { LibraryScreen, ReaderScreen } from './screens/Library';
+import { LibraryScreen, ReaderScreen, StudyScreen } from './screens/Library';
 import { Finish, Route } from './nav';
 import * as Notifications from 'expo-notifications';
 import { syncReminders } from './reminders';
@@ -27,6 +27,7 @@ import { SheetScreen, VaultScreen } from './screens/Vault';
 import { AppProvider, resolveTheme, useApp } from './state';
 import { setHapticsEnabled } from './haptics';
 import { setAnimationsEnabled } from './motion';
+import { setMusic } from './music';
 import { preloadSfx, setMeowsEnabled, setSfxEnabled } from './sfx';
 import { runQuery } from './sql/db';
 import { ErrorBoundary, LoadingScreen } from './screens/Loading';
@@ -73,6 +74,10 @@ function Root() {
   useEffect(() => setMeowsEnabled(state.settings.meows), [state.settings.meows]);
   useEffect(() => setHapticsEnabled(state.settings.haptics), [state.settings.haptics]);
   useEffect(() => setAnimationsEnabled(state.settings.animations), [state.settings.animations]);
+  useEffect(
+    () => setMusic(state.settings.music, state.settings.musicTrack, state.settings.musicVolume),
+    [state.settings.music, state.settings.musicTrack, state.settings.musicVolume],
+  );
 
   const go = (r: Route) => {
     stopSpeaking();
@@ -83,7 +88,7 @@ function Root() {
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       if (route.name === 'home' || !state.onboarded) return false;
-      go(route.name === 'sheet' ? { name: 'vault' } : route.name === 'guide' ? { name: 'settings' } : route.name === 'reader' ? { name: 'library' } : { name: 'home' });
+      go(route.name === 'sheet' ? { name: 'vault' } : route.name === 'guide' ? { name: 'settings' } : route.name === 'reader' || route.name === 'study' ? { name: 'library' } : { name: 'home' });
       return true;
     });
     return () => sub.remove();
@@ -163,6 +168,9 @@ function Root() {
         break;
       case 'library':
         screen = <LibraryScreen go={go} />;
+        break;
+      case 'study':
+        screen = <StudyScreen key={route.stage} stage={route.stage} go={go} />;
         break;
       case 'reader':
         screen = <ReaderScreen key={route.id} id={route.id} go={go} />;

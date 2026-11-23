@@ -7,6 +7,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { LESSONS, STAGES, lessonsInStage } from '../src/content';
 import { SHEETS } from '../src/content/cheatsheets';
 import { GLOSSARY } from '../src/content/glossary';
+import { STUDY_GUIDES } from '../src/content/studyguides';
 import { DATASETS } from '../src/sql/datasets';
 import { evalFormula, formatValue, functionsIn, gridFrom } from '../src/sheet/formula';
 
@@ -26,6 +27,7 @@ for (const s of STAGES) {
   if (bosses.length !== 1) problems.push(`stage ${s.n} has ${bosses.length} boss lessons`);
   if (bosses[0] && !bosses[0].steps.some((st) => st.kind === 'reflect')) problems.push(`boss ${bosses[0].id} has no reflect step`);
   if (!SHEETS.find((x) => x.stage === s.n)) problems.push(`stage ${s.n} has no cheat sheet`);
+  if (!STUDY_GUIDES.find((x) => x.stage === s.n)) problems.push(`stage ${s.n} has no study guide`);
 }
 
 const db = new DatabaseSync(':memory:');

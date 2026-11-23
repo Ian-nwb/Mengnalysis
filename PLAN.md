@@ -118,6 +118,10 @@ Today the native splash shows Meng's face, then a blank plum screen while fonts 
 3. B (settings), built on top of the new tabs
 4. A5, C8, then polish
 
+## v1.2.0 (2026-11-23)
+- Learn tab: lesson notes, 14 study guides, quick reference (5 groups), 200-term glossary, free resources
+- Background music: 3 original tracks (Cozy study, Rainy café, Sunny morning), volume, ducking during Listen
+
 ## Recommended order
 1. Phase 3 items 1–4 (test on her phone, signing key, OTA updates)
 2. Phase 4 items 1 & 6 (spreadsheet sandbox, adaptive review)

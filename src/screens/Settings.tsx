@@ -4,9 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Pressable, Share, TextInput, View } from 'react-native';
 import { IconName } from '../components/Icon';
 import { Mascot } from '../components/Mascot';
-import { BigButton, Card, Kicker, Screen, Txt } from '../components/ui';
+import { BigButton, Card, Kicker, ProgressBar, Screen, Txt } from '../components/ui';
 import { GUIDES } from '../guides';
 import { Go } from '../nav';
+import { TRACKS } from '../music';
 import { REMINDER_TIMES, testNotification } from '../reminders';
 import { AppState, defaultState, Settings, useApp } from '../state';
 import { radius, space, TEXT_SCALES, type } from '../theme';
@@ -120,6 +121,30 @@ export function ReminderPicker() {
           <BigButton key={t.label} label={t.label} icon={on ? 'check' : 'clock'} state={on ? 'selected' : 'normal'} onPress={() => setTime(t.hour, t.minute)} />
         );
       })}
+    </Card>
+  );
+}
+
+/** Music volume in 10% steps, with a level bar and a quick mute. */
+function MusicVolume() {
+  const { state, setState, colors } = useApp();
+  const v = Math.round(state.settings.musicVolume * 100);
+  const set = (pct: number) => {
+    const p = Math.max(0, Math.min(100, pct));
+    setState((s) => ({ ...s, settings: { ...s.settings, musicVolume: p / 100, music: p > 0 ? true : s.settings.music } }));
+  };
+  const word = v === 0 ? 'Muted' : v <= 15 ? 'Whisper' : v <= 35 ? 'Soft' : v <= 60 ? 'Medium' : 'Loud';
+  return (
+    <Card>
+      <Kicker icon="music">Music volume</Kicker>
+      <Txt v="h1" center color={colors.accent}>{v}%</Txt>
+      <Txt center color={colors.textMuted}>{word}</Txt>
+      <ProgressBar value={v / 100} height={16} label={`Music volume ${v} percent`} />
+      <View style={{ flexDirection: 'row', gap: space.sm }}>
+        <BigButton label="Quieter" icon="minus" style={{ flex: 1 }} disabled={v <= 0} a11y={`Quieter, music volume ${v} percent`} onPress={() => set(v - 10)} />
+        <BigButton label="Louder" icon="plus" style={{ flex: 1 }} disabled={v >= 100} a11y={`Louder, music volume ${v} percent`} onPress={() => set(v + 10)} />
+      </View>
+      <BigButton label={v === 0 ? 'Unmute (back to Soft)' : 'Mute music'} icon={v === 0 ? 'music' : 'x'} onPress={() => set(v === 0 ? 30 : 0)} />
     </Card>
   );
 }
@@ -357,6 +382,8 @@ const WHATS_NEW = [
   'Bottom tabs: Today, Path, Library, Meng and Me',
   'The Library: re-read finished lessons and look up 200 analyst terms',
   'A cozy loading screen',
+  'Background music: three original study tracks',
+  'Learn tab: study guides, quick reference, glossary and free resources',
   'Lots of new settings: name, daily goal, any reminder time, sounds, outlines and more',
 ];
 
@@ -393,6 +420,12 @@ export function SettingsScreen({ go }: { go: Go }) {
 
       <Section icon="bell" title="Notifications">
         <NotificationCards />
+      </Section>
+
+      <Section icon="music" title="Music">
+        <Choice title="Background music" icon="music" k="music" options={onOff('On', 'Off')} note="Original study tunes. They get quieter while lessons are read aloud." />
+        <Choice title="Track" icon="music" k="musicTrack" options={TRACKS.map((t) => ({ label: t.name, value: t.id, sub: t.sub }))} />
+        <MusicVolume />
       </Section>
 
       <Section icon="speaker" title="Sound & voice">

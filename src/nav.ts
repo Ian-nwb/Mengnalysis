@@ -28,7 +28,8 @@ export type Route =
   | { name: 'guide'; id: string }
   | { name: 'meng' }
   | { name: 'library' }
-  | { name: 'reader'; id: string };
+  | { name: 'reader'; id: string }
+  | { name: 'study'; stage: number };
 
 export type Go = (r: Route) => void;
 /** missed = lesson step indexes answered wrong on the first try. */

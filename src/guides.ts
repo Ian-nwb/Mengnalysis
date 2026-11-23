@@ -91,10 +91,12 @@ export const GUIDES: { id: string; icon: IconName; title: string; body: string[]
   {
     id: 'library',
     icon: 'book',
-    title: 'The Library',
+    title: 'The Learn tab',
     body: [
       'Lesson notes: every lesson you finish becomes a page you can re-read or listen to, with the answers to every check.',
-      'Glossary: every analyst term in the course, A to Z, in plain words. Search it or filter by stage.',
+      'Study guides: a calm read for each stage with the big ideas and key takeaways.',
+      'Quick reference: formulas, SQL, pandas, DAX and shortcuts to look up anytime.',
+      'Glossary: every analyst term in plain words, searchable. Free resources: trusted sites for extra practice.',
     ],
   },
   {

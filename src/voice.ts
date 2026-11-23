@@ -1,4 +1,5 @@
 import * as Speech from 'expo-speech';
+import { duckMusic } from './music';
 
 // Listen mode voice. Default: a male English voice if the phone has one.
 // Google TTS male voice ids contain these codes (e.g. "en-us-x-iom-local").
@@ -48,10 +49,23 @@ async function currentVoice(): Promise<string> {
 
 export async function speak(text: string, opts: Speech.SpeechOptions = {}) {
   const voice = await currentVoice();
+  const end = (cb?: () => void) => () => {
+    duckMusic(false);
+    cb?.();
+  };
+  duckMusic(true);
   // No male voice installed? A slightly lower pitch on the default voice.
-  Speech.speak(text, { ...opts, voice: voice || undefined, pitch: voice ? 1 : 0.8 });
+  Speech.speak(text, {
+    ...opts,
+    voice: voice || undefined,
+    pitch: voice ? 1 : 0.8,
+    onDone: end(opts.onDone as (() => void) | undefined),
+    onStopped: end(opts.onStopped as (() => void) | undefined),
+    onError: end(opts.onError as (() => void) | undefined),
+  });
 }
 
 export const stopSpeaking = () => {
   Speech.stop();
+  duckMusic(false);
 };
