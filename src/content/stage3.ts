@@ -1,0 +1,421 @@
+import { Lesson } from './types';
+
+// Stage 3: Statistics, with formulas shown for Google Sheets & Excel (same in both).
+
+export const stage3: Lesson[] = [
+  {
+    id: 's3l1',
+    stage: 3,
+    title: 'Mean vs. median',
+    minutes: 5,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'Two kinds of "middle"',
+        text: 'The mean is the average: add everything up, divide by the count. The median is the middle value when you line them up in order. They can tell very different stories.',
+        example: { kind: 'list', title: '5 coffee orders', items: ['$3', '$4', '$4', '$5', '$54'] },
+      },
+      {
+        kind: 'choice',
+        prompt: 'What is the MEDIAN of $3, $4, $4, $5, $54?',
+        options: ['$4', '$14', '$54'],
+        answer: 0,
+        why: 'Lined up in order, the middle (3rd) value is $4.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'The MEAN is $14. Why is it so much higher?',
+        options: ['The $54 order pulls it up', 'Math error', 'Medians are always smaller'],
+        answer: 0,
+        why: 'One huge value (an outlier) drags the mean. The median ignores it.',
+      },
+      {
+        kind: 'explain',
+        title: 'When to use which',
+        text: 'Use the median when there are extreme values, like house prices or salaries. Use the mean when values are fairly even.',
+        example: { kind: 'formula', formula: '=MEDIAN(B2:B6)', result: '$4', note: 'Works the same in Sheets and Excel.' },
+      },
+      {
+        kind: 'blank',
+        prompt: 'For salaries (a few people earn millions), the ___ is fairer.',
+        options: ['median', 'mean', 'maximum'],
+        answer: 0,
+        why: 'A few millionaires make the mean misleading. The median shows the typical person.',
+      },
+    ],
+    review: [
+      { id: 's3l1c1', front: 'Which is NOT pulled by extreme values?', options: ['Median', 'Mean', 'Sum'], answer: 0 },
+      { id: 's3l1c2', front: 'Median of 1, 2, 9 is...', options: ['2', '4', '9'], answer: 0 },
+    ],
+  },
+  {
+    id: 's3l2',
+    stage: 3,
+    title: 'Mode and frequency',
+    minutes: 4,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'The most common value',
+        text: 'The mode is the value that shows up the most. It\'s great for categories: the most popular drink, the most common size.',
+        example: { kind: 'list', title: 'Sizes ordered', items: ['Large', 'Medium', 'Large', 'Small', 'Large'] },
+      },
+      {
+        kind: 'choice',
+        prompt: 'What is the mode of those sizes?',
+        options: ['Large', 'Medium', 'Small'],
+        answer: 0,
+        why: 'Large appears 3 times, more than any other.',
+      },
+      {
+        kind: 'explain',
+        title: 'Frequency tables',
+        text: 'A frequency table counts how often each value appears. You already know the tools: COUNTIF or a pivot table with COUNT.',
+        example: {
+          kind: 'record',
+          title: 'Frequency',
+          fields: [
+            ['Large', '3'],
+            ['Medium', '1'],
+            ['Small', '1'],
+          ],
+        },
+      },
+      {
+        kind: 'choice',
+        prompt: 'Can you take the mean of drink names?',
+        options: ['No, but you can find the mode', 'Yes', 'Only on weekends'],
+        answer: 0,
+        why: 'Names are categories. You can count them and find the mode, but not average them.',
+      },
+    ],
+    review: [{ id: 's3l2c1', front: 'The most frequent value is the...', options: ['Mode', 'Median', 'Mean'], answer: 0 }],
+  },
+  {
+    id: 's3l3',
+    stage: 3,
+    title: 'Spread: range and standard deviation',
+    minutes: 6,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'Same average, different story',
+        text: 'Two shops both average 100 sales a day. Shop A sells 98 to 102 every day. Shop B sells anywhere from 20 to 180. The average hides this! Spread tells you how much values vary.',
+      },
+      {
+        kind: 'explain',
+        title: 'Range',
+        text: 'The simplest spread: biggest minus smallest.',
+        example: { kind: 'formula', formula: '=MAX(B2:B31)-MIN(B2:B31)', result: 'Shop B: 180 − 20 = 160' },
+      },
+      {
+        kind: 'explain',
+        title: 'Standard deviation',
+        text: 'Standard deviation (SD) is roughly the typical distance from the average. Small SD = values stay close together. Big SD = values are all over the place.',
+        example: { kind: 'formula', formula: '=STDEV(B2:B31)', result: 'Shop A: about 1.5 · Shop B: about 45' },
+      },
+      {
+        kind: 'choice',
+        prompt: 'Which shop is more predictable?',
+        options: ['Shop A, small SD', 'Shop B, big SD', 'They\'re the same'],
+        answer: 0,
+        why: 'A small standard deviation means sales are consistent day to day.',
+      },
+      {
+        kind: 'blank',
+        prompt: 'A big standard deviation means the values are ___.',
+        options: ['spread out', 'all equal', 'missing'],
+        answer: 0,
+        why: 'Bigger SD = more variation.',
+      },
+    ],
+    review: [
+      { id: 's3l3c1', front: 'Small standard deviation means...', options: ['Values are close together', 'Values are huge', 'Data is missing'], answer: 0 },
+      { id: 's3l3c2', front: 'Range = ...', options: ['Max − Min', 'Sum ÷ Count', 'The middle value'], answer: 0 },
+    ],
+  },
+  {
+    id: 's3l4',
+    stage: 3,
+    title: 'Distributions',
+    minutes: 5,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'The shape of data',
+        text: 'A distribution is how values are spread out. Draw a histogram (bars that count how many values fall in each range) and you see its shape.',
+      },
+      {
+        kind: 'explain',
+        title: 'Common shapes',
+        text: 'Here are three shapes you\'ll see again and again.',
+        example: {
+          kind: 'list',
+          items: [
+            'Normal (bell curve): most values in the middle, few at the ends. Like people\'s heights.',
+            'Right-skewed: most values small, a long tail of big ones. Like incomes or order sizes.',
+            'Uniform: everything about equally common. Like rolling a die.',
+          ],
+        },
+      },
+      {
+        kind: 'choice',
+        prompt: 'Most orders are $3–$6, but a few are $50+. What shape?',
+        options: ['Right-skewed', 'Normal', 'Uniform'],
+        answer: 0,
+        why: 'A long tail of big values to the right = right-skewed.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'For right-skewed data, which "middle" is better?',
+        options: ['Median', 'Mean', 'Max'],
+        answer: 0,
+        why: 'Remember lesson 1: the tail pulls the mean up. The median stays honest.',
+      },
+    ],
+    review: [{ id: 's3l4c1', front: 'A bell curve is also called a...', options: ['Normal distribution', 'Pie chart', 'Skew'], answer: 0 }],
+  },
+  {
+    id: 's3l5',
+    stage: 3,
+    title: 'Percentages and percentiles',
+    minutes: 5,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'Percent change',
+        text: 'Analysts say "sales grew 25%" all the time. The formula: (new − old) ÷ old.',
+        example: { kind: 'formula', formula: '=(C2-B2)/B2', result: '(125 − 100) ÷ 100 = 25%', note: 'Format the cell as % to see 25%.' },
+      },
+      {
+        kind: 'choice',
+        prompt: 'Sales went from 200 to 150. What is the percent change?',
+        options: ['−25%', '−50%', '+25%'],
+        answer: 0,
+        why: '(150 − 200) ÷ 200 = −50 ÷ 200 = −0.25 = −25%.',
+      },
+      {
+        kind: 'explain',
+        title: 'Percentiles',
+        text: 'The 90th percentile is the value that 90% of the data is below. "Your order was in the 90th percentile" means it was bigger than 90% of orders. The median is the 50th percentile!',
+        example: { kind: 'formula', formula: '=PERCENTILE(B2:B100, 0.9)', result: 'The 90th percentile order size' },
+      },
+      {
+        kind: 'blank',
+        prompt: 'The median is the same as the ___ percentile.',
+        options: ['50th', '90th', '100th'],
+        answer: 0,
+        why: 'Half the values are below the median, so it\'s the 50th percentile.',
+      },
+    ],
+    review: [
+      { id: 's3l5c1', front: 'Percent change formula:', options: ['(new − old) ÷ old', 'new × old', 'old ÷ 100'], answer: 0 },
+      { id: 's3l5c2', front: 'The median is the ___ percentile.', options: ['50th', '25th', '75th'], answer: 0 },
+    ],
+  },
+  {
+    id: 's3l6',
+    stage: 3,
+    title: 'Correlation',
+    minutes: 5,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'Do two things move together?',
+        text: 'Correlation measures how strongly two numbers move together, from −1 to +1. Hot days and iced coffee sales? They rise together, so that\'s a positive correlation.',
+        example: {
+          kind: 'list',
+          items: ['+1: perfect together (one up, other up)', '0: no relationship', '−1: perfect opposite (one up, other down)'],
+        },
+      },
+      {
+        kind: 'choice',
+        prompt: 'Hot chocolate sales drop as temperature rises. Correlation is...',
+        options: ['Negative', 'Positive', 'Zero'],
+        answer: 0,
+        why: 'One goes up while the other goes down → negative.',
+      },
+      {
+        kind: 'explain',
+        title: 'Calculate it',
+        text: 'Put temperature in column A and sales in column B.',
+        example: { kind: 'formula', formula: '=CORREL(A2:A31, B2:B31)', result: '0.82, a strong positive relationship' },
+      },
+      {
+        kind: 'choice',
+        prompt: 'CORREL gives 0.05. What does that mean?',
+        options: ['Almost no relationship', 'Very strong relationship', 'An error'],
+        answer: 0,
+        why: 'Close to 0 = the two don\'t really move together.',
+      },
+    ],
+    review: [
+      { id: 's3l6c1', front: 'Correlation ranges from...', options: ['−1 to +1', '0 to 100', '1 to 10'], answer: 0 },
+      { id: 's3l6c2', front: 'Function to calculate correlation:', options: ['CORREL', 'MATCH', 'LINK'], answer: 0 },
+    ],
+  },
+  {
+    id: 's3l7',
+    stage: 3,
+    title: 'Correlation is not causation',
+    minutes: 4,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'The most famous rule in data',
+        text: 'Ice cream sales and sunburns rise together. Does ice cream cause sunburns? No! A hidden third thing, sunny weather, causes both. That hidden thing is called a confounder.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'Cities with more firefighters have more fires. So...',
+        options: ['Bigger cities have more of both', 'Firefighters cause fires', 'Fires create firefighters'],
+        answer: 0,
+        why: 'City size is the confounder. Bigger cities have more fires AND more firefighters.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'How do you actually prove one thing CAUSES another?',
+        options: ['Run a controlled experiment', 'Find a high correlation', 'Ask on social media'],
+        answer: 0,
+        why: 'Experiments (like A/B tests, next lesson!) are the gold standard for cause and effect.',
+      },
+      {
+        kind: 'blank',
+        prompt: 'A hidden factor that causes both things is a ___.',
+        options: ['confounder', 'percentile', 'formula'],
+        answer: 0,
+        why: 'Always ask: "Could something else explain this?"',
+      },
+    ],
+    review: [{ id: 's3l7c1', front: 'Correlation proves causation.', options: ['False', 'True'], answer: 0 }],
+  },
+  {
+    id: 's3l8',
+    stage: 3,
+    title: 'A/B tests',
+    minutes: 5,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'Experiments for business',
+        text: 'An A/B test splits people randomly into two groups. Group A sees the old version, group B sees the new one. Then you compare results. Because groups are random, the change is the only difference.',
+        example: {
+          kind: 'record',
+          title: 'Coffee app test: "Order again" button',
+          fields: [
+            ['Group A (old app)', '1,000 users · 80 reorders · 8%'],
+            ['Group B (new button)', '1,000 users · 110 reorders · 11%'],
+          ],
+        },
+      },
+      {
+        kind: 'choice',
+        prompt: 'Why must groups be chosen RANDOMLY?',
+        options: ['So the only difference is the change being tested', 'It\'s faster', 'Random is more fun'],
+        answer: 0,
+        why: 'If you picked loyal customers for group B, they\'d reorder more anyway, and the test would be unfair.',
+      },
+      {
+        kind: 'explain',
+        title: 'Is it real or luck?',
+        text: 'With small groups, differences can happen by chance. Statistical significance tells you how unlikely the result is to be pure luck. A common rule: a p-value under 0.05 counts as significant.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'Group A: 10 users. Group B: 10 users. B did slightly better. Conclusion?',
+        options: ['Too small to be sure, so test with more people', 'B is definitely better', 'A is better'],
+        answer: 0,
+        why: 'Tiny groups make luck look like a pattern. More data = more confidence.',
+      },
+    ],
+    review: [
+      { id: 's3l8c1', front: 'In an A/B test, groups are chosen...', options: ['Randomly', 'By age', 'By the boss'], answer: 0 },
+      { id: 's3l8c2', front: 'Common significance cutoff for p-value:', options: ['0.05', '5', '50'], answer: 0 },
+    ],
+  },
+  {
+    id: 's3l9',
+    stage: 3,
+    title: 'Samples and bias',
+    minutes: 4,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'You rarely see everyone',
+        text: 'You can\'t survey every customer, so you ask a sample. A good sample represents the whole group. A biased sample gives misleading answers.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'You survey only customers at 7am. What\'s the problem?',
+        options: ['Afternoon customers might be totally different', 'Nothing', '7am is too early to count'],
+        answer: 0,
+        why: 'That\'s sampling bias. Morning commuters don\'t represent everyone.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'A review site only hears from very happy or very angry people. That\'s...',
+        options: ['Self-selection bias', 'A perfect sample', 'A normal distribution'],
+        answer: 0,
+        why: 'People who choose to respond are often not typical.',
+      },
+      {
+        kind: 'blank',
+        prompt: 'A sample that doesn\'t represent the group is ___.',
+        options: ['biased', 'random', 'normal'],
+        answer: 0,
+        why: 'Good analysts always ask: "Who is missing from this data?"',
+      },
+    ],
+    review: [{ id: 's3l9c1', front: 'Surveying only morning customers is an example of...', options: ['Sampling bias', 'Correlation', 'A pivot'], answer: 0 }],
+  },
+  {
+    id: 's3l10',
+    stage: 3,
+    title: 'Boss level: did the new menu work?',
+    minutes: 6,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'Your case',
+        text: 'Bean There launched a new menu in July. The owner says: "Average order went from $6 to $8. The menu worked!" Let\'s check like a real analyst.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'A few catering orders of $300 happened in July. Which number is safer to compare?',
+        options: ['Median order', 'Mean order', 'Biggest order'],
+        answer: 0,
+        why: 'Big outliers inflate the mean. Compare medians too.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'July is also when tourist season starts. What is that?',
+        options: ['A possible confounder', 'Proof the menu worked', 'A percentile'],
+        answer: 0,
+        why: 'Tourists might spend more no matter what menu they see.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'How could you truly test the menu?',
+        options: [
+          'A/B test: new menu at random times or stores, old menu at others',
+          'Ask the owner\'s friends',
+          'Look at one day',
+        ],
+        answer: 0,
+        why: 'Randomly splitting removes confounders like tourist season.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'What should you tell the owner?',
+        options: [
+          '"Orders went up, but outliers and tourist season may explain part of it. Let\'s run a test."',
+          '"The menu definitely worked!"',
+          '"Data is useless."',
+        ],
+        answer: 0,
+        why: 'Honest, clear, with a next step. That\'s exactly what great analysts do. Stage 3 conquered!',
+      },
+    ],
+    review: [{ id: 's3l10c1', front: 'Best way to prove a change caused a result:', options: ['A/B test', 'Correlation', 'A guess'], answer: 0 }],
+  },
+];

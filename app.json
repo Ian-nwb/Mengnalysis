@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Tori",
+    "slug": "tori",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#1B1420",
+    "android": {
+      "package": "com.tori.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#E5A2F2",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      "expo-notifications",
+      "expo-sqlite",
+      "expo-font",
+      "expo-sharing",
+      "expo-audio"
+    ],
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1B1420"
+    }
+  }
+}

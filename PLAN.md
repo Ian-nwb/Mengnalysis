@@ -1,0 +1,74 @@
+# Tori: Plan
+
+## Where we are (v2, built 2026-11-23)
+An Android app (`Tori.apk`) that teaches data analysis from zero to job-ready as a 5–10 minute daily habit, guided by **Meng**, a calico cat drawn after the real Meng.
+
+- **Curriculum:** 232 lessons in 13 stages (0 Data Foundations → 12 Career). Each stage ends in a boss level with an "Explain it like I'm your boss" box, and beating it unlocks a cheat sheet (PDF).
+- **Daily loop:** warm-up review → one new lesson (max 2 a day) → reward. Lite days, weekly streak freeze, XP and levels.
+- **Learning:** mastery gate (more than 30% missed → retry the missed ones), Bug Book (mistakes return after 7 days), spaced review, real SQL sandbox + playground.
+- **Feel:** animations, sound effects, male Listen voice, Meng reactions, game-style first launch and replayable tour, help guides.
+- **Style rules:** magnifier-friendly, large text, `#E5A2F2` + plum.
+
+---
+
+## Phase 3: Verify & harden (do first)
+Nothing new matters until the current build feels great on her phone.
+
+1. **On-device pass:** every screen at the largest font, with the magnifier on, in dark and light themes. Fix clipping, overlaps and anything that needs side-panning.
+2. **TalkBack pass:** labels and order on every screen, the SQL editor and charts.
+3. **Release signing key:** create a real keystore and **back it up** (Drive + USB). Without it, future updates can't install over the old app, and she'd have to uninstall and lose progress.
+4. **Over-the-air updates (EAS Update):** push new lessons and fixes without reinstalling an APK. This is the biggest quality-of-life upgrade for future expansion.
+5. **Automatic backup:** save progress to a file in her Google Drive (or local Downloads) weekly, on top of the manual backup code.
+6. **Crash safety:** an error screen with Meng ("Oops, let's go home") instead of a blank screen, plus a hidden "copy error details" button for debugging.
+7. **Content checker in the repo:** move the lesson validator into `scripts/check-content.ts` + `npm run check`. It checks duplicate ids and options, that each stage has one boss, reflect steps and cheat sheets, and runs every SQL answer against the datasets.
+
+## Phase 4: Hands-on practice (the biggest learning win)
+Today most practice is multiple choice. Real skill comes from doing.
+
+1. **Spreadsheet sandbox:** a small grid (one row card at a time on a phone) where she types real formulas (SUM, IF, XLOOKUP, SUMIFS) and they are evaluated and checked. (Pick a formula engine with a license that allows this; avoid GPL/commercial-only ones.)
+2. **Python sandbox:** run real pandas in the app with Pyodide in a WebView (offline after the first load), with "write the line" exercises checked by output.
+3. **Fill-in-the-query steps:** SQL with blanks (`SELECT ___ FROM sales`) as a gentler step between multiple choice and a blank editor.
+4. **Weekly mini-projects:** a Saturday "case file" of 3–5 connected tasks on one dataset, ending in a reflect summary.
+5. **More datasets:** pets adoption, movies, weather, a small e-commerce store with real dates, a support-ticket set for text classification.
+6. **Adaptive review:** track mastery per topic (SQL joins, IF formulas, charts…). Weak topics show up more often in warm-ups, and Home shows a "focus topic" card.
+
+## Phase 5: Motivation & delight
+1. **Meng's closet:** unlockable accessories for milestones (stage badges, 30/100-day streaks): bow, glasses, graduation cap, headphones. Equip in Settings.
+2. **Weekly recap screen** (Sunday): lessons done, XP, streak, the Bug Book squashed, Meng's note.
+3. **Android home-screen widget:** streak flame + "today's dose done?" with Meng's face.
+4. **Puzzle of the Day:** one optional data riddle (chart reading, spot the error, quick SQL).
+5. **Achievements page:** collectible badges (first JOIN, 10 Bug Book squashes, first PDF cheat sheet…).
+6. **Seasonal themes:** small Meng outfits and holiday puzzle sets.
+7. **More Meng animation:** blink, tail swish on tap, happy hop on level-up (all respecting "Remove animations").
+
+## Phase 6: Career bridge
+1. **Portfolio builder:** the boss reflections + mini-projects become a portfolio checklist with ready-to-adapt project write-ups (question → method → finding → recommendation).
+2. **Guided real projects:** 3 step-by-step projects on public datasets (Google Sheets, SQL in BigQuery sandbox, Looker Studio/Tableau Public dashboard), with checklists she ticks off outside the app.
+3. **Interview practice mode:** spaced practice of SQL, stats, Excel and behavioral (STAR) questions; record answers by voice and compare with a model answer.
+4. **Resume bullet helper:** turns completed projects into "action + tool + result" bullets.
+5. **Job search tracker:** simple list of applications and stages, with Meng cheering every application.
+6. **Certificate prep tracks:** optional paths aligned with Google Data Analytics and Microsoft PL-300 topics.
+
+## Phase 7: Content expansion (ongoing, via OTA updates)
+- **Deeper existing stages:** Excel Power Query & Power Pivot, Sheets Apps Script projects, advanced SQL (recursive CTEs, gaps & islands, sessionization), statistics (regression, A/B test sample sizes), Python (seaborn/matplotlib charts, functions & modules), Power BI DAX patterns.
+- **New tracks:** data storytelling with real presentations, data ethics & bias case studies, domain packs (marketing, finance, healthcare ops, e-commerce, SaaS), Looker/LookML basics, dbt hands-on.
+- **Refresh yearly:** tools and AI features change fast. Review Stages 7, 9 and 11 every 6–12 months.
+- Keep the rules: lesson ids never change, one boss per stage, every boss has a reflect step and a cheat sheet, and the content check passes.
+
+## Done in v3 (2026-11-23)
+- Phase 4.1 spreadsheet sandbox (own formula engine, Formula Lab lessons) · Phase 4.6 adaptive review (focus topic + weak-topic warm-up cards)
+- Phase 7 content: deeper Excel (Power Query, Data Model, LET/LAMBDA, Goal Seek, pivot power-ups), SQL++ (LAG/LEAD, % of total, NTILE, UNION, EXISTS, gaps & islands, recursive CTEs), deeper Power BI (relationships, DAX patterns, visuals, Service), Stage 12 Industry Packs (marketing, finance, e-commerce, SaaS, people, operations, healthcare). Career is now Stage 13
+- Meng's corner: earn treats by learning, feed food and toys, pet Meng
+- Content checker: `npm run check` (Phase 3.7)
+
+## Recommended order
+1. Phase 3 items 1–4 (test on her phone, signing key, OTA updates)
+2. Phase 4 items 1 & 6 (spreadsheet sandbox, adaptive review)
+3. Phase 5 items 1 & 2 (Meng's closet, weekly recap)
+4. Phase 6 item 1 (portfolio builder)
+5. Then alternate: one feature, one content pack per update
+
+## Open questions for the owner
+- Does she have a Google account on the phone (for Drive auto-backup and Sheets projects)?
+- How many minutes a day does she realistically have? (Tunes the daily limit and lesson length.)
+- Any specific industry she wants to work in? (Decides which domain pack to build first.)

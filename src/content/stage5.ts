@@ -1,0 +1,351 @@
+import { Lesson } from './types';
+
+// Stage 5: Charts & data storytelling.
+
+export const stage5: Lesson[] = [
+  {
+    id: 's5l1',
+    stage: 5,
+    title: 'Why charts?',
+    minutes: 4,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'A picture beats a table',
+        text: 'People remember pictures far better than rows of numbers. A good chart answers one question in one glance. Your job is to pick the chart that makes the answer obvious.',
+      },
+      {
+        kind: 'explain',
+        title: 'Pick by question',
+        text: 'Start with what you want to show.',
+        example: {
+          kind: 'list',
+          items: [
+            'Compare categories → bar chart',
+            'Change over time → line chart',
+            'Parts of a whole (2–3 parts) → pie or stacked bar',
+            'Relationship between two numbers → scatter plot',
+            'One key number → a big number (KPI)',
+          ],
+        },
+      },
+      {
+        kind: 'choice',
+        prompt: 'Does temperature relate to iced coffee sales? Best chart?',
+        options: ['Scatter plot', 'Pie chart', 'Big number'],
+        answer: 0,
+        why: 'Two numbers, looking for a relationship → scatter plot. (Remember correlation from Stage 3?)',
+      },
+      {
+        kind: 'choice',
+        prompt: 'The boss wants "this month\'s revenue" at a glance. Best choice?',
+        options: ['One big number', 'A 12-color pie chart', 'A table of every sale'],
+        answer: 0,
+        why: 'Sometimes the best chart is just one big, clear number.',
+      },
+    ],
+    review: [{ id: 's5l1c1', front: 'Relationship between two numbers?', options: ['Scatter plot', 'Pie chart', 'Line chart'], answer: 0 }],
+  },
+  {
+    id: 's5l2',
+    stage: 5,
+    title: 'Bar charts',
+    minutes: 4,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'The analyst\'s workhorse',
+        text: 'Bar charts compare amounts across categories. Longer bar = bigger number. Here are a week of drink sales at Bean There.',
+        example: {
+          kind: 'chart',
+          type: 'bar',
+          title: 'Drinks sold this week',
+          data: [['Latte', 42], ['Iced Latte', 35], ['Cold Brew', 28], ['Mocha', 19], ['Tea', 11]],
+        },
+      },
+      {
+        kind: 'choice',
+        prompt: 'Which drink sold the least?',
+        example: {
+          kind: 'chart',
+          type: 'bar',
+          title: 'Drinks sold this week',
+          data: [['Latte', 42], ['Iced Latte', 35], ['Cold Brew', 28], ['Mocha', 19], ['Tea', 11]],
+        },
+        options: ['Tea', 'Mocha', 'Latte'],
+        answer: 0,
+        why: 'Shortest bar = Tea, at 11.',
+      },
+      {
+        kind: 'explain',
+        title: 'Sort your bars',
+        text: 'Notice the bars above go biggest to smallest? Sorted bars let people see the ranking instantly. Unsorted bars make readers hunt.',
+      },
+      {
+        kind: 'blank',
+        prompt: 'Bar charts should usually be ___ from biggest to smallest.',
+        options: ['sorted', 'colored randomly', 'hidden'],
+        answer: 0,
+        why: 'Unless the categories have a natural order (like days of the week), sort them.',
+      },
+    ],
+    review: [{ id: 's5l2c1', front: 'Bar charts are best for...', options: ['Comparing categories', 'Showing time trends', 'One number'], answer: 0 }],
+  },
+  {
+    id: 's5l3',
+    stage: 5,
+    title: 'Line charts',
+    minutes: 4,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'Seeing change over time',
+        text: 'Line charts connect points in time order, so you can see the trend: going up, down, or bouncing around.',
+        example: {
+          kind: 'chart',
+          type: 'line',
+          title: 'Monthly revenue',
+          unit: '$',
+          data: [['Jan', 1200], ['Feb', 1350], ['Mar', 1100], ['Apr', 1600], ['May', 1900], ['Jun', 2300]],
+        },
+      },
+      {
+        kind: 'choice',
+        prompt: 'Which month had a dip?',
+        example: {
+          kind: 'chart',
+          type: 'line',
+          title: 'Monthly revenue',
+          unit: '$',
+          data: [['Jan', 1200], ['Feb', 1350], ['Mar', 1100], ['Apr', 1600], ['May', 1900], ['Jun', 2300]],
+        },
+        options: ['March', 'May', 'June'],
+        answer: 0,
+        why: 'Revenue fell from $1,350 in February to $1,100 in March, then climbed again.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'What\'s the overall trend?',
+        options: ['Growing', 'Shrinking', 'Flat'],
+        answer: 0,
+        why: 'From $1,200 to $2,300: almost doubled in 6 months! One dip doesn\'t change the trend.',
+      },
+    ],
+    review: [{ id: 's5l3c1', front: 'Best chart for change over time?', options: ['Line chart', 'Pie chart', 'Bar chart'], answer: 0 }],
+  },
+  {
+    id: 's5l4',
+    stage: 5,
+    title: 'The trouble with pie charts',
+    minutes: 4,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'Hard to compare slices',
+        text: 'Our eyes are bad at comparing angles. Is a 23% slice bigger than a 21% slice? Hard to tell! But two bars of 23 and 21? Easy.',
+      },
+      {
+        kind: 'explain',
+        title: 'When pies are okay',
+        text: 'Use a pie only for 2 or 3 parts that add up to 100%, where one part is clearly the biggest. "70% of orders are drinks, 30% are food" works fine.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'You have 9 product categories. Pie chart?',
+        options: ['No, a sorted bar chart is clearer', 'Yes, the more slices the better', 'Yes, in 3D'],
+        answer: 0,
+        why: '9 slices = confusion. Sorted bars show the ranking instantly. (And never use 3D charts. They distort sizes!)',
+      },
+    ],
+    review: [{ id: 's5l4c1', front: 'Pie charts work best with...', options: ['2–3 parts', '10+ parts', 'Time data'], answer: 0 }],
+  },
+  {
+    id: 's5l5',
+    stage: 5,
+    title: 'Misleading charts',
+    minutes: 5,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'Charts can lie',
+        text: 'A chart can be technically correct and still mislead. Analysts must spot these tricks and never use them.',
+        example: {
+          kind: 'list',
+          items: [
+            'Cut-off axis: bars that start at 95 instead of 0 make a tiny difference look huge',
+            'Cherry-picked dates: showing only the good months',
+            'Missing labels: no units, so you can\'t tell what\'s measured',
+            '3D effects: make front slices look bigger',
+          ],
+        },
+      },
+      {
+        kind: 'choice',
+        prompt: 'Sales went from 98 to 100. The chart\'s axis starts at 97, so the second bar looks 3x taller. What\'s wrong?',
+        options: ['The axis should start at 0 for bar charts', 'Nothing', 'It needs more colors'],
+        answer: 0,
+        why: 'Bar length must be honest. A 2% change shouldn\'t look like a 200% change.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'A report shows only April to June because those months were good. This is...',
+        options: ['Cherry-picking', 'Sorting', 'Good storytelling'],
+        answer: 0,
+        why: 'Hiding the bad months hides the truth. Show the full picture.',
+      },
+      {
+        kind: 'blank',
+        prompt: 'Bar charts should always start at ___.',
+        options: ['zero', 'the smallest value', 'one hundred'],
+        answer: 0,
+        why: 'Bars show size by length, so the baseline must be zero. (Line charts are allowed more flexibility.)',
+      },
+    ],
+    review: [{ id: 's5l5c1', front: 'Bar chart axes should start at...', options: ['Zero', 'The minimum', 'Anywhere'], answer: 0 }],
+  },
+  {
+    id: 's5l6',
+    stage: 5,
+    title: 'Highlight what matters',
+    minutes: 4,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'Guide the eye',
+        text: 'Make the important bar stand out and let the rest fade back. Add a label too, so it\'s never only about color.',
+        example: {
+          kind: 'chart',
+          type: 'bar',
+          title: 'Iced Latte is the summer star',
+          data: [['Iced Latte', 61], ['Latte', 40], ['Cold Brew', 33], ['Mocha', 14]],
+          highlight: 'Iced Latte',
+        },
+      },
+      {
+        kind: 'choice',
+        prompt: 'Why highlight just one bar?',
+        options: ['To point at the main message', 'To use more colors', 'To hide the others'],
+        answer: 0,
+        why: 'One highlight = one message. Highlighting everything highlights nothing.',
+      },
+    ],
+    review: [{ id: 's5l6c1', front: 'Highlighting everything highlights...', options: ['Nothing', 'Everything', 'The title'], answer: 0 }],
+  },
+  {
+    id: 's5l7',
+    stage: 5,
+    title: 'Titles that tell the story',
+    minutes: 4,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'Say the takeaway',
+        text: 'A boring title describes the chart. A great title tells people what to learn from it.',
+        example: {
+          kind: 'list',
+          items: ['Boring: "Sales by month"', 'Great: "Sales doubled since January"'],
+        },
+      },
+      {
+        kind: 'choice',
+        prompt: 'Which title is best?',
+        options: [
+          'Weekend orders are 40% bigger than weekdays',
+          'Orders by day',
+          'Chart 3',
+        ],
+        answer: 0,
+        why: 'It tells the reader the insight before they even look at the bars.',
+      },
+      {
+        kind: 'explain',
+        title: 'The 3-part story',
+        text: 'Most data stories have three parts: What happened? Why does it matter? What should we do next?',
+      },
+      {
+        kind: 'order',
+        prompt: 'Put the data story in order.',
+        items: ['What happened', 'Why it matters', 'What to do next'],
+        why: 'What → So what → Now what. Remember this for every presentation!',
+      },
+    ],
+    review: [{ id: 's5l7c1', front: 'A great chart title...', options: ['States the insight', 'Lists the columns', 'Is a number'], answer: 0 }],
+  },
+  {
+    id: 's5l8',
+    stage: 5,
+    title: 'Know your audience',
+    minutes: 4,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'Different people, different needs',
+        text: 'A CEO wants the headline and a decision. A teammate wants details to double-check. Match your story to who\'s listening.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'You have 2 minutes with the CEO. What do you show?',
+        options: ['One clear chart and your recommendation', 'All 25 charts you made', 'Your SQL queries'],
+        answer: 0,
+        why: 'Busy leaders need the "so what" fast. Keep the details ready in case they ask.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'Your teammate will rebuild your analysis. What do they need?',
+        options: ['Your data sources, steps and queries', 'Just the title', 'A pie chart'],
+        answer: 0,
+        why: 'Analysts share their work so others can check and reuse it.',
+      },
+    ],
+    review: [{ id: 's5l8c1', front: 'For executives, lead with...', options: ['The key takeaway', 'Raw data', 'Methods'], answer: 0 }],
+  },
+  {
+    id: 's5l9',
+    stage: 5,
+    title: 'Boss level: the 3-slide story',
+    minutes: 6,
+    steps: [
+      {
+        kind: 'explain',
+        title: 'Your case',
+        text: 'You analyzed Bean There\'s year. Afternoon sales are lower, but cold drinks after 2pm grew fast. Build a 3-slide story for the owner.',
+        example: {
+          kind: 'chart',
+          type: 'line',
+          title: 'Afternoon cold drinks per month',
+          data: [['Mar', 80], ['Apr', 110], ['May', 150], ['Jun', 210], ['Jul', 260]],
+        },
+      },
+      {
+        kind: 'choice',
+        prompt: 'Slide 1 title: what happened?',
+        options: [
+          'Afternoon cold drinks tripled since March',
+          'Data overview',
+          'Drinks: a table',
+        ],
+        answer: 0,
+        why: '80 → 260 is more than 3x. The title says the insight.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'Slide 2 (why it matters): which chart?',
+        options: ['The line chart above, showing growth over time', 'A pie chart of all drinks', 'No chart'],
+        answer: 0,
+        why: 'Growth over time → line chart.',
+      },
+      {
+        kind: 'choice',
+        prompt: 'Slide 3 (what to do next): best recommendation?',
+        options: [
+          'Stay open in the afternoon and run a cold drink special, then measure it',
+          'Close at 2pm',
+          'Make more charts',
+        ],
+        answer: 0,
+        why: 'A clear action plus a way to measure it. You just told a real data story. Stage 5 conquered! 🎉',
+      },
+    ],
+    review: [{ id: 's5l9c1', front: 'Data story order:', options: ['What → So what → Now what', 'Now what → What', 'Charts → Data'], answer: 0 }],
+  },
+];
