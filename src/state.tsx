@@ -1,9 +1,22 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { Appearance, useColorScheme } from 'react-native';
 import { Palette, palettes, ThemeName } from './theme';
 
 export type Settings = {
-  theme: ThemeName;
+  theme: ThemeName | 'system';
+  name: string;
+  dailyGoal: number; // new lessons per day
+  mastery: 'gentle' | 'standard';
+  notifications: boolean;
+  secondReminder: boolean;
+  secondHour: number;
+  streakSaver: boolean;
+  daysOff: number[]; // 0 = Sunday … 6 = Saturday
+  meows: boolean;
+  animations: boolean;
+  haptics: boolean;
+  boldOutlines: boolean;
   textScale: number;
   autoRead: boolean;
   speechRate: number;
@@ -59,6 +72,18 @@ export const defaultState: AppState = {
   pet: { treats: 3, fullness: 60, happiness: 60, day: '', fedTotal: 0 },
   settings: {
     theme: 'dark',
+    name: 'Tori',
+    dailyGoal: 2,
+    mastery: 'standard',
+    notifications: true,
+    secondReminder: false,
+    secondHour: 12,
+    streakSaver: true,
+    daysOff: [],
+    meows: true,
+    animations: true,
+    haptics: true,
+    boldOutlines: false,
     textScale: 1,
     autoRead: false,
     speechRate: 0.95,
@@ -101,13 +126,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (ready) AsyncStorage.setItem(KEY, JSON.stringify(state)).catch(() => {});
   }, [state, ready]);
 
+  const scheme = useColorScheme();
   const setState = useCallback((fn: (s: AppState) => AppState) => set(fn), []);
 
   return (
-    <AppCtx.Provider value={{ state, ready, setState, colors: palettes[state.settings.theme] }}>
+    <AppCtx.Provider value={{ state, ready, setState, colors: palettes[resolveTheme(state.settings.theme, scheme)] }}>
       {children}
     </AppCtx.Provider>
   );
+}
+
+export function resolveTheme(t: Settings['theme'], scheme?: string | null): ThemeName {
+  if (t !== 'system') return t;
+  return (scheme ?? Appearance.getColorScheme()) === 'light' ? 'light' : 'dark';
 }
 
 export function useApp() {

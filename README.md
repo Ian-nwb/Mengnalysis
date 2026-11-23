@@ -30,9 +30,13 @@ Tori is an offline Android app built around one idea: **a small dose of data ski
 - **Bug Book:** every mistake is saved and comes back about a week later until it's squashed
 - **Adaptive review:** weak topics show up more often, and Home suggests a *Focus topic*
 - **Boss levels** end every stage with a real-world case, plus an *"Explain it like I'm your boss"* summary
+- **Library:** re-read every finished lesson as notes (with the answers), and search a 200-term analyst glossary
 - **Cheat sheets:** a one-page summary unlocks for each stage, and you can save it as a PDF
 
 **Habit & fun**
+- A winding, game-style **path** with lesson nodes, practice stars, boss crowns and cheat-sheet chests
+- **Notes from Meng:** daily reminders in Meng's voice, an optional second reminder and evening streak saver, days off, and tap-to-open
+- Bottom tabs: **Today · Path · Library · Meng · Me**, plus a cozy loading screen
 - Daily streaks with a weekly streak freeze, and **Lite days** (2-minute review) for busy days
 - Max two new lessons a day, so the journey stays a steady habit
 - XP and level titles (*Data Curious → Spreadsheet Sorcerer → … → Analyst*)
@@ -41,7 +45,8 @@ Tori is an offline Android app built around one idea: **a small dose of data ski
 - Gentle animations, sound effects and haptics
 
 **Comfort**
-- Big text with an in-app size control, a cozy dark theme and a warm light theme
+- Big text with an in-app size control; dark, light or follow-your-phone themes; bolder outlines
+- A full settings page: name, daily goal (1–3 lessons), reminder at any time, sounds, meows, vibration, animations, backups, export and reset
 - **Listen mode:** every lesson, question and chart can be read aloud, with a choice of voices
 - One clear column per screen, large buttons, and nothing that disappears on a timer
 

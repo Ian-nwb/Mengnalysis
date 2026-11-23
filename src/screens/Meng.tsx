@@ -67,7 +67,6 @@ export function MengScreen({ go }: { go: Go }) {
 
   return (
     <Screen>
-      <TopBar onBack={() => go({ name: 'home' })} />
       <MascotSays mood={mood ?? baseMood} size={170}>
         <Txt v="h1">Meng's corner</Txt>
         <Txt>{said ?? baseLine}</Txt>

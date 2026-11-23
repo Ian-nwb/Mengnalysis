@@ -85,7 +85,7 @@ export function HomeScreen({ go }: { go: Go }) {
     <Screen>
       <Stagger>
         <MascotSays mood={mood}>
-          <Txt v="h1">{greeting()}, Tori!</Txt>
+          <Txt v="h1">{greeting()}, {state.settings.name || 'Tori'}!</Txt>
           <Txt>{message}</Txt>
         </MascotSays>
 
@@ -170,15 +170,8 @@ export function HomeScreen({ go }: { go: Go }) {
           </Card>
         ) : null}
 
-        <BigButton
-          label="Meng's corner"
-          sub={`${state.pet.treats} treats · ${fullnessWord(state.pet.fullness)}`}
-          icon="fish"
-          onPress={() => go({ name: 'meng' })}
-        />
 
         <View style={{ gap: space.sm }}>
-          <BigButton label="Your path" sub={stage ? `Stage ${stage.n}: ${stage.title}` : 'All stages'} icon="map" onPress={() => go({ name: 'path' })} />
           <BigButton
             label="Bug Book"
             sub={bugCount ? `${bugCount} to squash` : 'Your mistakes land here, so nothing slips by'}
@@ -189,7 +182,6 @@ export function HomeScreen({ go }: { go: Go }) {
           {state.completed.includes('s4l2') ? (
             <BigButton label="SQL playground" sub="Write any query you like" icon="flask" onPress={() => go({ name: 'playground' })} />
           ) : null}
-          <BigButton label="Settings & help" icon="gear" onPress={() => go({ name: 'settings' })} />
         </View>
       </Stagger>
     </Screen>

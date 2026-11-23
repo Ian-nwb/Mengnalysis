@@ -89,6 +89,15 @@ export const GUIDES: { id: string; icon: IconName; title: string; body: string[]
     ],
   },
   {
+    id: 'library',
+    icon: 'book',
+    title: 'The Library',
+    body: [
+      'Lesson notes: every lesson you finish becomes a page you can re-read or listen to, with the answers to every check.',
+      'Glossary: every analyst term in the course, A to Z, in plain words. Search it or filter by stage.',
+    ],
+  },
+  {
     id: 'backup',
     icon: 'shield',
     title: 'Backups',

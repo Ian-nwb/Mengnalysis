@@ -5,7 +5,7 @@ import { ChoiceQuestion, StepView } from '../components/questions';
 import { BigButton, Card, ProgressBar, Screen, TopBar, Txt } from '../components/ui';
 import { lessonById } from '../content';
 import { Step } from '../content/types';
-import { addCardBug, gradeCard, isQuestion, MAX_MISS_RATE, recordStat, resolveBug, ReviewItem, statLessonForCard, XP } from '../engine';
+import { addCardBug, gradeCard, isQuestion, missRate, recordStat, resolveBug, ReviewItem, statLessonForCard, XP } from '../engine';
 import { Finish, Go, ReviewMode } from '../nav';
 import { useApp } from '../state';
 import { space } from '../theme';
@@ -48,7 +48,7 @@ function Hint({ id }: { id: string }) {
 }
 
 export function LessonScreen({ id, xpSoFar, go, finish }: { id: string; xpSoFar: number; go: Go; finish: Finish }) {
-  const { setState } = useApp();
+  const { state, setState } = useApp();
   const lesson = lessonById(id)!;
   const steps = lesson.steps;
   const n = steps.length;
@@ -69,7 +69,7 @@ export function LessonScreen({ id, xpSoFar, go, finish }: { id: string; xpSoFar:
       scroll.toTop();
       return;
     }
-    if (qCount > 0 && missed.length / qCount > MAX_MISS_RATE) {
+    if (qCount > 0 && missed.length / qCount > missRate(state)) {
       setQueue(missed);
       setPhase('retryIntro');
       scroll.toTop();

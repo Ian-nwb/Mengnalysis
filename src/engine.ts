@@ -128,7 +128,8 @@ export function practiceCards(s: AppState, limit = 5): ReviewCard[] {
 /** New lessons per day. Keeps the course a long, steady habit instead of a binge. */
 export const DAILY_NEW_LIMIT = 2;
 export const newLessonsToday = (s: AppState) => (s.newToday.day === dayStr() ? s.newToday.count : 0);
-export const canStartNew = (s: AppState) => newLessonsToday(s) < DAILY_NEW_LIMIT;
+export const dailyLimit = (s: AppState) => s.settings.dailyGoal || DAILY_NEW_LIMIT;
+export const canStartNew = (s: AppState) => newLessonsToday(s) < dailyLimit(s);
 
 export const nextLesson = (s: AppState) => LESSONS.find((l) => !s.completed.includes(l.id)) ?? null;
 
@@ -144,6 +145,7 @@ export function shuffle<T>(arr: T[]): T[] {
 // ---------- Mastery ----------
 /** Share of questions she may miss and still pass a lesson. */
 export const MAX_MISS_RATE = 0.3;
+export const missRate = (s: AppState) => (s.settings.mastery === 'gentle' ? 0.45 : MAX_MISS_RATE);
 export const isQuestion = (st: Step) => st.kind !== 'explain' && st.kind !== 'reflect';
 
 // ---------- Bug Book ----------

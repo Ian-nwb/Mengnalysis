@@ -52,11 +52,14 @@ const PATHS = {
   box: 'M3 8l9-4 9 4v9l-9 4-9-4z M3 8l9 4 9-4 M12 12v9',
   heart: 'M12 20s-7-4.5-9-9c-1.3-3 1-6.5 4.5-6.5 2 0 3.5 1.5 4.5 3 1-1.5 2.5-3 4.5-3 3.5 0 5.8 3.5 4.5 6.5-2 4.5-9 9-9 9z',
   mouse: 'M4 15c0-4 3-7 7-7s7 3 7 7H4z M14 9.5a2.5 2.5 0 1 1 3-3 M18 15c2 0 3 1.5 3 3',
+  paw: 'M4.4 10.2a1.9 2.3 0 1 0 3.8 0a1.9 2.3 0 1 0 -3.8 0z M7.9 6.6a1.9 2.3 0 1 0 3.8 0a1.9 2.3 0 1 0 -3.8 0z M12.299999999999999 6.6a1.9 2.3 0 1 0 3.8 0a1.9 2.3 0 1 0 -3.8 0z M15.799999999999999 10.2a1.9 2.3 0 1 0 3.8 0a1.9 2.3 0 1 0 -3.8 0z M12 12.5c-3 0-5.2 2.6-5.2 4.8 0 1.6 1.5 2.6 3.1 2.1 1.4-.4 2.8-.4 4.2 0 1.6.5 3.1-.5 3.1-2.1 0-2.2-2.2-4.8-5.2-4.8z',
+  crown: 'M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z M5 19h14',
+  user: 'M12 12a4 4 0 1 0 0-8a4 4 0 1 0 0 8z M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5',
   database: 'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3z M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6 M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3',
 } as const;
 
 export type IconName = keyof typeof PATHS;
-const FILLED: IconName[] = ['play', 'stop', 'star', 'flame', 'sparkle', 'bolt'];
+const FILLED: IconName[] = ['play', 'stop', 'star', 'flame', 'sparkle', 'bolt', 'paw'];
 
 export function Icon({ name, size = 24, color, filled }: { name: IconName; size?: number; color: string; filled?: boolean }) {
   const fill = filled ?? FILLED.includes(name);

@@ -26,7 +26,9 @@ export type Route =
   | { name: 'sheet'; stage: number }
   | { name: 'tour' }
   | { name: 'guide'; id: string }
-  | { name: 'meng' };
+  | { name: 'meng' }
+  | { name: 'library' }
+  | { name: 'reader'; id: string };
 
 export type Go = (r: Route) => void;
 /** missed = lesson step indexes answered wrong on the first try. */

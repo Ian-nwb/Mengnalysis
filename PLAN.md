@@ -61,6 +61,63 @@ Today most practice is multiple choice. Real skill comes from doing.
 - Meng's corner: earn treats by learning, feed food and toys, pet Meng
 - Content checker: `npm run check` (Phase 3.7)
 
+## v4 (built 2026-11-23): Meng notifications, full settings, journey path, loading screen
+**Done:** A1–A5 (Meng-branded notes with her icon, 30+ messages, second reminder, streak saver, unlocked/Bug Book/comeback wording, tap-to-open, days off, test button), B (all sections except avatar picker & auto weekly backup & lesson-length), C1–C7 (winding trail, node types, states, stage banners, inline node card, jump-to-current, bottom tabs) except C8 milestone markers, D (loading screen + error screen). Plus a Library tab: lesson notes for every finished lesson + a 200-term glossary. Version 1.1.0.
+
+### Original v4 notes
+
+### A. Notifications from Meng
+Today: one daily reminder at a chosen time (4 presets), titled "Tori", with 7 rotating messages, scheduled 14 days ahead. It works, but it's generic.
+1. **Meng is the sender:** title "Meng 🐾", Meng's face as the notification icon (white silhouette for the status bar, color image in the notification), and a lavender accent color.
+2. **Messages in Meng's voice** (30+, rotating, never guilt-tripping): "Mrrp! Your daily dose is ready ☕", "I saved you a spot on the path 🐾", "Your streak is purring. One lesson keeps it warm 🔥", "My tummy says treat time… and lessons earn treats 🐟".
+3. **Smart reminders:**
+   - Skip today's reminder once the dose is done (already done)
+   - Evening "streak saver" (optional) if today isn't done by 8pm
+   - "Lesson unlocked" morning note after a day she hit the daily limit
+   - Celebration notes: streak milestones, new level, new stage unlocked, Bug Book items ready
+   - Weekly recap ping on Sunday
+   - Gentle comeback note after 2+ days away ("No pressure! I'll be here whenever you're ready")
+4. **Tap to open the right screen:** reminder → Today's dose; Bug Book note → Bug Book; Meng note → Meng's corner.
+5. **Quiet hours** and **days off** (e.g. no reminders on Sundays).
+
+### B. Settings like a real app
+Grouped sections, each a large card, with a search-free, scroll-friendly layout:
+- **Profile:** name shown in greetings (default Tori), Meng's name, avatar (pick a Meng pose)
+- **Learning:** daily goal (1, 2 or 3 new lessons), lesson length preference, auto-advance after correct answers (off by default), show hints automatically, retry threshold (gentle / standard)
+- **Notifications:** master on/off, custom time picker (any hour and minute), second reminder, streak saver, celebrations, weekly recap, quiet hours, days off, test notification button
+- **Sound & voice:** sound effects on/off + volume, Meng meows on/off, voice picker, reading speed, read lessons aloud automatically
+- **Display:** text size, theme (dark / light / follow phone), bolder outlines, animations (full / reduced / off), haptics on/off
+- **Data:** back up now, restore, automatic weekly backup, export my reflections (text file), reset Bug Book, reset all progress (double-confirm)
+- **Help & about:** replay tour, guides, what's new (changelog), app version, "Made for Tori 💜", send feedback
+
+### C. Journey path (Duolingo-style)
+Replace the list with a playful winding path, but keep it comfortable to read up close:
+1. **Winding trail:** big round lesson nodes (72dp+) that sway gently left and right along a single centered column (small offsets only, so there's no sideways panning), joined by a dotted trail.
+2. **Node types with distinct shapes and icons**, not just color: lesson (circle), practice/review (star), boss (crown, larger), cheat-sheet chest (treasure box), Meng's treat stop (fish bowl).
+3. **States:** done (filled lavender + check), current (pulsing ring + "START" bubble + Meng sitting next to it), unlocks tomorrow (moon), locked (padlock). Each has a text label.
+4. **Stage banners:** a colorful header card per stage (stage number, title, progress, "Cheat sheet" button), with a different illustration tint per stage.
+5. **Tap a node** → a bottom card (not a tiny popup) with the lesson title, minutes, accuracy so far and big Start / Replay buttons.
+6. **Jump to current** floating button. The path opens scrolled to her current lesson.
+7. **Path becomes the main tab:** bottom navigation with 4 big tabs: Path · Practice (Bug Book, focus, lite day) · Meng · Profile/Settings.
+8. **Milestone markers along the trail:** "Halfway through SQL!", level-up flags, streak trophies.
+9. Respect "Remove animations" (no pulse or sway), with every node reachable by TalkBack in order.
+
+### D. A proper loading screen
+Today the native splash shows Meng's face, then a blank plum screen while fonts and progress load.
+1. **Seamless splash → loader:** the native splash (Meng on plum) hands off to an in-app loading screen that looks identical, so there's no flash or jump.
+2. **Animated Meng:** Meng blinks, flicks her tail and pads in place (gentle, centered), with the "Tori" wordmark underneath in Nunito.
+3. **Progress feedback:** a lavender paw-print progress bar that fills while fonts, saved progress, sounds and the SQL sandbox warm up.
+4. **Rotating tips and fun facts** in big text ("Tip: tap Meng to say hi", "Fun fact: SQL was invented in the 1970s"), with Listen support.
+5. **Greeting by time of day** ("Good morning, Tori!") once loading finishes, then a soft fade into Home.
+6. **Smart timing:** shows at least ~0.8s (no flicker) and moves on as soon as everything is ready. Static version when "Remove animations" is on.
+7. **Friendly error state:** if loading ever fails, Meng says "Oops, let's try that again" with a big Retry button. Progress is never lost.
+
+### Suggested order
+1. A1–A4 (Meng notifications) + D (loading screen)
+2. C1–C6 (journey path) + C7 bottom tabs
+3. B (settings), built on top of the new tabs
+4. A5, C8, then polish
+
 ## Recommended order
 1. Phase 3 items 1–4 (test on her phone, signing key, OTA updates)
 2. Phase 4 items 1 & 6 (spreadsheet sandbox, adaptive review)

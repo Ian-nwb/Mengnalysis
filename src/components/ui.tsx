@@ -1,5 +1,4 @@
-import * as Haptics from 'expo-haptics';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Pressable, ScrollView, ScrollViewInstance, StyleProp, Text, TextStyle, View, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Line, Polyline, Text as SvgText } from 'react-native-svg';
@@ -7,6 +6,7 @@ import { Example } from '../content/types';
 import { appearStyle, popStyle, useAppear, useReducedMotion } from '../motion';
 import { useApp } from '../state';
 import { fonts, maxWidth, radius, space, type } from '../theme';
+import { buzz } from '../haptics';
 import { playSfx } from '../sfx';
 import { speak, stopSpeaking } from '../voice';
 import { Icon, IconName, isIconName } from './Icon';
@@ -52,23 +52,31 @@ export function Txt({
 }
 
 // ---------- Screen: one centered column, gentle entrance ----------
+/** True when the bottom tab bar is showing (it handles the bottom safe area itself). */
+export const TabsContext = createContext(false);
+
 export function Screen({
   children,
   scrollRef,
+  contentRef,
 }: {
   children: React.ReactNode;
   scrollRef?: React.RefObject<ScrollViewInstance | null>;
+  contentRef?: React.RefObject<React.ComponentRef<typeof View> | null>;
 }) {
   const { colors } = useApp();
+  const tabs = useContext(TabsContext);
   const v = useAppear(240);
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} edges={['top', 'bottom']}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} edges={tabs ? ['top'] : ['top', 'bottom']}>
       <ScrollView
         ref={scrollRef}
         contentContainerStyle={{ padding: 20, paddingBottom: 56, alignItems: 'center' }}
         keyboardShouldPersistTaps="handled"
       >
-        <Animated.View style={[{ width: '100%', maxWidth, gap: space.md }, appearStyle(v)]}>{children}</Animated.View>
+        <Animated.View ref={contentRef} style={[{ width: '100%', maxWidth, gap: space.md }, appearStyle(v)]}>
+          {children}
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -159,7 +167,7 @@ export function BigButton({
         style={({ pressed }) => ({
           minHeight: 62,
           borderRadius: radius,
-          borderWidth: state === 'normal' || state === 'dim' ? 2 : 4,
+          borderWidth: (state === 'normal' || state === 'dim' ? 2 : 4) + (app.settings.boldOutlines ? 1 : 0),
           borderColor: border,
           backgroundColor: pressed && !primary ? colors.surfaceHi : bg,
           paddingVertical: 14,
@@ -202,7 +210,8 @@ export function Card({
   style?: StyleProp<ViewStyle>;
   tone?: 'plain' | 'hero' | 'inset';
 }) {
-  const { colors } = useApp();
+  const { colors, state } = useApp();
+  const bold = state.settings.boldOutlines;
   const bg = tone === 'hero' ? colors.brandSoft : tone === 'inset' ? colors.surfaceHi : colors.surface;
   return (
     <View
@@ -212,8 +221,8 @@ export function Card({
           borderRadius: radius,
           padding: space.md,
           gap: space.sm,
-          borderWidth: tone === 'hero' ? 2 : 1,
-          borderColor: tone === 'hero' ? colors.brand : colors.border,
+          borderWidth: (tone === 'hero' ? 2 : 1) + (bold ? 1 : 0),
+          borderColor: tone === 'hero' ? colors.brand : bold ? colors.textMuted : colors.border,
           elevation: tone === 'inset' ? 0 : 2,
           shadowColor: '#000',
           shadowOpacity: tone === 'inset' ? 0 : 0.18,
@@ -329,9 +338,7 @@ export function Feedback({ correct, detail, onContinue }: { correct: boolean; de
   const [title] = useState(() => (correct ? PRAISE : NUDGE)[Math.floor(Math.random() * (correct ? PRAISE : NUDGE).length)]);
   useEffect(() => {
     playSfx(correct ? 'correct' : 'wrong');
-    Haptics.notificationAsync(
-      correct ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Warning,
-    ).catch(() => {});
+    buzz(correct ? 'success' : 'warning');
   }, [correct]);
   return (
     <Animated.View style={popStyle(v)}>

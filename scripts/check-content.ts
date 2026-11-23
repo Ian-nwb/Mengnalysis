@@ -6,6 +6,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { LESSONS, STAGES, lessonsInStage } from '../src/content';
 import { SHEETS } from '../src/content/cheatsheets';
+import { GLOSSARY } from '../src/content/glossary';
 import { DATASETS } from '../src/sql/datasets';
 import { evalFormula, formatValue, functionsIn, gridFrom } from '../src/sheet/formula';
 
@@ -64,7 +65,13 @@ for (const l of LESSONS) {
   });
 }
 
-console.log(`${LESSONS.length} lessons · ${STAGES.length} stages · ${sheetCount} formula steps · ${sqlCount} SQL steps`);
+const termNames = GLOSSARY.map((t) => t.term.toLowerCase());
+if (dup(termNames).length) problems.push(`duplicate glossary terms: ${dup(termNames)}`);
+GLOSSARY.forEach((t) => {
+  if (!STAGES.find((s) => s.n === t.stage)) problems.push(`glossary term ${t.term} has unknown stage ${t.stage}`);
+});
+
+console.log(`${GLOSSARY.length} glossary terms · ${LESSONS.length} lessons · ${STAGES.length} stages · ${sheetCount} formula steps · ${sqlCount} SQL steps`);
 for (const s of STAGES) console.log(`  ${s.n} ${s.title}: ${lessonsInStage(s.n).length}`);
 if (problems.length) {
   console.error(`\n${problems.length} problem(s):\n- ` + problems.join('\n- '));

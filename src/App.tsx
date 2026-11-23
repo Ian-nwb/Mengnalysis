@@ -1,16 +1,20 @@
 import { AtkinsonHyperlegible_400Regular, AtkinsonHyperlegible_700Bold } from '@expo-google-fonts/atkinson-hyperlegible';
 import { Nunito_800ExtraBold, useFonts } from '@expo-google-fonts/nunito';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useRef, useState } from 'react';
 import { BackHandler, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { SqlPlayground } from './components/sql';
-import { Screen, TopBar, Txt } from './components/ui';
+import { Tab, TabBar } from './components/TabBar';
+import { Screen, TabsContext, TopBar, Txt } from './components/ui';
 import { lessonById } from './content';
-import { addBugs, addLessonCards, addTreats, bossOf, dayStr, doneToday, levelFor, markDayDone, newLessonsToday, refreshFreezes, tickPet, XP } from './engine';
+import { addBugs, addLessonCards, addTreats, bossOf, dayStr, levelFor, markDayDone, newLessonsToday, refreshFreezes, tickPet, XP } from './engine';
 import { MengScreen } from './screens/Meng';
+import { LibraryScreen, ReaderScreen } from './screens/Library';
 import { Finish, Route } from './nav';
-import { scheduleReminders } from './reminders';
+import * as Notifications from 'expo-notifications';
+import { syncReminders } from './reminders';
 import { BugBookScreen } from './screens/BugBook';
 import { GuideScreen } from './screens/Guide';
 import { HomeScreen } from './screens/Home';
@@ -20,9 +24,15 @@ import { RewardScreen } from './screens/Reward';
 import { LessonScreen, ReviewScreen } from './screens/Session';
 import { SettingsScreen } from './screens/Settings';
 import { SheetScreen, VaultScreen } from './screens/Vault';
-import { AppProvider, useApp } from './state';
-import { setSfxEnabled } from './sfx';
-import { setVoiceSetting, stopSpeaking } from './voice';
+import { AppProvider, resolveTheme, useApp } from './state';
+import { setHapticsEnabled } from './haptics';
+import { setAnimationsEnabled } from './motion';
+import { preloadSfx, setMeowsEnabled, setSfxEnabled } from './sfx';
+import { runQuery } from './sql/db';
+import { ErrorBoundary, LoadingScreen } from './screens/Loading';
+import { englishVoices, setVoiceSetting, stopSpeaking } from './voice';
+
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 function Root() {
   const { state, ready, setState, colors } = useApp();
@@ -34,11 +44,35 @@ function Root() {
     if (!ready || booted.current) return;
     booted.current = true;
     setState((s) => tickPet(refreshFreezes(s)));
-    if (state.onboarded) scheduleReminders(state.settings.reminderHour, state.settings.reminderMinute, doneToday(state));
   }, [ready, state, setState]);
+
+  // Re-plan Meng's notes whenever notification settings change (and on launch).
+  const st = state.settings;
+  const notifKey = JSON.stringify([state.onboarded, st.notifications, st.reminderHour, st.reminderMinute, st.secondReminder, st.secondHour, st.streakSaver, st.daysOff, st.dailyGoal]);
+  useEffect(() => {
+    if (ready) syncReminders(state);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, notifKey]);
+
+  // Tapping one of Meng's notes opens the right screen.
+  useEffect(() => {
+    const open = (r: Notifications.NotificationResponse | null) => {
+      const screen = r?.notification.request.content.data?.screen;
+      if (screen === 'bugbook') go({ name: 'bugbook' });
+      else if (screen === 'meng') go({ name: 'meng' });
+      else if (screen) go({ name: 'home' });
+    };
+    Notifications.getLastNotificationResponseAsync().then(open).catch(() => {});
+    const sub = Notifications.addNotificationResponseReceivedListener(open);
+    return () => sub.remove();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => setVoiceSetting(state.settings.voiceId), [state.settings.voiceId]);
   useEffect(() => setSfxEnabled(state.settings.sounds), [state.settings.sounds]);
+  useEffect(() => setMeowsEnabled(state.settings.meows), [state.settings.meows]);
+  useEffect(() => setHapticsEnabled(state.settings.haptics), [state.settings.haptics]);
+  useEffect(() => setAnimationsEnabled(state.settings.animations), [state.settings.animations]);
 
   const go = (r: Route) => {
     stopSpeaking();
@@ -49,7 +83,7 @@ function Root() {
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       if (route.name === 'home' || !state.onboarded) return false;
-      go(route.name === 'sheet' ? { name: 'vault' } : route.name === 'guide' ? { name: 'settings' } : { name: 'home' });
+      go(route.name === 'sheet' ? { name: 'vault' } : route.name === 'guide' ? { name: 'settings' } : route.name === 'reader' ? { name: 'library' } : { name: 'home' });
       return true;
     });
     return () => sub.remove();
@@ -79,7 +113,7 @@ function Root() {
       (day.newDay && [7, 14, 30, 50, 100, 200, 365].includes(s.streak) ? 5 : 0);
     s = addTreats(s, treats);
     setState(() => s);
-    scheduleReminders(s.settings.reminderHour, s.settings.reminderMinute, true);
+    syncReminders(s);
     go({
       name: 'reward',
       xp: total,
@@ -127,6 +161,12 @@ function Root() {
       case 'guide':
         screen = <GuideScreen id={route.id} go={go} />;
         break;
+      case 'library':
+        screen = <LibraryScreen go={go} />;
+        break;
+      case 'reader':
+        screen = <ReaderScreen key={route.id} id={route.id} go={go} />;
+        break;
       case 'meng':
         screen = <MengScreen go={go} />;
         break;
@@ -146,22 +186,65 @@ function Root() {
         screen = <HomeScreen go={go} />;
     }
 
+  const tab: Tab | null =
+    state.onboarded && (route.name === 'home' || route.name === 'path' || route.name === 'library' || route.name === 'meng' || route.name === 'settings') ? route.name : null;
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      <StatusBar style={state.settings.theme === 'dark' ? 'light' : 'dark'} />
-      {screen}
+      <StatusBar style={resolveTheme(state.settings.theme) === 'dark' ? 'light' : 'dark'} />
+      <TabsContext.Provider value={!!tab}>
+        <View style={{ flex: 1 }}>{screen}</View>
+      </TabsContext.Provider>
+      {tab ? <TabBar active={tab} onTab={(t) => go({ name: t })} /> : null}
     </View>
+  );
+}
+
+/** Loading screen: waits for fonts, saved progress, sounds, voices and the SQL sandbox. */
+function Boot({ fontsReady }: { fontsReady: boolean }) {
+  const { state, ready } = useApp();
+  const [steps, setSteps] = useState({ sounds: false, voices: false, sql: false });
+  const [minDone, setMinDone] = useState(false);
+  const [forced, setForced] = useState(false);
+  const [show, setShow] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
+
+  useEffect(() => {
+    const mark = (k: keyof typeof steps) => setSteps((p) => ({ ...p, [k]: true }));
+    try {
+      preloadSfx();
+    } catch {}
+    mark('sounds');
+    englishVoices().finally(() => mark('voices'));
+    runQuery('SELECT 1').finally(() => mark('sql'));
+    const a = setTimeout(() => setMinDone(true), 900);
+    const b = setTimeout(() => setForced(true), 6000); // never get stuck on loading
+    return () => {
+      clearTimeout(a);
+      clearTimeout(b);
+    };
+  }, []);
+
+  const parts = [fontsReady, ready, steps.sounds, steps.voices, steps.sql];
+  const progress = parts.filter(Boolean).length / parts.length;
+  const done = fontsReady && ready && minDone && (progress === 1 || forced);
+
+  if (!show)
+    return <LoadingScreen progress={progress} done={done} name={ready ? state.settings.name || 'Tori' : 'Tori'} fontsReady={fontsReady} onFinish={() => setShow(true)} />;
+  return (
+    <ErrorBoundary onReset={() => setResetKey((k) => k + 1)}>
+      <Root key={resetKey} />
+    </ErrorBoundary>
   );
 }
 
 export default function App() {
   // If fonts fail to load, the app still works with system fonts.
   const [loaded, error] = useFonts({ Nunito_800ExtraBold, AtkinsonHyperlegible_400Regular, AtkinsonHyperlegible_700Bold });
-  if (!loaded && !error) return <View style={{ flex: 1, backgroundColor: '#1B1420' }} />;
   return (
     <SafeAreaProvider>
       <AppProvider>
-        <Root />
+        <Boot fontsReady={loaded || !!error} />
       </AppProvider>
     </SafeAreaProvider>
   );

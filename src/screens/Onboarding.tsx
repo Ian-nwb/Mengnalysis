@@ -5,16 +5,16 @@ import { MascotSays, MASCOT_NAME, Mood } from '../components/Mascot';
 import { ChoiceQuestion } from '../components/questions';
 import { BigButton, Card, ListenButton, ProgressBar, Screen, Txt } from '../components/ui';
 import { STAGES } from '../content';
-import { scheduleReminders } from '../reminders';
 import { useApp } from '../state';
 import { space } from '../theme';
 import { ReminderPicker, TextSizePicker } from './Settings';
 
 const TOUR: { icon: IconName; title: string; text: string }[] = [
+  { icon: 'home', title: 'Five tabs', text: 'At the bottom: Today (your daily dose), Path (your journey), Library (lesson notes and a glossary of every term), Meng (my corner) and Me (settings and help).' },
   { icon: 'coffee', title: "Today's dose", text: 'Each day: a quick warm-up, then one new lesson. About 5 minutes. Tap Start on Home.' },
   { icon: 'flame', title: 'Your streak', text: 'Come back every day to grow your flame. Miss one day? Your weekly streak freeze has your back.' },
   { icon: 'bolt', title: 'Lite days', text: 'Busy or tired? A 2-minute review still keeps your streak alive.' },
-  { icon: 'map', title: 'Your path', text: '14 stages, from your very first spreadsheet to landing the job. Tap any finished lesson to replay it.' },
+  { icon: 'map', title: 'Your path', text: 'A winding trail with practice stars, boss crowns and treasure chests. 14 stages, from your very first spreadsheet to landing the job. Tap any finished lesson to replay it.' },
   { icon: 'bug', title: 'Bug Book', text: "Mistakes aren't failures, they're bugs to squash! They come back a week later so they really stick." },
   { icon: 'sheet', title: 'Cheat sheets', text: "Beat a stage's boss level to unlock a one-page cheat sheet you can save as a PDF." },
   { icon: 'sheet', title: 'Real formulas', text: 'In spreadsheet lessons you type real formulas. Tap the buttons to build them, then press Check formula.' },
@@ -173,7 +173,6 @@ export function OnboardingScreen({ first = false, onDone }: { first?: boolean; o
       variant="primary"
       onPress={() => {
         if (first) {
-          scheduleReminders(state.settings.reminderHour, state.settings.reminderMinute, false);
           setState((s) => ({ ...s, onboarded: true }));
         }
         onDone();

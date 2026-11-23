@@ -4,10 +4,18 @@ import { AccessibilityInfo, Animated, Easing } from 'react-native';
 // All motion is short, happens on appear/tap only (never while reading),
 // and turns off when Android's "Remove animations" is on.
 
+let animationsOn = true;
+export function setAnimationsEnabled(v: boolean) {
+  animationsOn = v;
+}
+export const animationsEnabled = () => animationsOn;
+
 export function useReducedMotion() {
-  const [reduced, setReduced] = useState(false);
+  const [sysReduced, setReduced] = useState(false);
+  const reduced = sysReduced || !animationsOn;
   useEffect(() => {
     AccessibilityInfo.isReduceMotionEnabled().then(setReduced).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduced);
     return () => sub.remove();
   }, []);
