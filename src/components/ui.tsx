@@ -59,8 +59,10 @@ export function Screen({
   children,
   scrollRef,
   contentRef,
+  scrollEnabled = true,
 }: {
   children: React.ReactNode;
+  scrollEnabled?: boolean;
   scrollRef?: React.RefObject<ScrollViewInstance | null>;
   contentRef?: React.RefObject<React.ComponentRef<typeof View> | null>;
 }) {
@@ -71,6 +73,7 @@ export function Screen({
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} edges={tabs ? ['top'] : ['top', 'bottom']}>
       <ScrollView
         ref={scrollRef}
+        scrollEnabled={scrollEnabled}
         contentContainerStyle={{ padding: 20, paddingBottom: 56, alignItems: 'center' }}
         keyboardShouldPersistTaps="handled"
       >

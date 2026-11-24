@@ -33,7 +33,17 @@ export type Settings = {
 export type Bug = { lessonId: string; step: number; day: string; due: string; misses: number };
 
 /** Meng's corner: treats earned by learning, spent on food and toys. Never punishing. */
-export type Pet = { treats: number; fullness: number; happiness: number; day: string; fedTotal: number };
+export type Pet = {
+  treats: number;
+  fullness: number;
+  happiness: number;
+  day: string;
+  fedTotal: number;
+  /** food in Meng's pantry: item id → count */
+  inventory: Record<string, number>;
+  /** toys Meng owns (reusable) */
+  toys: string[];
+};
 
 export type AppState = {
   onboarded: boolean;
@@ -72,7 +82,7 @@ export const defaultState: AppState = {
   hintsSeen: [],
   reflections: {},
   stats: {},
-  pet: { treats: 3, fullness: 60, happiness: 60, day: '', fedTotal: 0 },
+  pet: { treats: 3, fullness: 60, happiness: 60, day: '', fedTotal: 0, inventory: { kibble: 2, fish: 1 }, toys: [] },
   settings: {
     theme: 'dark',
     name: 'Tori',
@@ -121,7 +131,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (!raw) return;
         try {
           const saved = JSON.parse(raw);
-          set({ ...defaultState, ...saved, settings: { ...defaultState.settings, ...saved.settings } });
+          set({ ...defaultState, ...saved, pet: { ...defaultState.pet, ...saved.pet }, settings: { ...defaultState.settings, ...saved.settings } });
         } catch {}
       })
       .catch(() => {})

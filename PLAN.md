@@ -122,6 +122,10 @@ Today the native splash shows Meng's face, then a blank plum screen while fonts 
 - Learn tab: lesson notes, 14 study guides, quick reference (5 groups), 200-term glossary, free resources
 - Background music: 3 original tracks (Cozy study, Rainy café, Sunny morning), volume, ducking during Listen
 
+## v1.3.0 (2026-11-24)
+- Meng's corner rebuilt as a virtual pet: rub to pet, drag-to-feed pantry, toy box, shop; new moods (purr, eat, love, hungry), blinking, breathing, hops, wiggles, floating hearts; purr/chomp/boing sounds
+- Rainy café music regenerated (warm brown-noise rain + soft drips instead of hiss); music generator kept in `scripts/make-music.py`
+
 ## Recommended order
 1. Phase 3 items 1–4 (test on her phone, signing key, OTA updates)
 2. Phase 4 items 1 & 6 (spreadsheet sandbox, adaptive review)

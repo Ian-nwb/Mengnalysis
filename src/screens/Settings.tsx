@@ -377,6 +377,9 @@ function DataCards() {
 }
 
 const WHATS_NEW = [
+  "Meng's corner is now a real little pet: rub her to pet her, drag snacks and toys onto her",
+  'Meng blinks, breathes, purrs, chews and shows hearts',
+  'Softer Rainy café music',
   'Notes from Meng, with smart reminders, a streak saver and days off',
   'A winding path with practice stars, boss crowns and cheat-sheet chests',
   'Bottom tabs: Today, Path, Library, Meng and Me',

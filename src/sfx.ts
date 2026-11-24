@@ -8,6 +8,9 @@ const SOURCES = {
   complete: require('../assets/sfx/complete.wav'),
   levelup: require('../assets/sfx/levelup.wav'),
   meow: require('../assets/sfx/meow.wav'),
+  purr: require('../assets/sfx/purr.wav'),
+  chomp: require('../assets/sfx/chomp.wav'),
+  boing: require('../assets/sfx/boing.wav'),
 };
 export type Sfx = keyof typeof SOURCES;
 
@@ -23,7 +26,7 @@ export function setSfxEnabled(v: boolean) {
 }
 
 export function playSfx(name: Sfx, delayMs = 0) {
-  if (!enabled || (name === 'meow' && !meows)) return;
+  if (!enabled || ((name === 'meow' || name === 'purr') && !meows)) return;
   const go = () => {
     try {
       const p = players[name] ?? (players[name] = createAudioPlayer(SOURCES[name]));

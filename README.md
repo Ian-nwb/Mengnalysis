@@ -41,7 +41,7 @@ Tori is an offline Android app built around one idea: **a small dose of data ski
 - Daily streaks with a weekly streak freeze, and **Lite days** (2-minute review) for busy days
 - Max two new lessons a day, so the journey stays a steady habit
 - XP and level titles (*Data Curious → Spreadsheet Sorcerer → … → Analyst*)
-- **Meng's corner:** earn treats by learning, then share food and toys with Meng
+- **Meng's corner:** a little virtual pet. Rub Meng to pet her, drag snacks and toys onto her, and watch her purr, blink, chew and show hearts. Treats come from learning
 - A game-style first launch, a replayable tour, help guides and one-time tips
 - Gentle animations, sound effects and haptics
 

@@ -67,7 +67,8 @@ export const GUIDES: { id: string; icon: IconName; title: string; body: string[]
     title: "Meng's corner",
     body: [
       'Lessons earn treats: +2 for a new lesson, +1 for a replay or review, +5 for a boss level, +3 for a level-up, and +5 at streak milestones.',
-      "Spend them on food and toys in Meng's corner. Petting Meng is always free. Meng gets a little peckish over time, but never sad. Visit whenever you like.",
+      'Buy snacks for the pantry and toys for the toy box in the shop. Then drag a snack or toy onto Meng, or tap it and then tap Meng.',
+      "Rub Meng with your finger to pet her (a tap works too). She purrs, blinks and shows hearts. She gets a little peckish over time, but never sad.",
     ],
   },
   {

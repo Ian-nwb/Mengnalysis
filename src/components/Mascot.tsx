@@ -11,7 +11,7 @@ import { BRAND, space } from '../theme';
 // clearly at any zoom level.
 export const MASCOT_NAME = 'Meng';
 
-export type Mood = 'happy' | 'wave' | 'think' | 'cheer' | 'sleep' | 'encourage';
+export type Mood = 'happy' | 'wave' | 'think' | 'cheer' | 'sleep' | 'encourage' | 'purr' | 'eat' | 'love' | 'hungry';
 
 const PLUM = '#1B1420';
 const WHITE = '#FFFDF9';
@@ -20,17 +20,33 @@ const BLACK = '#2B2230';
 const PINK = '#F5A9C0';
 const GOLD = '#D9B44A';
 
-export function Mascot({ mood = 'happy', size = 140 }: { mood?: Mood; size?: number }) {
+export function Mascot({
+  mood = 'happy',
+  size = 140,
+  blink = false,
+  chewOpen = false,
+  tapToMeow = true,
+}: {
+  mood?: Mood;
+  size?: number;
+  /** eyes briefly closed (idle blinking) */
+  blink?: boolean;
+  /** mouth open while chewing */
+  chewOpen?: boolean;
+  tapToMeow?: boolean;
+}) {
   const raw = useId().replace(/[^a-zA-Z0-9]/g, '');
   const clip = `head${raw}`;
   const v = useAppear(380);
-  const closed = mood === 'cheer';
+  const closed = mood === 'cheer' || mood === 'purr' || mood === 'eat' || blink;
   const sleeping = mood === 'sleep';
-  const eyeY = mood === 'think' ? 90 : 94;
+  const eyeY = mood === 'think' ? 90 : mood === 'hungry' ? 97 : 94;
+  const heart = (cx: number, cy: number, k = 1) =>
+    `M${cx} ${cy + 7 * k} c-7 -5 -11 -9 -11 -14 c0 -5 6 -8 11 -3 c5 -5 11 -2 11 3 c0 5 -4 9 -11 14 z`;
 
   return (
     <Animated.View style={popStyle(v)}>
-      <Pressable onPress={() => playSfx('meow')} accessibilityRole="imagebutton" accessibilityLabel={`${MASCOT_NAME} the cat. Tap to say hi.`}>
+      <Pressable disabled={!tapToMeow} onPress={() => playSfx('meow')} accessibilityRole="imagebutton" accessibilityLabel={`${MASCOT_NAME} the cat. Tap to say hi.`}>
       <Svg width={size} height={size} viewBox="0 0 200 200">
         <Defs>
           <ClipPath id={clip}>
@@ -71,7 +87,12 @@ export function Mascot({ mood = 'happy', size = 140 }: { mood?: Mood; size?: num
         <Ellipse cx={136} cy={112} rx={9} ry={5} fill={BRAND} opacity={0.7} />
 
         {/* eyes: golden, like hers */}
-        {closed ? (
+        {mood === 'love' && !blink ? (
+          <>
+            <Path d={heart(78, 92)} fill="#E0457B" stroke={PLUM} strokeWidth={2.5} />
+            <Path d={heart(122, 92)} fill="#E0457B" stroke={PLUM} strokeWidth={2.5} />
+          </>
+        ) : closed ? (
           <>
             <Path d="M68 98 q10 -12 20 0" stroke={PLUM} strokeWidth={5} fill="none" strokeLinecap="round" />
             <Path d="M112 98 q10 -12 20 0" stroke={PLUM} strokeWidth={5} fill="none" strokeLinecap="round" />
@@ -94,7 +115,18 @@ export function Mascot({ mood = 'happy', size = 140 }: { mood?: Mood; size?: num
 
         {/* nose + mouth */}
         <Polygon points="94,108 106,108 100,115" fill={PINK} stroke={PLUM} strokeWidth={2.5} strokeLinejoin="round" />
-        {mood === 'cheer' ? (
+        {mood === 'eat' ? (
+          chewOpen ? (
+            <Ellipse cx={100} cy={123} rx={9} ry={7} fill="#B4466A" stroke={PLUM} strokeWidth={3} />
+          ) : (
+            <Path d="M90 119 q5 5 10 0 q5 5 10 0" stroke={PLUM} strokeWidth={3.5} fill="none" strokeLinecap="round" />
+          )
+        ) : mood === 'hungry' ? (
+          <>
+            <Path d="M90 117 q5 6 10 0 q5 6 10 0" stroke={PLUM} strokeWidth={3} fill="none" strokeLinecap="round" />
+            <Path d="M97 121 q3 9 6 0 z" fill="#F07A9A" stroke={PLUM} strokeWidth={2} />
+          </>
+        ) : mood === 'cheer' || mood === 'love' ? (
           <Path d="M88 118 q12 18 24 0 z" fill="#B4466A" stroke={PLUM} strokeWidth={3} strokeLinejoin="round" />
         ) : mood === 'think' ? (
           <Ellipse cx={100} cy={122} rx={4} ry={4} fill="none" stroke={PLUM} strokeWidth={3} />
@@ -152,6 +184,19 @@ export function Mascot({ mood = 'happy', size = 140 }: { mood?: Mood; size?: num
           <>
             <SvgText x={150} y={40} fontSize={26} fontWeight="900" fill={BRAND} stroke={PLUM} strokeWidth={1.5}>z</SvgText>
             <SvgText x={168} y={22} fontSize={34} fontWeight="900" fill={BRAND} stroke={PLUM} strokeWidth={1.5}>Z</SvgText>
+          </>
+        ) : null}
+        {mood === 'purr' ? (
+          <>
+            <Ellipse cx={64} cy={112} rx={12} ry={7} fill="#F07A9A" opacity={0.55} />
+            <Ellipse cx={136} cy={112} rx={12} ry={7} fill="#F07A9A" opacity={0.55} />
+            <SvgText x={150} y={44} fontSize={22} fontWeight="900" fill={BRAND} stroke={PLUM} strokeWidth={1.2}>prr</SvgText>
+          </>
+        ) : null}
+        {mood === 'love' ? (
+          <>
+            <Path d={heart(28, 40, 0.9)} fill="#E0457B" stroke={PLUM} strokeWidth={2} />
+            <Path d={heart(172, 30, 0.8)} fill="#E0457B" stroke={PLUM} strokeWidth={2} />
           </>
         ) : null}
         {mood === 'encourage' ? (
