@@ -6,7 +6,7 @@
 
 <p align="center">
   A daily habit app that takes you from <b>zero to job-ready data analyst</b>, a few minutes at a time,<br/>
-  guided by <b>Meng</b>, a calico cat with a love for clean data and tuna.
+  guided by <b>Meng</b>, a calico cat with a love for clean data and Trisha.
 </p>
 
 <p align="center">
