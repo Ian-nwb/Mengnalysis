@@ -39,7 +39,7 @@ function GuideList({ go }: { go: Go }) {
           <BigButton
             key={g.stage}
             label={g.title}
-            sub={`Stage ${g.stage} · ${st?.title}${reached ? '' : ' · a sneak peek'}`}
+            sub={`Stage ${g.stage}: ${st?.title}${reached ? '' : ' (a sneak peek)'}`}
             icon="bulb"
             onPress={() => go({ name: 'study', stage: g.stage })}
           />
@@ -120,7 +120,7 @@ export function StudyScreen({ stage, go }: { stage: number; go: Go }) {
     <Screen>
       <TopBar onBack={() => go({ name: 'library' })} backLabel="Learn" />
       <Card tone="hero">
-        <Kicker icon="bulb">Study guide · Stage {stage} · {st?.title}</Kicker>
+        <Kicker icon="bulb">Study guide for stage {stage}: {st?.title}</Kicker>
         <Txt v="h1">{g.title}</Txt>
         <Txt>{g.intro}</Txt>
       </Card>
@@ -395,7 +395,7 @@ export function LibraryScreen({ go }: { go: Go }) {
                 </Txt>
               ) : null}
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-                <Txt v="small" color={colors.textMuted}>Stage {t.stage} · {STAGES.find((s) => s.n === t.stage)?.title}</Txt>
+                <Txt v="small" color={colors.textMuted}>Stage {t.stage}: {STAGES.find((s) => s.n === t.stage)?.title}</Txt>
               </View>
               <ListenButton text={`${t.term}. ${t.def}${t.example ? ` For example: ${t.example}` : ''}`} />
             </Card>
@@ -456,7 +456,7 @@ export function ReaderScreen({ id, go }: { id: string; go: Go }) {
     <Screen>
       <TopBar onBack={() => go({ name: 'library' })} backLabel="Library" />
       <Card tone="hero">
-        <Kicker icon="book">Stage {l.stage} · {stage?.title}</Kicker>
+        <Kicker icon="book">Stage {l.stage}: {stage?.title}</Kicker>
         <Txt v="h1">{l.title}</Txt>
       </Card>
       <ListenButton text={all} />

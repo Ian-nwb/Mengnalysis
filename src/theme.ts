@@ -13,6 +13,7 @@ export type Palette = {
   bad: string;
   border: string;
   brandSoft: string; // tinted hero backgrounds
+  warm: string; // apricot from the cats' fur: treats and streaks only
 };
 
 // Signature color: #E5A2F2 (her favorite lavender-pink).
@@ -33,6 +34,7 @@ export const palettes: Record<ThemeName, Palette> = {
     bad: '#FFAB9C',
     border: '#7A6584',
     brandSoft: '#3A2646',
+    warm: '#F6AE68',
   },
   light: {
     bg: '#FFF8FE',
@@ -47,6 +49,7 @@ export const palettes: Record<ThemeName, Palette> = {
     bad: '#A3271A',
     border: '#A58BAE',
     brandSoft: '#F6E3FA',
+    warm: '#6E370A',
   },
 };
 
@@ -61,6 +64,8 @@ export const type = {
 
 export const space = { xs: 6, sm: 12, md: 18, lg: 26, xl: 36 };
 export const radius = 22;
+/** Corner radius follows importance: the hero card is the roundest, chips the tightest. */
+export const radii = { hero: 32, card: 22, chip: 16 };
 export const maxWidth = 560;
 export const TEXT_SCALES = [1, 1.15, 1.3, 1.5, 1.75];
 

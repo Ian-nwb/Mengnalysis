@@ -29,7 +29,7 @@ function Section({ icon, title, children }: { icon: IconName; title: string; chi
   return (
     <View style={{ gap: space.sm, marginTop: space.sm }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, borderBottomWidth: 2, borderBottomColor: colors.brand, paddingBottom: 6 }}>
-        <Kicker icon={icon}>{title.toUpperCase()}</Kicker>
+        <Kicker icon={icon}>{title}</Kicker>
       </View>
       {children}
     </View>
@@ -213,7 +213,7 @@ function VoicePicker() {
         <BigButton
           key={v.identifier}
           label={`Voice ${i + 1}${isMale(v) ? ' (male)' : ''}`}
-          sub={`${v.language}${v.identifier.includes('network') ? ' · needs internet' : ''}`}
+          sub={`${v.language}${v.identifier.includes('network') ? ' (needs internet)' : ''}`}
           icon={cur === v.identifier ? 'check' : undefined}
           state={cur === v.identifier ? 'selected' : 'normal'}
           onPress={() => pick(v.identifier)}
@@ -225,6 +225,9 @@ function VoicePicker() {
 }
 
 const WHATS_NEW = [
+  'A cozier look: your cat peeks over Today\'s dose, warm apricot for treats and streaks, calmer labels',
+  'Tori 2.0: all the cats got a cuter makeover, with big shiny eyes, blushing cheeks, toe-bean paws and soft shading',
+  'A matching new app icon and splash screen',
   'A new app icon: all five cats together',
   'Cats: tap the paw in the cat corner to unlock Tuxedo, Orangina, Whitey and Dost as you learn, and pick who keeps you company',
   'A fresh Today screen: your daily dose up top, quick stats, and colorful practice tiles',
@@ -438,31 +441,31 @@ export function SettingsScreen({ go }: { go: Go }) {
     <Screen>
       <ProfileHeader onEdit={() => setPanel('name')} />
 
-      <GroupTitle>YOUR CAT</GroupTitle>
+      <GroupTitle>Your cat</GroupTitle>
       <RowGroup>
-        <NavRow icon="paw" title="Cats" value={`${currentCat(state).name} · ${unlockedCats(state).length} of ${CATS.length} unlocked`} onPress={() => go({ name: 'cats' })} />
+        <NavRow icon="paw" title="Cats" value={`${currentCat(state).name}, ${unlockedCats(state).length} of ${CATS.length} unlocked`} onPress={() => go({ name: 'cats' })} />
       </RowGroup>
 
-      <GroupTitle>LEARNING</GroupTitle>
+      <GroupTitle>Learning</GroupTitle>
       <RowGroup>
         <NavRow icon="star" title="Daily goal" value={`${st.dailyGoal} new ${st.dailyGoal === 1 ? 'lesson' : 'lessons'} a day`} onPress={() => setPanel('goal')} />
         <NavRow icon="refresh" title="Practice before moving on" value={st.mastery === 'gentle' ? 'Gentle' : 'Standard'} onPress={() => setPanel('mastery')} />
       </RowGroup>
 
-      <GroupTitle>NOTIFICATIONS</GroupTitle>
+      <GroupTitle>Notifications</GroupTitle>
       <RowGroup>
         <ToggleRow title="Notes from Meng" sub="Daily reminders in her voice" value={st.notifications} onChange={(v) => set('notifications', v)} />
         {st.notifications ? (
           <NavRow
             icon="bell"
             title="Reminder times and days off"
-            value={`${fmtTime(st.reminderHour, st.reminderMinute)}${st.secondReminder ? ` and ${fmtTime(st.secondHour, 0)}` : ''}${st.daysOff.length ? ` · ${st.daysOff.length} ${st.daysOff.length === 1 ? 'day' : 'days'} off` : ''}`}
+            value={`${fmtTime(st.reminderHour, st.reminderMinute)}${st.secondReminder ? ` and ${fmtTime(st.secondHour, 0)}` : ''}${st.daysOff.length ? `, ${st.daysOff.length} ${st.daysOff.length === 1 ? 'day' : 'days'} off` : ''}`}
             onPress={() => setPanel('reminders')}
           />
         ) : null}
       </RowGroup>
 
-      <GroupTitle>MUSIC AND SOUND</GroupTitle>
+      <GroupTitle>Music and sound</GroupTitle>
       <RowGroup>
         <ToggleRow title="Background music" sub={st.music ? `Playing: ${track}` : 'Off'} value={st.music} onChange={(v) => set('music', v)} />
         <NavRow icon="music" title="Track" value={track} onPress={() => setPanel('track')} />
@@ -472,14 +475,14 @@ export function SettingsScreen({ go }: { go: Go }) {
         <ToggleRow title="Vibration" value={st.haptics} onChange={(v) => set('haptics', v)} />
       </RowGroup>
 
-      <GroupTitle>READING AND VOICE</GroupTitle>
+      <GroupTitle>Reading and voice</GroupTitle>
       <RowGroup>
         <NavRow icon="speaker" title="Voice" value={st.voiceId === 'auto' ? 'Automatic (male when available)' : 'Chosen voice'} onPress={() => setPanel('voice')} />
         <NavRow icon="clock" title="Reading speed" value={speedName} onPress={() => setPanel('speed')} />
         <ToggleRow title="Read lessons aloud automatically" value={st.autoRead} onChange={(v) => set('autoRead', v)} />
       </RowGroup>
 
-      <GroupTitle>DISPLAY</GroupTitle>
+      <GroupTitle>Display</GroupTitle>
       <RowGroup>
         <NavRow icon="text" title="Text size" value={`Size ${sizeIdx + 1} of ${TEXT_SCALES.length}`} onPress={() => setPanel('text')} />
         <NavRow icon="palette" title="Theme" value={themeName} onPress={() => setPanel('theme')} />
@@ -487,7 +490,7 @@ export function SettingsScreen({ go }: { go: Go }) {
         <ToggleRow title="Animations" value={st.animations} onChange={(v) => set('animations', v)} />
       </RowGroup>
 
-      <GroupTitle>YOUR DATA</GroupTitle>
+      <GroupTitle>Your data</GroupTitle>
       <RowGroup>
         <NavRow icon="shield" title="Back up or restore" value="Save a code to Drive or email" onPress={() => setPanel('backup')} />
         <NavRow icon="sheet" title="Export my summaries" value="Your boss-level answers" onPress={exportReflections} />
@@ -495,7 +498,7 @@ export function SettingsScreen({ go }: { go: Go }) {
         <NavRow icon="refresh" title="Reset all progress" value="Asks twice first" danger onPress={resetAll} />
       </RowGroup>
 
-      <GroupTitle>HELP AND ABOUT</GroupTitle>
+      <GroupTitle>Help and about</GroupTitle>
       <RowGroup>
         <NavRow icon="play" title="Replay the tour" value="Meng shows you around again" onPress={() => go({ name: 'tour' })} />
         <NavRow icon="help" title="How-to guides" value={`${GUIDES.length} topics`} onPress={() => setPanel('guides')} />
@@ -503,7 +506,7 @@ export function SettingsScreen({ go }: { go: Go }) {
       </RowGroup>
 
       <View style={{ alignItems: 'center', gap: 2, paddingVertical: space.md }}>
-        <Txt bold center>Tori · version {version}</Txt>
+        <Txt bold center>Tori, version {version}</Txt>
         <Txt v="small" center color={colors.textMuted}>Made with love for Tori 💜🐾</Txt>
         <Txt v="small" center color={colors.textMuted}>Works offline. Your progress stays on this phone.</Txt>
       </View>

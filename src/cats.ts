@@ -7,6 +7,7 @@ export type CatId = 'meng' | 'tuxedo' | 'orangina' | 'whitey' | 'dost';
 
 export type CatLook = {
   fur: string; // head + body base
+  shade: string; // soft shading at the edges
   earL: string; // her right ear (viewer's left)
   earR: string;
   innerEar: string;
@@ -22,9 +23,9 @@ export type CatLook = {
   whisker: string;
 };
 
-const PLUM = '#1B1420';
+const PLUM = '#4A3550'; // soft plum outline
 const WHITE = '#FFFDF9';
-const ORANGE = '#F2A65A';
+const ORANGE = '#F6AE68';
 const BLACK = '#2B2230';
 const DARK = '#26212B';
 const PINK = '#F5A9C0';
@@ -41,35 +42,35 @@ export const CATS: Cat[] = [
     name: 'Meng',
     blurb: 'The original calico: white blaze, black forehead spot, golden eyes.',
     unlock: null,
-    look: { fur: WHITE, earL: BLACK, earR: ORANGE, innerEar: WHITE, tail: BLACK, feet: WHITE, patches: 'calico', collar: '#E5A2F2', iris: '#D9B44A', nose: PINK, line: PLUM, ink: PLUM, lid: PLUM, whisker: PLUM },
+    look: { fur: WHITE, shade: '#EADFEA', earL: BLACK, earR: ORANGE, innerEar: PINK, tail: BLACK, feet: WHITE, patches: 'calico', collar: '#E5A2F2', iris: '#D9B44A', nose: '#F58BA8', line: PLUM, ink: PLUM, lid: PLUM, whisker: PLUM },
   },
   {
     id: 'tuxedo',
     name: 'Tuxedo',
     blurb: 'A dapper tuxedo cat with white mittens and a blue collar.',
     unlock: { label: 'Finish 10 lessons', progress: (s) => [lessonsDone(s), 10] },
-    look: { fur: DARK, earL: DARK, earR: DARK, innerEar: PINK, tail: DARK, feet: WHITE, patches: 'tuxedo', collar: '#4A90E2', iris: '#B8D86A', nose: PINK, line: '#8C7F99', ink: PLUM, lid: SOFT, whisker: SOFT },
+    look: { fur: DARK, shade: '#1E1922', earL: DARK, earR: DARK, innerEar: '#6B4A5E', tail: DARK, feet: WHITE, patches: 'tuxedo', collar: '#4A90E2', iris: '#B8D86A', nose: '#F58BA8', line: '#8C7F99', ink: PLUM, lid: SOFT, whisker: SOFT },
   },
   {
     id: 'orangina',
     name: 'Orangina',
     blurb: 'A sunny orange cat with a white mouth and white shoulder. No collar, free spirit.',
     unlock: { label: 'Reach a 7-day streak', progress: (s) => [s.bestStreak, 7] },
-    look: { fur: ORANGE, earL: ORANGE, earR: ORANGE, innerEar: PINK, tail: ORANGE, feet: ORANGE, patches: 'orange', collar: null, iris: '#8FCB5A', nose: PINK, line: PLUM, ink: PLUM, lid: PLUM, whisker: PLUM },
+    look: { fur: ORANGE, shade: '#E4924C', earL: ORANGE, earR: ORANGE, innerEar: PINK, tail: ORANGE, feet: ORANGE, patches: 'orange', collar: null, iris: '#8FCB5A', nose: '#F58BA8', line: PLUM, ink: PLUM, lid: PLUM, whisker: PLUM },
   },
   {
     id: 'whitey',
     name: 'Whitey',
     blurb: 'A fluffy white cat with blue eyes and a yellow collar.',
     unlock: { label: 'Beat 2 boss levels', progress: (s) => [bossesBeaten(s), 2] },
-    look: { fur: WHITE, earL: WHITE, earR: WHITE, innerEar: PINK, tail: WHITE, feet: WHITE, patches: 'none', collar: '#F6CF3E', iris: '#7FB7FF', nose: PINK, line: PLUM, ink: PLUM, lid: PLUM, whisker: PLUM },
+    look: { fur: WHITE, shade: '#E6E0EE', earL: WHITE, earR: WHITE, innerEar: PINK, tail: WHITE, feet: WHITE, patches: 'none', collar: '#F6CF3E', iris: '#7FB7FF', nose: '#F58BA8', line: PLUM, ink: PLUM, lid: PLUM, whisker: PLUM },
   },
   {
     id: 'dost',
     name: 'Dost',
     blurb: 'A sleek black cat with glowing golden eyes.',
     unlock: { label: 'Finish 30 lessons', progress: (s) => [lessonsDone(s), 30] },
-    look: { fur: DARK, earL: DARK, earR: DARK, innerEar: '#6E4A5C', tail: DARK, feet: DARK, patches: 'none', collar: null, iris: '#F2D14B', nose: '#9A6276', line: '#8C7F99', ink: SOFT, lid: SOFT, whisker: SOFT },
+    look: { fur: DARK, shade: '#1E1922', earL: DARK, earR: DARK, innerEar: '#6B4A5E', tail: DARK, feet: DARK, patches: 'none', collar: null, iris: '#F2D14B', nose: '#F58BA8', line: '#8C7F99', ink: SOFT, lid: SOFT, whisker: SOFT },
   },
 ];
 

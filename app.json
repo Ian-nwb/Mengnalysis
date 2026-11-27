@@ -2,7 +2,7 @@
   "expo": {
     "name": "Tori",
     "slug": "tori",
-    "version": "1.7.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -16,7 +16,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "versionCode": 8
+      "versionCode": 9
     },
     "plugins": [
       [

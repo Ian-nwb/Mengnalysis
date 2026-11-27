@@ -5,7 +5,7 @@ import Svg, { Circle, Line, Polyline, Text as SvgText } from 'react-native-svg';
 import { Example } from '../content/types';
 import { appearStyle, popStyle, useAppear, useReducedMotion } from '../motion';
 import { useApp } from '../state';
-import { fonts, maxWidth, radius, space, type } from '../theme';
+import { fonts, maxWidth, radius, space, type, radii } from '../theme';
 import { buzz } from '../haptics';
 import { playSfx } from '../sfx';
 import { speak, stopSpeaking } from '../voice';
@@ -221,8 +221,8 @@ export function Card({
       style={[
         {
           backgroundColor: bg,
-          borderRadius: radius,
-          padding: space.md,
+          borderRadius: tone === 'hero' ? radii.hero : radius,
+          padding: tone === 'hero' ? space.lg : space.md,
           gap: space.sm,
           borderWidth: (tone === 'hero' ? 2 : 1) + (bold ? 1 : 0),
           borderColor: tone === 'hero' ? colors.brand : bold ? colors.textMuted : colors.border,

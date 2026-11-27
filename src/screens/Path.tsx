@@ -183,7 +183,7 @@ export function PathScreen({ go }: { go: Go }) {
                   <View style={{ alignItems: 'center', marginBottom: 4 }}>
                     <Mascot mood={status === 'Unlocks tomorrow' ? 'sleep' : 'wave'} size={80} />
                     <View style={{ backgroundColor: colors.brand, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 4 }}>
-                      <Txt v="small" bold color={colors.onBrand}>{status === 'Unlocks tomorrow' ? 'TOMORROW' : 'START'}</Txt>
+                      <Txt v="small" bold color={colors.onBrand}>{status === 'Unlocks tomorrow' ? 'Tomorrow' : 'Start'}</Txt>
                     </View>
                   </View>
                 ) : null}
@@ -229,7 +229,7 @@ export function PathScreen({ go }: { go: Go }) {
                     <>
                       <Txt color={colors.textMuted}>
                         About {n.lesson.minutes} min
-                        {accuracy(state, n.lesson.id) !== null ? ` · ${Math.round((accuracy(state, n.lesson.id) ?? 0) * 100)}% right so far` : ''}
+                        {accuracy(state, n.lesson.id) !== null ? `, ${Math.round((accuracy(state, n.lesson.id) ?? 0) * 100)}% right so far` : ''}
                       </Txt>
                       {playable ? (
                         <BigButton
@@ -306,7 +306,7 @@ export function PathScreen({ go }: { go: Go }) {
                 <ProgressBar value={lessons.length ? done / lessons.length : 0} height={12} label={`${st.title} progress`} />
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                   <Txt v="small" bold color={colors.accent}>
-                    {done} of {lessons.length} · {isOpen ? 'Hide path' : 'Show path'}
+                    {done} of {lessons.length} done. {isOpen ? 'Hide path' : 'Show path'}
                   </Txt>
                   <Icon name={isOpen ? 'up' : 'down'} size={20} color={colors.accent} />
                 </View>

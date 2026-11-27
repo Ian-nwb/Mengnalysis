@@ -5,7 +5,10 @@ import { buzz } from '../haptics';
 import { useApp } from '../state';
 import { radius, space } from '../theme';
 import { Icon, IconName } from './Icon';
-import { Txt } from './ui';
+import { Card, Txt } from './ui';
+import { Mascot, Mood } from './Mascot';
+import Svg, { Ellipse, Path } from 'react-native-svg';
+import { currentCat } from '../cats';
 
 // Shared building blocks for list-style screens (Me & settings, Learn, Meng's home sheets).
 
@@ -47,11 +50,11 @@ export function Sheet({ visible, title, onClose, children }: { visible: boolean;
   );
 }
 
-/** Small uppercase heading above a group of rows. */
+/** Heading above a group of rows. */
 export function GroupTitle({ children }: { children: React.ReactNode }) {
   const { colors } = useApp();
   return (
-    <Txt v="small" bold color={colors.accent} style={{ letterSpacing: 1, marginTop: space.sm, marginLeft: 4 }}>
+    <Txt v="h2" style={{ marginTop: space.md, marginLeft: 4 }}>
       {children}
     </Txt>
   );
@@ -188,3 +191,35 @@ export function Tile({ icon, title, sub, tint, onPress }: { icon: IconName; titl
 
 /** Pastel tints for icons and tiles (dark icons on top keep strong contrast). */
 export const TINTS = { lavender: '#E5A2F2', peach: '#F7C08A', mint: '#A6E8BC', sky: '#A9D3FF', pink: '#F5B3C8', butter: '#F6E08F' };
+
+/**
+ * The hero card with your cat peeking over its top edge, paws resting on it.
+ * Used once (Today's dose) so it stays special.
+ */
+export function PeekCard({ mood = 'happy', size = 150, children }: { mood?: Mood; size?: number; children: React.ReactNode }) {
+  const { state } = useApp();
+  const look = currentCat(state).look;
+  const paw = size * 0.16;
+  return (
+    <View>
+      <View pointerEvents="box-none" style={{ alignItems: 'center', height: size * 0.76, overflow: 'hidden' }}>
+        <Mascot mood={mood} size={size} />
+      </View>
+      <Card tone="hero" style={{ marginTop: -size * 0.06 }}>
+        <View
+          pointerEvents="none"
+          importantForAccessibility="no-hide-descendants"
+          style={{ position: 'absolute', top: -paw * 0.55, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: size * 0.1 }}
+        >
+          {[0, 1].map((i) => (
+            <Svg key={i} width={paw} height={paw * 0.66} viewBox="0 0 30 20">
+              <Ellipse cx={15} cy={10} rx={13} ry={8.5} fill={look.feet} stroke={look.line} strokeWidth={2.5} />
+              <Path d="M11 5 v5 M19 5 v5" stroke={look.line} strokeWidth={1.8} strokeLinecap="round" />
+            </Svg>
+          ))}
+        </View>
+        {children}
+      </Card>
+    </View>
+  );
+}

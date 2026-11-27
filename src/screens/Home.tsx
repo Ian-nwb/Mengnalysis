@@ -1,8 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Icon, IconName } from '../components/Icon';
-import { GroupTitle, TINTS, Tile } from '../components/kit';
-import { Mascot } from '../components/Mascot';
+import { GroupTitle, PeekCard, TINTS, Tile } from '../components/kit';
 import { BigButton, Card, Kicker, ProgressBar, Screen, Stagger, Txt } from '../components/ui';
 import { LESSONS, lessonsInStage, STAGES } from '../content';
 import {
@@ -25,7 +24,7 @@ import {
 import { CATS, currentCat, unlockedCats } from '../cats';
 import { Go } from '../nav';
 import { useApp } from '../state';
-import { space } from '../theme';
+import { radii, space } from '../theme';
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -39,15 +38,15 @@ function greeting() {
   return 'Good evening';
 }
 
-function StatChip({ icon, value, label, children }: { icon: IconName; value: string; label: string; children?: React.ReactNode }) {
+function StatChip({ icon, value, label, children, warm }: { icon: IconName; value: string; label: string; children?: React.ReactNode; warm?: boolean }) {
   const { colors } = useApp();
   return (
     <View
       accessible
       accessibilityLabel={`${value} ${label}`}
-      style={{ flexGrow: 1, flexBasis: 100, backgroundColor: colors.surface, borderRadius: 18, borderWidth: 1, borderColor: colors.border, padding: space.sm, gap: 4, alignItems: 'center' }}
+      style={{ flexGrow: 1, flexBasis: 100, backgroundColor: colors.surface, borderRadius: radii.chip, borderWidth: 1, borderColor: colors.border, padding: space.sm, gap: 4, alignItems: 'center' }}
     >
-      <Icon name={icon} size={28} color={colors.brand} />
+      <Icon name={icon} size={28} color={warm ? colors.warm : colors.brand} />
       <Txt bold center>{value}</Txt>
       <Txt v="small" center color={colors.textMuted}>{label}</Txt>
       {children}
@@ -98,23 +97,18 @@ export function HomeScreen({ go }: { go: Go }) {
     <Screen>
       <Stagger>
         {/* greeting */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
-          <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-            <Txt v="small" bold color={colors.accent}>{dateLabel.toUpperCase()}</Txt>
-            <Txt v="h1">
-              {greeting()}, {state.settings.name || 'Tori'}!
-            </Txt>
-          </View>
-          <Mascot mood={mood} size={96} />
-        </View>
-        <View style={{ backgroundColor: colors.surface, borderRadius: 18, borderLeftWidth: 5, borderLeftColor: colors.brand, padding: space.md }}>
-          <Txt>{message}</Txt>
+        <View style={{ gap: 4 }}>
+          <Txt v="small" color={colors.textMuted}>{dateLabel}</Txt>
+          <Txt v="h1">
+            {greeting()}, {state.settings.name || 'Tori'}!
+          </Txt>
+          <Txt color={colors.textMuted}>{message}</Txt>
         </View>
 
         {/* today's dose */}
-        <Card tone="hero" style={{ gap: space.sm }}>
-          <Kicker icon={today ? 'check' : 'coffee'}>{today ? "TODAY'S DOSE: DONE" : "TODAY'S DOSE"}</Kicker>
-          {stage && !capped ? <Txt v="small" color={colors.textMuted}>Stage {stage.n} · {stage.title}</Txt> : null}
+        <PeekCard mood={mood}>
+          <Kicker icon={today ? 'check' : 'coffee'}>{today ? "Today's dose is done" : "Today's dose"}</Kicker>
+          {stage && !capped ? <Txt v="small" color={colors.textMuted}>Stage {stage.n}: {stage.title}</Txt> : null}
           <Txt v="h1">{capped || !next ? 'Practice round' : next.title}</Txt>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
             {capped ? (
@@ -141,22 +135,22 @@ export function HomeScreen({ go }: { go: Go }) {
             </>
           ) : null}
           <BigButton label={today ? (capped || !next ? 'Practice' : 'Keep going') : 'Start'} icon="play" variant="primary" onPress={start} />
-        </Card>
+        </PeekCard>
 
         {/* stats */}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
-          <StatChip icon="flame" value={`${streak}`} label="day streak" />
+          <StatChip icon="flame" value={`${streak}`} label="day streak" warm />
           <StatChip icon="star" value={`Level ${lvl.level}`} label={lvl.title}>
             <View style={{ alignSelf: 'stretch' }}>
               <ProgressBar value={progress} height={8} label="Level progress" />
             </View>
           </StatChip>
-          <StatChip icon="fish" value={`${state.pet.treats}`} label={`treats for ${currentCat(state).name}`} />
+          <StatChip warm icon="fish" value={`${state.pet.treats}`} label={`treats for ${currentCat(state).name}`} />
         </View>
 
         {/* this week */}
         <Card>
-          <Kicker icon="clock">THIS WEEK</Kicker>
+          <Kicker icon="clock">This week</Kicker>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'space-between' }}>
             {week.map((d, i) => {
               const done = state.daysDone.includes(d);
@@ -197,7 +191,7 @@ export function HomeScreen({ go }: { go: Go }) {
 
         {weak ? (
           <Card>
-            <Kicker icon="bulb">FOCUS TOPIC</Kicker>
+            <Kicker icon="bulb">Focus topic</Kicker>
             <Txt bold>{weak.title}</Txt>
             <Txt v="small" color={colors.textMuted}>This one's been a little tricky. A quick focus round makes it click!</Txt>
             <BigButton label="Practice this topic" icon="refresh" onPress={() => go({ name: 'review', items: focusItems(state, weak.id), then: null, mode: 'focus' })} />
@@ -205,7 +199,7 @@ export function HomeScreen({ go }: { go: Go }) {
         ) : null}
 
         {/* more ways to practice */}
-        <GroupTitle>MORE WAYS TO PLAY AND PRACTICE</GroupTitle>
+        <GroupTitle>More ways to play and practice</GroupTitle>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
           {!today && hasReviews ? (
             <Tile icon="bolt" title="Lite day" sub="2 minutes, streak stays safe" tint={TINTS.mint} onPress={() => go({ name: 'review', items: liteItems(state), then: null, mode: 'lite' })} />

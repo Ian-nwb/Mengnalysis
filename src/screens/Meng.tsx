@@ -1125,7 +1125,7 @@ export function MengScreen({ go }: { go: Go }) {
           <BigButton
             key={it.id}
             label={it.name}
-            sub={`${it.cost} ${it.cost === 1 ? 'treat' : 'treats'} · +${it.full} tummy · you have ${inventory[it.id] ?? 0}`}
+            sub={`${it.cost} ${it.cost === 1 ? 'treat' : 'treats'}, +${it.full} tummy. You have ${inventory[it.id] ?? 0}`}
             icon={it.icon}
             state={pet.treats < it.cost ? 'dim' : 'normal'}
             disabled={pet.treats < it.cost}
@@ -1139,7 +1139,7 @@ export function MengScreen({ go }: { go: Go }) {
             <BigButton
               key={it.id}
               label={owned ? `${it.name} ✓` : it.name}
-              sub={owned ? 'Already in the toy box' : `${it.cost} treats · +${it.happy} happiness each play`}
+              sub={owned ? 'Already in the toy box' : `${it.cost} treats, +${it.happy} happiness each play`}
               icon={it.icon}
               state={owned || pet.treats < it.cost ? 'dim' : 'normal'}
               disabled={owned || pet.treats < it.cost}
@@ -1155,7 +1155,7 @@ export function MengScreen({ go }: { go: Go }) {
             <BigButton
               key={it.id}
               label={it.name}
-              sub={it.kind === 'food' ? `${inventory[it.id]} left · +${it.full} tummy` : `+${it.happy} happiness`}
+              sub={it.kind === 'food' ? `${inventory[it.id]} left, +${it.full} tummy` : `+${it.happy} happiness`}
               icon={it.icon}
               state={cur?.id === it.id ? 'selected' : 'normal'}
               onPress={() => {

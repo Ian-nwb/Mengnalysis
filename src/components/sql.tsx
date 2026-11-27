@@ -52,7 +52,7 @@ export function ResultsView({ rows }: { rows: Row[] }) {
   return (
     <Card style={{ backgroundColor: colors.surfaceHi }}>
       <Txt bold color={colors.accent}>
-        {rows.length} {rows.length === 1 ? 'row' : 'rows'}{rows.length > 1 ? ` · showing row ${i + 1}` : ''}
+        {rows.length} {rows.length === 1 ? 'row' : 'rows'}{rows.length > 1 ? `, showing row ${i + 1}` : ''}
       </Txt>
       {Object.entries(row).map(([k, v]) => (
         <View key={k} accessible accessibilityLabel={`${k}: ${v}`}>

@@ -26,7 +26,7 @@ export function VaultScreen({ go }: { go: Go }) {
           <BigButton
             key={sh.stage}
             label={sh.title}
-            sub={open ? `Stage ${sh.stage} · tap to open` : `Locked · beat "${bossOf(sh.stage)?.title ?? 'the boss level'}"`}
+            sub={open ? `Stage ${sh.stage}, tap to open` : `Locked: beat "${bossOf(sh.stage)?.title ?? 'the boss level'}" to open`}
             icon={open ? 'sheet' : 'lock'}
             state={open ? 'normal' : 'dim'}
             disabled={!open}

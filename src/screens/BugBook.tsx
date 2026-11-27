@@ -90,7 +90,7 @@ export function BugBookScreen({ go }: { go: Go }) {
             </View>
             <Txt v="small" color={colors.textMuted}>
               {days > 0 ? `Comes back in ${days} ${days === 1 ? 'day' : 'days'}` : 'Comes back in your next warm-up'}
-              {bug && bug.misses > 1 ? ` · tricky one (${bug.misses} slips)` : ''}
+              {bug && bug.misses > 1 ? `, a tricky one (${bug.misses} slips)` : ''}
             </Txt>
           </Card>
         );

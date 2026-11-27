@@ -111,7 +111,7 @@ export function LessonScreen({ id, xpSoFar, go, finish }: { id: string; xpSoFar:
     <Screen scrollRef={scroll.ref}>
       <TopBar
         onBack={() => go({ name: 'home' })}
-        right={phase === 'retry' ? `Practice · ${queue.length} left` : `Step ${i + 1} of ${n}`}
+        right={phase === 'retry' ? `Practice, ${queue.length} left` : `Step ${i + 1} of ${n}`}
       />
       <ProgressBar value={phase === 'retry' ? 1 - queue.length / Math.max(1, missed.length + 1) : i / n} label="Lesson progress" />
       <Txt v="small" bold color={undefined}>{lesson.title}</Txt>
