@@ -225,7 +225,8 @@ function VoicePicker() {
 }
 
 const WHATS_NEW = [
-  'Cats tab: unlock Tuxedo, Orangina, Whitey and Dost as you learn, and pick who keeps you company',
+  'A new app icon: all five cats together',
+  'Cats: tap the paw in the cat corner to unlock Tuxedo, Orangina, Whitey and Dost as you learn, and pick who keeps you company',
   'A fresh Today screen: your daily dose up top, quick stats, and colorful practice tiles',
   'A fresh Me & settings page: profile, tidy groups and on/off switches',
   'A new Learn hub: search everything, pick up where you left off, colorful sections',

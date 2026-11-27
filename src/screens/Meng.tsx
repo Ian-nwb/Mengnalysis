@@ -5,6 +5,7 @@ import Svg, { Circle, Ellipse, G, Line, Path, Rect } from 'react-native-svg';
 import { Icon, IconName } from '../components/Icon';
 import { Mascot, Mood } from '../components/Mascot';
 import { currentCat } from '../cats';
+import { CatPicker } from './Cats';
 import { BigButton, Card, Kicker, ListenButton, ProgressBar, Txt } from '../components/ui';
 import { buzz } from '../haptics';
 import { useReducedMotion } from '../motion';
@@ -221,7 +222,7 @@ export function MengScreen({ go }: { go: Go }) {
   const [idx, setIdx] = useState(0);
   const [drag, setDrag] = useState<{ x: number; y: number } | null>(null);
   const [particles, setParticles] = useState<Particle[]>([]);
-  const [sheet, setSheet] = useState<'shop' | 'items' | 'help' | null>(null);
+  const [sheet, setSheet] = useState<'shop' | 'items' | 'help' | 'cats' | null>(null);
   const [stage, setStage] = useState({ w: 0, h: 0 });
   const [look, setLook] = useState({ x: 0, y: 0 });
   const [yawn, setYawn] = useState(false);
@@ -937,6 +938,7 @@ export function MengScreen({ go }: { go: Go }) {
               <Meter icon="bowl" value={pet.fullness} label="Tummy" />
               <Meter icon="heart" value={pet.happiness} label="Happiness" />
             </View>
+            <RoundBtn icon="paw" onPress={() => setSheet('cats')} size={44} a11y="Change cat" variant="soft" />
             <RoundBtn icon="help" onPress={() => setSheet('help')} size={44} a11y="How Meng's home works" variant="soft" />
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
@@ -1170,12 +1172,13 @@ export function MengScreen({ go }: { go: Go }) {
         )}
       </Sheet>
 
+      <Sheet visible={sheet === 'cats'} title="Change cat" onClose={() => setSheet(null)}>
+        <CatPicker onChosen={() => setSheet(null)} />
+      </Sheet>
       <Sheet visible={sheet === 'help'} title={`${MASCOT_NAME}'s home`} onClose={() => setSheet(null)}>
-        <BigButton label="Change cat" sub="Unlock new cats as you learn" icon="paw" onPress={() => {
-          setSheet(null);
-          go({ name: 'cats' });
-        }} />
+        <BigButton label="Change cat" sub="Unlock new cats as you learn" icon="paw" onPress={() => setSheet('cats')} />
         <Card>
+          <Txt>• <Txt bold>Change cat:</Txt> tap the paw button at the top to pick another cat you've unlocked.</Txt>
           <Txt>• <Txt bold>Pet:</Txt> rub {MASCOT_NAME} with your finger (or tap her). She purrs and kneads!</Txt>
           <Txt>• <Txt bold>Feed:</Txt> in the Kitchen, slide the snack at the bottom up onto her, or just tap it. Use ‹ › to pick another snack.</Txt>
           <Txt>• <Txt bold>Play:</Txt> in the Living room, give her a toy, then play! Fling the yarn ball, wave the feather near her, tap the mouse to make it run, or watch her scratch the box.</Txt>

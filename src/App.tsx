@@ -203,7 +203,7 @@ function Root() {
     }
 
   const tab: Tab | null =
-    state.onboarded && (route.name === 'home' || route.name === 'path' || route.name === 'library' || route.name === 'meng' || route.name === 'cats' || route.name === 'settings') ? route.name : null;
+    state.onboarded && (route.name === 'home' || route.name === 'path' || route.name === 'library' || route.name === 'meng' || route.name === 'settings') ? route.name : null;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>

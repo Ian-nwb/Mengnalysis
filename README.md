@@ -37,7 +37,7 @@ Tori is an offline Android app built around one idea: **a small dose of data ski
 **Habit & fun**
 - A winding, game-style **path** with lesson nodes, practice stars, boss crowns and cheat-sheet chests
 - **Notes from Meng:** daily reminders in Meng's voice, an optional second reminder and evening streak saver, days off, and tap-to-open
-- Bottom tabs: **Today · Path · Learn · Meng · Cats · Me**
+- Bottom tabs: **Today · Path · Learn · Meng · Me**
 - **Study music:** three original background tracks that soften while lessons are read aloud, plus a cozy loading screen
 - Daily streaks with a weekly streak freeze, and **Lite days** (2-minute review) for busy days
 - Max two new lessons a day, so the journey stays a steady habit

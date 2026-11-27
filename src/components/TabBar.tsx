@@ -7,13 +7,12 @@ import { useApp } from '../state';
 import { fonts } from '../theme';
 import { Icon, IconName } from './Icon';
 
-export type Tab = 'home' | 'path' | 'library' | 'meng' | 'cats' | 'settings';
+export type Tab = 'home' | 'path' | 'library' | 'meng' | 'settings';
 const TABS: { id: Tab; label: string; icon: IconName }[] = [
   { id: 'home', label: 'Today', icon: 'home' },
   { id: 'path', label: 'Path', icon: 'map' },
   { id: 'library', label: 'Learn', icon: 'book' },
   { id: 'meng', label: 'Meng', icon: 'paw' },
-  { id: 'cats', label: 'Cats', icon: 'heart' },
   { id: 'settings', label: 'Me', icon: 'user' },
 ];
 

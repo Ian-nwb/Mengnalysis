@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { Icon } from '../components/Icon';
 import { Mascot } from '../components/Mascot';
-import { BigButton, Card, ProgressBar, Screen, Txt } from '../components/ui';
+import { BigButton, Card, ProgressBar, Screen, TopBar, Txt } from '../components/ui';
 import { CATS, currentCat, isUnlocked } from '../cats';
 import { buzz } from '../haptics';
 import { Go } from '../nav';
@@ -12,7 +12,18 @@ import { space } from '../theme';
 
 /** Cats: pick which cat keeps you company. New cats unlock as you learn. */
 export function CatsScreen({ go }: { go: Go }) {
-  void go;
+  const { state } = useApp();
+  return (
+    <Screen>
+      <TopBar onBack={() => go({ name: 'meng' })} backLabel={`${currentCat(state).name}'s home`} />
+      <Txt v="h1">Cats</Txt>
+      <CatPicker />
+    </Screen>
+  );
+}
+
+/** The list of cats with unlock progress and a Choose button (used in the cat's home and the Cats screen). */
+export function CatPicker({ onChosen }: { onChosen?: () => void }) {
   const { state, setState, colors } = useApp();
   const chosen = currentCat(state).id;
   const open = CATS.filter((c) => isUnlocked(state, c)).length;
@@ -20,10 +31,10 @@ export function CatsScreen({ go }: { go: Go }) {
     buzz('success');
     playSfx('meow');
     setState((s) => ({ ...s, settings: { ...s.settings, cat: id } }));
+    onChosen?.();
   };
   return (
-    <Screen>
-      <Txt v="h1">Cats</Txt>
+    <>
       <Txt color={colors.textMuted}>
         Pick who keeps you company. New friends join as you learn. {open} of {CATS.length} unlocked.
       </Txt>
@@ -60,6 +71,6 @@ export function CatsScreen({ go }: { go: Go }) {
           </Card>
         );
       })}
-    </Screen>
+    </>
   );
 }
