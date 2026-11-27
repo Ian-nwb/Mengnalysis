@@ -138,6 +138,7 @@ const MODE_TEXT: Record<ReviewMode, { title: string; body: (n: number) => string
   practice: { title: 'Practice round', body: (n) => `${n} questions from everything you've learned. Keeps it fresh!` },
   lite: { title: 'Lite day', body: (n) => `Busy day? Just ${n} quick ${n === 1 ? 'question' : 'questions'}. Your streak stays safe.` },
   bugs: { title: 'Bug Book practice', body: (n) => `${n} questions that tripped you up before. Let's squash them!` },
+  arcade: { title: 'Game arcade', body: (n) => `${n} quick games from lessons you've finished: matching, sorting, bug hunts and more!` },
   focus: { title: 'Focus practice', body: (n) => `${n} questions on a topic that's been tricky. A little extra practice makes it click!` },
 };
 

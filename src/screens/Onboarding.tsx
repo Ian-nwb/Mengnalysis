@@ -17,6 +17,7 @@ const TOUR: { icon: IconName; title: string; text: string }[] = [
   { icon: 'map', title: 'Your path', text: 'A winding trail with practice stars, boss crowns and treasure chests. 15 stages, from your very first spreadsheet to landing the job. Tap any finished lesson to replay it.' },
   { icon: 'bug', title: 'Bug Book', text: "Mistakes aren't failures, they're bugs to squash! They come back a week later so they really stick." },
   { icon: 'sheet', title: 'Cheat sheets', text: "Beat a stage's boss level to unlock a one-page cheat sheet you can save as a PDF." },
+  { icon: 'star', title: 'Game arcade', text: 'Matching, sorting, bug hunts and chart games, made from lessons you have finished. Find it on Today.' },
   { icon: 'sheet', title: 'Real formulas', text: 'In spreadsheet lessons you type real formulas. Tap the buttons to build them, then press Check formula.' },
   { icon: 'fish', title: "Meng's corner", text: 'Every lesson earns treats. Share snacks and toys with me in Meng\'s corner. Tap me anytime to say hi!' },
   { icon: 'music', title: 'Study music', text: 'Cozy original tunes play softly while you learn. Pick a track or turn it off in Me → Music.' },

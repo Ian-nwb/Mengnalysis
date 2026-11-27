@@ -46,6 +46,14 @@ for (const l of LESSONS) {
     }
     if (st.kind === 'build' && st.extras.some((e) => st.answer.includes(e))) problems.push(`${where}: build decoy repeats an answer tile`);
     if (st.kind === 'tf' && st.statements.length < 2) problems.push(`${where}: true/false needs 2+ statements`);
+    if (st.kind === 'sort') {
+      if (st.items.some(([, b]) => b < 0 || b >= st.buckets.length)) problems.push(`${where}: sort item points to a missing bucket`);
+      if (new Set(st.items.map(([t]) => t)).size !== st.items.length) problems.push(`${where}: sort items must be unique`);
+      if (st.buckets.some((_, bi) => !st.items.some(([, b]) => b === bi))) problems.push(`${where}: every sort bucket needs at least one item`);
+    }
+    if (st.kind === 'spot' && (st.bug < 0 || st.bug >= st.tokens.length || st.tokens[st.bug] === st.fix)) problems.push(`${where}: spot bug index/fix is wrong`);
+    if (st.kind === 'odd' && (st.items.length < 3 || new Set(st.items).size !== st.items.length)) problems.push(`${where}: odd needs 3+ unique items`);
+    if (st.kind === 'chartpick' && !st.data.some(([l]) => l === st.answer)) problems.push(`${where}: chartpick answer is not a bar`);
     if (st.kind === 'sheet') {
       sheetCount++;
       try {

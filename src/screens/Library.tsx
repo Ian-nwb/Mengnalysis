@@ -321,6 +321,14 @@ function stepText(st: Step): string {
       return `Build: ${st.prompt} Answer: ${st.answer.join(' ')}. ${st.why}`;
     case 'tf':
       return `True or false: ${st.statements.map(([s, v]) => `${s} ${v ? 'True' : 'False'}`).join('. ')}. ${st.why}`;
+    case 'sort':
+      return `Sort: ${st.items.map(([t, b]) => `${t}: ${st.buckets[b]}`).join('. ')}. ${st.why}`;
+    case 'spot':
+      return `Find the bug: ${st.tokens.join(' ')}. The bug is ${st.tokens[st.bug]}, it should be ${st.fix}. ${st.why}`;
+    case 'odd':
+      return `Odd one out: ${st.items[st.answer]}. ${st.why}`;
+    case 'chartpick':
+      return `${st.prompt} Answer: ${st.answer}. ${st.why}`;
   }
 }
 
@@ -407,6 +415,37 @@ export function ReaderScreen({ id, go }: { id: string; go: Go }) {
               <Kicker icon="pencil">Build it</Kicker>
               <Txt bold>{st.prompt}</Txt>
               <Txt bold color={colors.accent} style={{ fontFamily: 'monospace' }}>{st.answer.join(' ')}</Txt>
+              <Txt>{st.why}</Txt>
+            </Card>
+          );
+        if (st.kind === 'sort')
+          return (
+            <Card key={i} tone="inset">
+              <Kicker icon="box">Sorted</Kicker>
+              <Txt bold>{st.prompt}</Txt>
+              {st.buckets.map((b, bi) => (
+                <Txt key={b}>
+                  <Txt bold color={colors.accent}>{b}:</Txt> {st.items.filter(([, x]) => x === bi).map(([t]) => t).join(' · ')}
+                </Txt>
+              ))}
+            </Card>
+          );
+        if (st.kind === 'spot')
+          return (
+            <Card key={i} tone="inset">
+              <Kicker icon="bug">Find the bug</Kicker>
+              <Txt bold>{st.prompt}</Txt>
+              <Txt style={{ fontFamily: 'monospace' }}>{st.tokens.join(' ')}</Txt>
+              <Txt bold color={colors.good} style={{ fontFamily: 'monospace' }}>{st.tokens.map((t, j) => (j === st.bug ? st.fix : t)).join(' ')}</Txt>
+              <Txt>{st.why}</Txt>
+            </Card>
+          );
+        if (st.kind === 'odd' || st.kind === 'chartpick')
+          return (
+            <Card key={i} tone="inset">
+              <Kicker icon={st.kind === 'odd' ? 'sparkle' : 'chart'}>{st.kind === 'odd' ? 'Odd one out' : 'Read the chart'}</Kicker>
+              <Txt bold>{st.prompt}</Txt>
+              <Txt bold color={colors.good}>{st.kind === 'odd' ? st.items[st.answer] : st.answer}</Txt>
               <Txt>{st.why}</Txt>
             </Card>
           );

@@ -1,6 +1,6 @@
 import { ReviewItem } from './engine';
 
-export type ReviewMode = 'warmup' | 'practice' | 'lite' | 'bugs' | 'focus';
+export type ReviewMode = 'warmup' | 'practice' | 'lite' | 'bugs' | 'focus' | 'arcade';
 
 export type Route =
   | { name: 'home' }

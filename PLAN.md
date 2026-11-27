@@ -126,6 +126,12 @@ Today the native splash shows Meng's face, then a blank plum screen while fonts 
 - Meng's corner rebuilt as a virtual pet: rub to pet, drag-to-feed pantry, toy box, shop; new moods (purr, eat, love, hungry), blinking, breathing, hops, wiggles, floating hearts; purr/chomp/boing sounds
 - Rainy café music regenerated (warm brown-noise rain + soft drips instead of hiss); music generator kept in `scripts/make-music.py`
 
+## v1.5.0 (2026-11-27)
+- Meng animations: layered, native-driven tail/ears/paws/extras; greets, leans toward food, happy dance, hunger rumble, butterfly chase, dozes off and wakes, love burst after long petting, toy drop-and-pounce
+- Meng's home design fixes: solid status band (meters can no longer overlap the help button), room art only below the band, window/shelf moved below the speech bubble, curtains on a rod
+- Games: sort, find the bug, odd one out, tap the chart (+ ~23 new rounds in existing lessons) and a Game arcade on Today
+- 24 new lessons (stages 0, 7, 9, 10, 11, 12, 13, 14) and 11 glossary terms: 309 lessons, 220 terms
+
 ## v1.4.0 (2026-11-27)
 - Games: match the pairs, build from word tiles, true/false (mixed into ~35 lessons) + glossary term-match in warm-ups, practice and Learn
 - New content: Stage 13 Real-World Projects (5 case studies, Career is now 14), cleaning chapter, Formula Lab 2, sample size & forecasting, SQL practice sets (self joins, GROUP_CONCAT, OFFSET), chart critique, pandas practice. 285 lessons, 209 glossary terms

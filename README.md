@@ -22,8 +22,8 @@ Tori is an offline Android app built around one idea: **a small dose of data ski
 ## Features
 
 **Learning**
-- **285 lessons in 15 stages**: short, friendly, one concept per lesson
-- **Duolingo-style games:** match the pairs, build answers from word tiles, true/false rounds, plus a glossary term-match game
+- **309 lessons in 15 stages**: short, friendly, one concept per lesson
+- **Duolingo-style games:** match the pairs, build answers from word tiles, true/false, sort into groups, find the bug, odd one out and tap the chart, plus a **Game arcade** and a glossary term-match game
 - **Real practice, not just quizzes**
   - **SQL sandbox:** write real queries against built-in datasets, checked by comparing results
   - **Spreadsheet sandbox:** type real formulas (SUM, IF, SUMIFS, XLOOKUP, …) into a practice sheet, checked by a built-in formula engine
@@ -31,7 +31,7 @@ Tori is an offline Android app built around one idea: **a small dose of data ski
 - **Bug Book:** every mistake is saved and comes back about a week later until it's squashed
 - **Adaptive review:** weak topics show up more often, and Home suggests a *Focus topic*
 - **Boss levels** end every stage with a real-world case, plus an *"Explain it like I'm your boss"* summary
-- **Learn tab:** re-read every finished lesson as notes, study guides for each stage, quick reference (Excel/Sheets, SQL, pandas, DAX, shortcuts), a 209-term glossary and free resources
+- **Learn tab:** re-read every finished lesson as notes, study guides for each stage, quick reference (Excel/Sheets, SQL, pandas, DAX, shortcuts), a 220-term glossary and free resources
 - **Cheat sheets:** a one-page summary unlocks for each stage, and you can save it as a PDF
 
 **Habit & fun**

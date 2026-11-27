@@ -77,7 +77,7 @@ export function LoadingScreen({
       accessibilityLabel={done ? greeting(name) : `Loading Tori. ${tip}`}
     >
       <Animated.View style={{ transform: [{ translateY: bob.interpolate({ inputRange: [0, 1], outputRange: [0, -10] }) }] }}>
-        <Mascot mood={done ? 'cheer' : 'happy'} size={200} />
+        <Mascot mood={done ? 'cheer' : 'happy'} size={200} alive tapToMeow={false} />
       </Animated.View>
       <Text style={{ color: C.text, fontSize: 48, marginTop: 8, ...font('Nunito_800ExtraBold') }}>Tori</Text>
       <View style={{ flexDirection: 'row', gap: 12, marginTop: 20 }}>

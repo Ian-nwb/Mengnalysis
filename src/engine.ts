@@ -245,6 +245,22 @@ export function termMatchItem(s: AppState, n = 4): ReviewItem | null {
   return { kind: 'step', key: `match-${dayStr()}-${pairs[0][0]}`, step: { kind: 'match', prompt: 'Match each term to its meaning.', pairs, why: 'Look them up anytime in Learn → Glossary.' } };
 }
 
+const GAME_KINDS = ['match', 'build', 'tf', 'sort', 'spot', 'odd', 'chartpick'];
+
+/** Game arcade: a mix of game steps from lessons she has finished, plus a glossary match. */
+export function arcadeItems(s: AppState, n = 6): ReviewItem[] {
+  const pool: ReviewItem[] = [];
+  LESSONS.filter((l) => s.completed.includes(l.id)).forEach((l) =>
+    l.steps.forEach((st, i) => {
+      if (GAME_KINDS.includes(st.kind)) pool.push({ kind: 'step', key: `arcade-${l.id}-${i}`, step: st });
+    }),
+  );
+  const picked = shuffle(pool).slice(0, n - 1);
+  const m = termMatchItem(s);
+  const items = m ? [...picked, m] : picked;
+  return items.length >= 2 ? shuffle(items) : [...items, ...asItems(practiceCards(s, 3))];
+}
+
 export const practiceItems = (s: AppState, n = 5) => {
   const items = asItems(practiceCards(s, n));
   const m = s.completed.length >= 3 ? termMatchItem(s) : null;

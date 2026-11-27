@@ -26,6 +26,13 @@ export type Step =
   | { kind: 'match'; prompt: string; pairs: [string, string][]; why: string }
   | { kind: 'build'; prompt: string; answer: string[]; extras: string[]; why: string }
   | { kind: 'tf'; prompt: string; statements: [string, boolean][]; why: string }
+  // items: [text, bucket index]
+  | { kind: 'sort'; prompt: string; buckets: string[]; items: [string, number][]; why: string }
+  // tap the wrong token; `fix` is what it should be
+  | { kind: 'spot'; prompt: string; tokens: string[]; bug: number; fix: string; why: string }
+  | { kind: 'odd'; prompt: string; items: string[]; answer: number; why: string }
+  // tap the bar that answers the question
+  | { kind: 'chartpick'; prompt: string; title: string; data: [string, number][]; answer: string; unit?: string; why: string }
   | { kind: 'sql'; prompt: string; dataset: 'coffee' | 'shop' | 'music' | 'app'; answer: string; hint: string; why: string; starter?: string };
 
 export type ReviewCard = { id: string; front: string; options: string[]; answer: number };

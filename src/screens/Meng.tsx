@@ -13,8 +13,8 @@ import { playSfx } from '../sfx';
 import { useApp } from '../state';
 import { BRAND, palettes, space } from '../theme';
 
-// Meng's home: three cozy rooms, one screen, no scrolling. Meng sits in the middle;
-// the item you're holding sits right below her: drag it up onto her, or just tap it.
+// Meng's home: one screen, three cozy rooms. A solid status band on top, the room in
+// the middle, and the item you're holding right below Meng: drag it up onto her or tap it.
 
 type Room = 'living' | 'kitchen' | 'bedroom';
 const ROOMS: { id: Room; name: string }[] = [
@@ -22,61 +22,74 @@ const ROOMS: { id: Room; name: string }[] = [
   { id: 'kitchen', name: 'Kitchen' },
   { id: 'bedroom', name: 'Bedroom' },
 ];
-type Particle = { id: number; x: number; y: number; icon: IconName; color: string };
+type FxKind = 'float' | 'drop' | 'fly';
+type Particle = { id: number; x: number; y: number; icon: IconName; color: string; kind: FxKind; size?: number; travel?: number };
 type Rect4 = { x: number; y: number; w: number; h: number };
 const PURR_LINES = ['Purrrr…', 'Right behind the ears, please.', 'You are my favorite human.', 'Mrrp! ♡', 'More scritches!', 'Ahh, the best spot.'];
+const IDLE_ACTS = ['look', 'look', 'yawn', 'stretch', 'hop', 'peek', 'butterfly', 'wave'] as const;
 
-// ---------- room art ----------
+// ---------- room art (drawn only inside the room area, never under the controls) ----------
 function RoomArt({ room, w, h, dark, lightsOff }: { room: Room; w: number; h: number; dark: boolean; lightsOff: boolean }) {
-  const floorY = h * 0.68;
+  const floorY = h * 0.6;
   const wall = { living: dark ? '#3A2646' : '#F6E3FA', kitchen: dark ? '#3B2A35' : '#FFE9DC', bedroom: dark ? '#2B2447' : '#E6DDF8' }[room];
   const floor = { living: dark ? '#5A3F33' : '#D9B48F', kitchen: dark ? '#4A3C4E' : '#EADBEA', bedroom: dark ? '#3E3060' : '#CFC0EE' }[room];
   const trim = dark ? '#1B1420' : '#7A2E8C';
-  const winX = w * 0.08;
-  const winW = Math.min(w * 0.3, 150);
+  const winW = Math.min(w * 0.26, 120);
+  const winX = w - winW - w * 0.06;
+  const winY = Math.max(70, h * 0.17); // below Meng's speech bubble
+  const night = lightsOff || dark;
   return (
     <Svg width={w} height={h} style={{ position: 'absolute', left: 0, top: 0 }}>
       <Rect x={0} y={0} width={w} height={h} fill={wall} />
       {room === 'kitchen'
-        ? Array.from({ length: Math.ceil(w / 40) + 1 }, (_, i) => (
-            <Line key={`v${i}`} x1={i * 40} y1={0} x2={i * 40} y2={floorY} stroke={trim} strokeOpacity={0.12} strokeWidth={2} />
-          )).concat(
-            Array.from({ length: Math.ceil(floorY / 40) }, (_, i) => (
-              <Line key={`h${i}`} x1={0} y1={i * 40} x2={w} y2={i * 40} stroke={trim} strokeOpacity={0.12} strokeWidth={2} />
+        ? [
+            ...Array.from({ length: Math.ceil(w / 44) + 1 }, (_, i) => (
+              <Line key={`v${i}`} x1={i * 44} y1={0} x2={i * 44} y2={floorY} stroke={trim} strokeOpacity={0.1} strokeWidth={2} />
             )),
-          )
+            ...Array.from({ length: Math.ceil(floorY / 44) }, (_, i) => (
+              <Line key={`h${i}`} x1={0} y1={i * 44} x2={w} y2={i * 44} stroke={trim} strokeOpacity={0.1} strokeWidth={2} />
+            )),
+          ]
         : null}
       {room === 'bedroom'
-        ? [0.15, 0.32, 0.55, 0.78, 0.9].map((fx, i) => (
-            <Path key={i} d={`M${w * fx} ${h * (0.1 + (i % 3) * 0.08)} l3 7 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1z`} fill={BRAND} opacity={0.45} />
+        ? [0.12, 0.28, 0.45, 0.6].map((fx, i) => (
+            <Path key={i} d={`M${w * fx} ${h * (0.08 + (i % 2) * 0.1)} l3 7 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1z`} fill={BRAND} opacity={0.4} />
           ))
         : null}
-      {/* window */}
       {room !== 'kitchen' ? (
         <G>
-          <Rect x={winX} y={h * 0.1} width={winW} height={winW * 0.9} rx={14} fill={lightsOff || dark ? '#2B3A67' : '#BFE3FF'} stroke={trim} strokeWidth={5} />
-          <Line x1={winX + winW / 2} y1={h * 0.1} x2={winX + winW / 2} y2={h * 0.1 + winW * 0.9} stroke={trim} strokeWidth={4} />
-          <Line x1={winX} y1={h * 0.1 + winW * 0.45} x2={winX + winW} y2={h * 0.1 + winW * 0.45} stroke={trim} strokeWidth={4} />
-          {lightsOff || dark ? <Circle cx={winX + winW * 0.72} cy={h * 0.1 + winW * 0.25} r={winW * 0.1} fill="#FFF3C4" /> : <Circle cx={winX + winW * 0.75} cy={h * 0.1 + winW * 0.22} r={winW * 0.1} fill="#FFD66B" />}
+          <Rect x={winX} y={winY} width={winW} height={winW * 0.95} rx={12} fill={night ? '#2B3A67' : '#BFE3FF'} stroke={trim} strokeWidth={4} />
+          <Line x1={winX + winW / 2} y1={winY} x2={winX + winW / 2} y2={winY + winW * 0.95} stroke={trim} strokeWidth={3} />
+          <Line x1={winX} y1={winY + winW * 0.47} x2={winX + winW} y2={winY + winW * 0.47} stroke={trim} strokeWidth={3} />
+          <Circle cx={winX + winW * 0.73} cy={winY + winW * 0.24} r={winW * 0.1} fill={night ? '#FFF3C4' : '#FFD66B'} />
+          {/* curtain rod + curtains */}
+          <Line x1={winX - 16} y1={winY - 9} x2={winX + winW + 16} y2={winY - 9} stroke={trim} strokeWidth={4} strokeLinecap="round" />
+          <Rect x={winX - 14} y={winY - 9} width={winW * 0.2} height={winW * 1.08} rx={8} fill={BRAND} opacity={0.85} />
+          <Rect x={winX + winW + 14 - winW * 0.2} y={winY - 9} width={winW * 0.2} height={winW * 1.08} rx={8} fill={BRAND} opacity={0.85} />
         </G>
       ) : (
         <G>
-          {/* shelf with jars */}
-          <Rect x={w * 0.62} y={h * 0.2} width={w * 0.32} height={8} rx={4} fill={trim} />
+          <Rect x={w * 0.06} y={Math.max(100, h * 0.3)} width={w * 0.34} height={8} rx={4} fill={trim} />
           {[0, 1, 2].map((i) => (
-            <Rect key={i} x={w * 0.64 + i * (w * 0.1)} y={h * 0.2 - 34} width={w * 0.07} height={34} rx={8} fill={[BRAND, '#F2A65A', '#8FE3A6'][i]} stroke={trim} strokeWidth={3} />
+            <Rect key={i} x={w * 0.08 + i * (w * 0.11)} y={Math.max(100, h * 0.3) - 32} width={w * 0.075} height={32} rx={8} fill={[BRAND, '#F2A65A', '#8FE3A6'][i]} stroke={trim} strokeWidth={3} />
           ))}
         </G>
       )}
-      {/* floor */}
+      {/* floor + baseboard */}
       <Rect x={0} y={floorY} width={w} height={h - floorY} fill={floor} />
-      <Rect x={0} y={floorY} width={w} height={6} fill={trim} opacity={0.35} />
-      {room === 'living' ? <Ellipse cx={w / 2} cy={floorY + (h - floorY) * 0.35} rx={w * 0.36} ry={(h - floorY) * 0.22} fill={BRAND} opacity={0.55} /> : null}
-      {room === 'bedroom' ? <Ellipse cx={w / 2} cy={floorY + (h - floorY) * 0.3} rx={w * 0.33} ry={(h - floorY) * 0.24} fill="#7A2E8C" stroke={trim} strokeWidth={4} /> : null}
+      <Rect x={0} y={floorY - 4} width={w} height={8} fill={trim} opacity={0.3} />
+      {room === 'living' ? (
+        <G>
+          <Ellipse cx={w / 2} cy={floorY + (h - floorY) * 0.62} rx={w * 0.38} ry={(h - floorY) * 0.2} fill={BRAND} opacity={0.5} />
+          <Rect x={w * 0.05} y={floorY - h * 0.11} width={w * 0.08} height={h * 0.12} rx={6} fill="#C77B4A" stroke={trim} strokeWidth={3} />
+          <Ellipse cx={w * 0.09} cy={floorY - h * 0.13} rx={w * 0.07} ry={h * 0.05} fill="#6FBF73" stroke={trim} strokeWidth={3} />
+        </G>
+      ) : null}
+      {room === 'bedroom' ? <Ellipse cx={w / 2} cy={floorY + (h - floorY) * 0.6} rx={w * 0.34} ry={(h - floorY) * 0.24} fill="#7A2E8C" stroke={trim} strokeWidth={4} /> : null}
       {room === 'kitchen' ? (
         <G>
-          <Ellipse cx={w * 0.8} cy={floorY + (h - floorY) * 0.35} rx={w * 0.09} ry={(h - floorY) * 0.12} fill={BRAND} stroke={trim} strokeWidth={4} />
-          <Ellipse cx={w * 0.8} cy={floorY + (h - floorY) * 0.3} rx={w * 0.06} ry={(h - floorY) * 0.05} fill={trim} opacity={0.4} />
+          <Ellipse cx={w * 0.84} cy={floorY + (h - floorY) * 0.55} rx={w * 0.09} ry={(h - floorY) * 0.12} fill={BRAND} stroke={trim} strokeWidth={4} />
+          <Ellipse cx={w * 0.84} cy={floorY + (h - floorY) * 0.5} rx={w * 0.06} ry={(h - floorY) * 0.05} fill={trim} opacity={0.4} />
         </G>
       ) : null}
       {lightsOff ? <Rect x={0} y={0} width={w} height={h} fill="#0B0614" opacity={0.55} /> : null}
@@ -84,31 +97,44 @@ function RoomArt({ room, w, h, dark, lightsOff }: { room: Room; w: number; h: nu
   );
 }
 
-function FloatUp({ p, onDone }: { p: Particle; onDone: (id: number) => void }) {
+/** Little effects: hearts float up, toys drop and bounce, butterflies flutter past. */
+function Fx({ p, onDone }: { p: Particle; onDone: (id: number) => void }) {
   const reduced = useReducedMotion();
   const v = useRef(new Animated.Value(0)).current;
+  const dur = p.kind === 'fly' ? 2600 : p.kind === 'drop' ? 1300 : 1000;
   useEffect(() => {
-    Animated.timing(v, { toValue: 1, duration: reduced ? 500 : 1000, easing: Easing.out(Easing.quad), useNativeDriver: true }).start(() => onDone(p.id));
-  }, [v, p.id, onDone, reduced]);
+    Animated.timing(v, { toValue: 1, duration: reduced ? Math.min(dur, 500) : dur, easing: p.kind === 'float' ? Easing.out(Easing.quad) : Easing.linear, useNativeDriver: true }).start(() => onDone(p.id));
+  }, [v, p.id, p.kind, dur, onDone, reduced]);
+  const s = p.size ?? 34;
+  const style =
+    p.kind === 'float'
+      ? {
+          opacity: v.interpolate({ inputRange: [0, 0.7, 1], outputRange: [1, 1, 0] }),
+          transform: reduced ? [] : [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [0, -80] }) }, { scale: v.interpolate({ inputRange: [0, 0.3, 1], outputRange: [0.6, 1.25, 1] }) }],
+        }
+      : p.kind === 'drop'
+        ? {
+            opacity: v.interpolate({ inputRange: [0, 0.85, 1], outputRange: [1, 1, 0] }),
+            transform: reduced ? [] : [{ translateY: v.interpolate({ inputRange: [0, 0.35, 0.5, 0.62, 0.72, 1], outputRange: [-140, 0, -36, 0, -10, 0] }) }],
+          }
+        : {
+            opacity: v.interpolate({ inputRange: [0, 0.1, 0.9, 1], outputRange: [0, 1, 1, 0] }),
+            transform: [
+              { translateX: v.interpolate({ inputRange: [0, 1], outputRange: [0, p.travel ?? 260] }) },
+              { translateY: v.interpolate({ inputRange: [0, 0.25, 0.5, 0.75, 1], outputRange: [0, -22, 0, -22, 0] }) },
+            ],
+          };
   return (
-    <Animated.View
-      pointerEvents="none"
-      style={{
-        position: 'absolute',
-        left: p.x - 16,
-        top: p.y - 16,
-        opacity: v.interpolate({ inputRange: [0, 0.7, 1], outputRange: [1, 1, 0] }),
-        transform: reduced ? [] : [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [0, -80] }) }, { scale: v.interpolate({ inputRange: [0, 0.3, 1], outputRange: [0.6, 1.25, 1] }) }],
-      }}
-    >
-      <Icon name={p.icon} size={34} color={p.color} filled />
+    <Animated.View pointerEvents="none" style={[{ position: 'absolute', left: p.x - s / 2, top: p.y - s / 2 }, style]}>
+      <Icon name={p.icon} size={s} color={p.color} filled />
     </Animated.View>
   );
 }
 
-/** Round icon button used in the top and bottom bars. */
-function RoundBtn({ icon, label, onPress, size = 64, a11y }: { icon: IconName; label?: string; onPress: () => void; size?: number; a11y: string }) {
+/** Round icon button. `soft` = filled chip for the top band; `ring` = outlined, for the bottom bar. */
+function RoundBtn({ icon, label, onPress, size = 64, a11y, variant = 'ring' }: { icon: IconName; label?: string; onPress: () => void; size?: number; a11y: string; variant?: 'ring' | 'soft' }) {
   const { colors } = useApp();
+  const soft = variant === 'soft';
   return (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={a11y} style={{ alignItems: 'center', gap: 2, minWidth: size }}>
       {({ pressed }) => (
@@ -118,19 +144,19 @@ function RoundBtn({ icon, label, onPress, size = 64, a11y }: { icon: IconName; l
               width: size,
               height: size,
               borderRadius: size / 2,
-              backgroundColor: pressed ? colors.brand : colors.surface,
-              borderWidth: 3,
+              backgroundColor: pressed ? colors.brand : soft ? colors.brandSoft : colors.surface,
+              borderWidth: soft ? 0 : 3,
               borderColor: colors.brand,
               alignItems: 'center',
               justifyContent: 'center',
-              elevation: 4,
+              elevation: soft ? 0 : 3,
               shadowColor: '#000',
-              shadowOpacity: 0.25,
+              shadowOpacity: soft ? 0 : 0.22,
               shadowRadius: 5,
               shadowOffset: { width: 0, height: 3 },
             }}
           >
-            <Icon name={icon} size={Math.round(size * 0.48)} color={pressed ? colors.onBrand : colors.accent} />
+            <Icon name={icon} size={Math.round(size * 0.5)} color={pressed ? colors.onBrand : colors.accent} />
           </View>
           {label ? (
             <Txt v="small" bold center>
@@ -143,13 +169,14 @@ function RoundBtn({ icon, label, onPress, size = 64, a11y }: { icon: IconName; l
   );
 }
 
+/** A small labelled meter that can shrink with the screen (never pushes into its neighbors). */
 function Meter({ icon, value, label }: { icon: IconName; value: number; label: string }) {
   const { colors } = useApp();
   return (
-    <View accessible accessibilityLabel={`${label}: ${value} out of 100`} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexGrow: 1, flexBasis: 90 }}>
-      <Icon name={icon} size={26} color={colors.accent} />
-      <View style={{ flex: 1, height: 14, borderRadius: 7, backgroundColor: colors.surfaceHi, borderWidth: 2, borderColor: colors.border, overflow: 'hidden' }}>
-        <View style={{ width: `${value}%`, height: '100%', backgroundColor: value < 30 ? '#F2A65A' : colors.brand }} />
+    <View accessible accessibilityLabel={`${label}: ${value} out of 100`} style={{ flex: 1, minWidth: 0, flexShrink: 1, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+      <Icon name={icon} size={24} color={colors.accent} />
+      <View style={{ flex: 1, minWidth: 16, height: 12, borderRadius: 6, backgroundColor: colors.surfaceHi, overflow: 'hidden' }}>
+        <View style={{ width: `${Math.max(4, value)}%`, height: '100%', borderRadius: 6, backgroundColor: value < 30 ? '#F2A65A' : colors.brand }} />
       </View>
     </View>
   );
@@ -164,7 +191,7 @@ function Sheet({ visible, title, onClose, children }: { visible: boolean; title:
         <SafeAreaView edges={['bottom']} style={{ backgroundColor: colors.bg, borderTopLeftRadius: 28, borderTopRightRadius: 28, maxHeight: '88%', borderTopWidth: 3, borderColor: colors.brand }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: space.md, gap: space.sm }}>
             <Txt v="h2" style={{ flexShrink: 1 }}>{title}</Txt>
-            <RoundBtn icon="x" onPress={onClose} size={52} a11y={`Close ${title}`} />
+            <RoundBtn icon="x" onPress={onClose} size={50} a11y={`Close ${title}`} variant="soft" />
           </View>
           <ScrollView contentContainerStyle={{ padding: space.md, paddingTop: 0, gap: space.sm }}>{children}</ScrollView>
         </SafeAreaView>
@@ -181,9 +208,11 @@ export function MengScreen({ go }: { go: Go }) {
   const pet = state.pet;
   const inventory = pet.inventory ?? {};
   const toys = pet.toys ?? [];
+  const name = state.settings.name || 'Tori';
 
   const [room, setRoom] = useState<Room>('living');
   const [lightsOff, setLightsOff] = useState(false);
+  const [dozing, setDozing] = useState(false);
   const [tempMood, setTempMood] = useState<Mood | null>(null);
   const [line, setLine] = useState<string | null>(null);
   const [blink, setBlink] = useState(false);
@@ -192,26 +221,31 @@ export function MengScreen({ go }: { go: Go }) {
   const [drag, setDrag] = useState<{ x: number; y: number } | null>(null);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [sheet, setSheet] = useState<'shop' | 'items' | 'help' | null>(null);
-  const [size, setSize] = useState({ w: 0, h: 0 });
+  const [stage, setStage] = useState({ w: 0, h: 0 });
   const [look, setLook] = useState({ x: 0, y: 0 });
   const [yawn, setYawn] = useState(false);
   const [antic, setAntic] = useState(false); // mouth open, waiting for food
 
   const rootRef = useRef<React.ComponentRef<typeof View> | null>(null);
   const mengRef = useRef<React.ComponentRef<typeof View> | null>(null);
-  const root = useRef({ x: 0, y: 0 });
+  const root = useRef({ x: 0, y: 0, w: 0 });
   const mengRect = useRef<Rect4>({ x: 0, y: 0, w: 0, h: 0 });
   const pid = useRef(0);
   const moodTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastPurr = useRef(0);
+  const lastAct = useRef(Date.now());
+  const petRun = useRef({ n: 0, last: 0 });
+  const recentPets = useRef<number[]>([]);
+  const recentTaps = useRef<number[]>([]);
+  const busy = useRef(false);
+
   const breathe = useRef(new Animated.Value(0)).current;
   const hop = useRef(new Animated.Value(0)).current;
   const wiggle = useRef(new Animated.Value(0)).current;
   const squash = useRef(new Animated.Value(0)).current;
   const enter = useRef(new Animated.Value(0)).current;
-  const recentPets = useRef<number[]>([]);
-  const recentTaps = useRef<number[]>([]);
-  const busy = useRef(false);
+  const lean = useRef(new Animated.Value(0)).current;
+  const shake = useRef(new Animated.Value(0)).current;
 
   // What the bottom bar holds depends on the room.
   const items: PetItem[] =
@@ -223,89 +257,30 @@ export function MengScreen({ go }: { go: Go }) {
   const cur = items.length ? items[((idx % items.length) + items.length) % items.length] : null;
 
   const sleeping = room === 'bedroom' && lightsOff;
-  const baseMood: Mood = sleeping ? 'sleep' : pet.fullness < 30 ? 'hungry' : pet.happiness >= 85 && pet.fullness >= 70 ? 'love' : 'happy';
-  const sleepingRef = useRef(false);
-  sleepingRef.current = sleeping;
-  const mood = antic ? 'eat' : tempMood ?? baseMood;
+  const sleepy = sleeping || dozing;
+  const baseMood: Mood = sleepy ? 'sleep' : pet.fullness < 30 ? 'hungry' : pet.happiness >= 85 && pet.fullness >= 70 ? 'love' : 'happy';
+  const mood: Mood = antic ? 'eat' : tempMood ?? baseMood;
   const baseLine = sleeping
     ? 'Zzz… goodnight. Tap the lamp to turn the lights back on.'
-    : room === 'kitchen'
-      ? pet.fullness < 30
-        ? 'My tummy is rumbling! Something yummy? 🐟'
-        : cur
-          ? `Slide the ${cur.name.toLowerCase()} up to me, or just tap it.`
-          : 'The pantry is empty. Let\'s visit the shop!'
-      : room === 'bedroom'
-        ? 'Cozy time. Tap the lamp when I need a nap.'
-        : cur
-          ? 'Rub me for scritches, or toss me a toy!'
-          : 'Rub me for scritches! Toys from the shop live here.';
+    : dozing
+      ? `${MASCOT_NAME} dozed off… rub her gently to wake her up.`
+      : room === 'kitchen'
+        ? pet.fullness < 30
+          ? 'My tummy is rumbling! Something yummy? 🐟'
+          : cur
+            ? `Slide the ${cur.name.toLowerCase()} up to me, or just tap it.`
+            : "The pantry is empty. Let's visit the shop!"
+        : room === 'bedroom'
+          ? 'Cozy time. Tap the lamp when I need a nap.'
+          : cur
+            ? 'Rub me for scritches, or toss me a toy!'
+            : 'Rub me for scritches! Toys from the shop live here.';
 
-  useEffect(() => {
-    if (reduced) return;
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(breathe, { toValue: 1, duration: 1600, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-        Animated.timing(breathe, { toValue: 0, duration: 1600, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-      ]),
-    );
-    loop.start();
-    const b = setInterval(() => {
-      setBlink(true);
-      setTimeout(() => setBlink(false), 150);
-    }, 3800);
-    return () => {
-      loop.stop();
-      clearInterval(b);
-    };
-  }, [reduced, breathe]);
-  useEffect(
-    () => () => {
-      if (moodTimer.current) clearTimeout(moodTimer.current);
-    },
-    [],
-  );
-  useEffect(() => {
-    setLine(null);
-    if (reduced) return;
-    enter.setValue(1);
-    Animated.spring(enter, { toValue: 0, useNativeDriver: true, speed: 6, bounciness: 6 }).start();
-  }, [room, reduced, enter]);
+  // Values the timers need without restarting.
+  const life = useRef({ sleeping, dozing, fullness: pet.fullness });
+  life.current = { sleeping, dozing, fullness: pet.fullness };
 
-  // Pou-style idle life: every few seconds Meng does something on her own.
-  useEffect(() => {
-    if (reduced) return;
-    const t = setInterval(() => {
-      if (busy.current) return;
-      const acts = sleepingRef.current ? ['snore'] : ['look', 'look', 'yawn', 'stretch', 'hop', 'tail', 'peek'];
-      const a = acts[Math.floor(Math.random() * acts.length)];
-      if (a === 'look') {
-        setLook({ x: -1, y: 0 });
-        setTimeout(() => setLook({ x: 1, y: -0.3 }), 700);
-        setTimeout(() => setLook({ x: 0, y: 0 }), 1500);
-      } else if (a === 'peek') {
-        setLook({ x: 0, y: 1 });
-        setTimeout(() => setLook({ x: 0, y: 0 }), 1200);
-      } else if (a === 'yawn') {
-        setYawn(true);
-        setTimeout(() => setYawn(false), 1300);
-      } else if (a === 'stretch') {
-        Animated.sequence([
-          Animated.timing(squash, { toValue: -1, duration: 500, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-          Animated.spring(squash, { toValue: 0, useNativeDriver: true, speed: 8, bounciness: 10 }),
-        ]).start();
-      } else if (a === 'hop') doHopRef.current();
-      else if (a === 'tail') doWiggleRef.current(0.4);
-      else if (a === 'snore') {
-        Animated.sequence([
-          Animated.timing(squash, { toValue: 0.4, duration: 900, useNativeDriver: true }),
-          Animated.timing(squash, { toValue: 0, duration: 900, useNativeDriver: true }),
-        ]).start();
-      }
-    }, 5200);
-    return () => clearInterval(t);
-  }, [reduced, squash]);
-
+  // ---------- animation helpers ----------
   const feel = (m: Mood, ms = 2200) => {
     setTempMood(m);
     busy.current = true;
@@ -315,11 +290,11 @@ export function MengScreen({ go }: { go: Go }) {
       busy.current = false;
     }, ms);
   };
-  const doHop = () => {
+  const doHop = (h = 1) => {
     if (reduced) return;
     hop.setValue(0);
     Animated.sequence([
-      Animated.timing(hop, { toValue: 1, duration: 140, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+      Animated.timing(hop, { toValue: h, duration: 140, easing: Easing.out(Easing.quad), useNativeDriver: true }),
       Animated.spring(hop, { toValue: 0, useNativeDriver: true, speed: 14, bounciness: 12 }),
     ]).start();
   };
@@ -336,28 +311,184 @@ export function MengScreen({ go }: { go: Go }) {
       Animated.spring(squash, { toValue: 0, useNativeDriver: true, speed: 18, bounciness: 16 }),
     ]).start();
   };
-  const doHopRef = useRef(doHop);
-  doHopRef.current = doHop;
-  const doWiggleRef = useRef(doWiggle);
-  doWiggleRef.current = doWiggle;
-  const spawn = useCallback((x: number, y: number, icon: IconName, color: string, n = 1) => {
-    setParticles((ps) => [...ps.slice(-14), ...Array.from({ length: n }, (_, i) => ({ id: ++pid.current, x: x + (i - (n - 1) / 2) * 26, y: y - i * 6, icon, color }))]);
+  const doStretch = () => {
+    if (reduced) return;
+    Animated.sequence([
+      Animated.timing(squash, { toValue: -1, duration: 520, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+      Animated.spring(squash, { toValue: 0, useNativeDriver: true, speed: 8, bounciness: 10 }),
+    ]).start();
+  };
+  const doRumble = () => {
+    if (reduced) return;
+    Animated.sequence([1, -1, 0.8, -0.8, 0.5, -0.5, 0].map((to) => Animated.timing(shake, { toValue: to, duration: 55, useNativeDriver: true }))).start();
+  };
+  const doDance = () => {
+    doHop();
+    setTimeout(() => {
+      doWiggle(0.7);
+      doHop(0.8);
+    }, 380);
+    setTimeout(() => {
+      doWiggle(0.5);
+      doHop(1.1);
+    }, 760);
+  };
+  const spawn = useCallback((x: number, y: number, icon: IconName, color: string, n = 1, kind: FxKind = 'float', size?: number) => {
+    setParticles((ps) => [
+      ...ps.slice(-16),
+      ...Array.from({ length: n }, (_, i) => ({ id: ++pid.current, x: x + (i - (n - 1) / 2) * 28, y: y - (i % 2) * 10, icon, color, kind, size })),
+    ]);
   }, []);
   const removeParticle = useCallback((id: number) => setParticles((ps) => ps.filter((p) => p.id !== id)), []);
   const measure = () => {
-    rootRef.current?.measureInWindow((x, y) => (root.current = { x, y }));
+    rootRef.current?.measureInWindow((x, y, w) => (root.current = { x, y, w }));
     mengRef.current?.measureInWindow((x, y, w, h) => (mengRect.current = { x, y, w, h }));
   };
   const center = () => ({ x: mengRect.current.x - root.current.x + mengRect.current.w / 2, y: mengRect.current.y - root.current.y + mengRect.current.h * 0.3 });
+  const touched = () => {
+    lastAct.current = Date.now();
+  };
+  const wake = () => {
+    setDozing(false);
+    setYawn(true);
+    setTimeout(() => setYawn(false), 1100);
+    doStretch();
+    setLine("Oh! You're back! 😸");
+  };
 
+  const fns = useRef({ doHop, doWiggle, doStretch, doRumble, spawn, feel, measure });
+  fns.current = { doHop, doWiggle, doStretch, doRumble, spawn, feel, measure };
+
+  // Breathing (slower when sleepy) + blinking.
+  useEffect(() => {
+    if (reduced) return;
+    const ms = sleepy ? 2600 : 1600;
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(breathe, { toValue: 1, duration: ms, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        Animated.timing(breathe, { toValue: 0, duration: ms, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+      ]),
+    );
+    loop.start();
+    const b = setInterval(() => {
+      if (life.current.sleeping || life.current.dozing) return;
+      setBlink(true);
+      setTimeout(() => setBlink(false), 140);
+    }, 3600);
+    return () => {
+      loop.stop();
+      clearInterval(b);
+    };
+  }, [reduced, breathe, sleepy]);
+
+  useEffect(
+    () => () => {
+      if (moodTimer.current) clearTimeout(moodTimer.current);
+    },
+    [],
+  );
+
+  // Walk in when the room changes; say hi when you arrive.
+  useEffect(() => {
+    setLine(null);
+    if (reduced) return;
+    enter.setValue(1);
+    Animated.spring(enter, { toValue: 0, useNativeDriver: true, speed: 6, bounciness: 6 }).start();
+  }, [room, reduced, enter]);
+  useEffect(() => {
+    const t = setTimeout(() => {
+      fns.current.doStretch();
+      fns.current.feel('wave', 1900);
+      setLine(`Hi ${name}! 👋`);
+    }, 650);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Pou-style idle life: every few seconds Meng does something on her own, and dozes off if left alone.
+  useEffect(() => {
+    if (reduced) return;
+    const t = setInterval(() => {
+      if (busy.current) return;
+      const L = life.current;
+      if (L.sleeping) {
+        Animated.sequence([
+          Animated.timing(squash, { toValue: 0.35, duration: 900, useNativeDriver: true }),
+          Animated.timing(squash, { toValue: 0, duration: 900, useNativeDriver: true }),
+        ]).start();
+        return;
+      }
+      if (L.dozing) return;
+      if (Date.now() - lastAct.current > 40000) {
+        setDozing(true);
+        setLine(null);
+        return;
+      }
+      if (L.fullness < 30 && Math.random() < 0.45) {
+        fns.current.doRumble();
+        setLook({ x: 0, y: 1 });
+        setTimeout(() => setLook({ x: 0, y: 0 }), 1100);
+        setLine('*grrrumble* …was that my tummy? 🙀');
+        return;
+      }
+      const a = IDLE_ACTS[Math.floor(Math.random() * IDLE_ACTS.length)];
+      if (a === 'look') {
+        setLook({ x: -1, y: 0 });
+        setTimeout(() => setLook({ x: 1, y: -0.3 }), 700);
+        setTimeout(() => setLook({ x: 0, y: 0 }), 1500);
+      } else if (a === 'peek') {
+        setLook({ x: 0, y: 1 });
+        setTimeout(() => setLook({ x: 0, y: 0 }), 1200);
+      } else if (a === 'yawn') {
+        setYawn(true);
+        setTimeout(() => setYawn(false), 1300);
+      } else if (a === 'stretch') fns.current.doStretch();
+      else if (a === 'hop') fns.current.doHop(0.7);
+      else if (a === 'wave') fns.current.feel('wave', 1600);
+      else if (a === 'butterfly') {
+        // A butterfly flutters past; Meng's eyes follow it, then she pounces.
+        const m = mengRect.current;
+        if (!m.w) return;
+        const startX = 24;
+        const travel = Math.max(120, root.current.w - 48);
+        const y = m.y - root.current.y + m.h * 0.15;
+        fns.current.spawn(startX, y, 'butterfly', '#F2A65A', 1, 'fly', 30);
+        busy.current = true;
+        let k = 0;
+        const follow = setInterval(() => {
+          k += 1;
+          const px = startX + (travel * k) / 26;
+          const cx = m.x - root.current.x + m.w / 2;
+          setLook({ x: Math.max(-1, Math.min(1, (px - cx) / (m.w * 0.5))), y: -0.8 });
+          if (k >= 26) {
+            clearInterval(follow);
+            setLook({ x: 0, y: 0 });
+            fns.current.doHop(1.2);
+            fns.current.doWiggle(0.5);
+            setLine('Almost got it! 🦋');
+            busy.current = false;
+          }
+        }, 100);
+        setTimeout(() => clearInterval(follow), 4000);
+      }
+    }, 5200);
+    return () => clearInterval(t);
+  }, [reduced, squash]);
+
+  // ---------- interactions ----------
   const petTick = (x: number, y: number) => {
+    touched();
     if (sleeping) {
       spawn(x, y, 'heart', '#E0457B');
       return;
     }
+    if (dozing) {
+      wake();
+      return;
+    }
     setState((s) => ({ ...s, pet: { ...s.pet, happiness: Math.min(100, s.pet.happiness + 2) } }));
-    const now0 = Date.now();
-    recentPets.current = [...recentPets.current.filter((t) => now0 - t < 1500), now0];
+    const now = Date.now();
+    recentPets.current = [...recentPets.current.filter((t) => now - t < 1500), now];
     if (recentPets.current.length >= 9) {
       recentPets.current = [];
       feel('dizzy', 2200);
@@ -366,9 +497,20 @@ export function MengScreen({ go }: { go: Go }) {
       spawn(x, y, 'star', BRAND, 3);
       return;
     }
+    // A long, gentle petting session ends in a burst of love.
+    petRun.current = now - petRun.current.last < 2500 ? { n: petRun.current.n + 1, last: now } : { n: 1, last: now };
+    if (petRun.current.n >= 12) {
+      petRun.current = { n: 0, last: now };
+      feel('love', 2600);
+      doHop();
+      playSfx('meow');
+      const c = center();
+      spawn(c.x, c.y, 'heart', '#E0457B', 5);
+      setLine('I love you this much! 💕');
+      return;
+    }
     feel('purr');
     buzz('light');
-    const now = Date.now();
     if (now - lastPurr.current > 1600) {
       playSfx('purr');
       lastPurr.current = now;
@@ -378,8 +520,10 @@ export function MengScreen({ go }: { go: Go }) {
   };
 
   const give = (it: PetItem) => {
+    touched();
     const c = center();
     if (sleeping) return;
+    if (dozing) setDozing(false);
     if (it.kind === 'food') {
       if ((inventory[it.id] ?? 0) <= 0) return;
       if (pet.fullness >= 100) {
@@ -387,6 +531,7 @@ export function MengScreen({ go }: { go: Go }) {
         setLine("I'm so full! Maybe later. 😺");
         return;
       }
+      const after = pet.fullness + it.full;
       setState((s) => {
         const inv = { ...(s.pet.inventory ?? {}) };
         inv[it.id] = Math.max(0, (inv[it.id] ?? 0) - 1);
@@ -395,27 +540,42 @@ export function MengScreen({ go }: { go: Go }) {
       playSfx('chomp');
       buzz('success');
       setTempMood('eat');
+      busy.current = true;
       if (moodTimer.current) clearTimeout(moodTimer.current);
+      spawn(c.x, c.y + 40, it.icon, colors.accent);
       let n = 0;
       const t = setInterval(() => {
         setChew((v) => !v);
+        if (n % 3 === 1) spawn(c.x + (n % 2 ? 26 : -26), c.y + 70, 'sparkle', '#F2A65A', 1, 'drop', 16);
         if (++n >= 8) {
           clearInterval(t);
           setChew(false);
-          feel(pet.fullness + it.full >= 90 ? 'love' : 'cheer', 2000);
+          if (after >= 90 || it.cost >= 5) {
+            feel('love', 2400);
+            doDance();
+            spawn(c.x, c.y - 10, 'heart', '#E0457B', 3);
+          } else {
+            feel('cheer', 2000);
+            doHop();
+          }
           playSfx('meow');
-          doHop();
         }
       }, 160);
-      spawn(c.x, c.y + 40, it.icon, colors.accent);
     } else {
       setState((s) => ({ ...s, pet: { ...s.pet, happiness: Math.min(100, s.pet.happiness + it.happy) } }));
+      // The toy drops and bounces next to her… then she pounces.
+      spawn(c.x + mengRect.current.w * 0.42, c.y + mengRect.current.h * 0.55, it.icon, colors.accent, 1, 'drop', 40);
       playSfx('boing');
-      buzz('success');
-      feel('cheer', 2400);
-      doWiggle();
-      doHop();
-      spawn(c.x, c.y, 'star', BRAND, 3);
+      busy.current = true;
+      setLook({ x: 1, y: 0.6 });
+      setTimeout(() => {
+        setLook({ x: 0, y: 0 });
+        feel('cheer', 2200);
+        doWiggle();
+        doHop(1.2);
+        buzz('success');
+        spawn(c.x, c.y, 'star', BRAND, 3);
+      }, 650);
     }
     setLine(it.line);
   };
@@ -427,7 +587,7 @@ export function MengScreen({ go }: { go: Go }) {
     measure,
     cur,
     hopTap: () => {
-      if (sleeping) return;
+      if (sleeping || dozing) return;
       doSquish();
       const now = Date.now();
       recentTaps.current = [...recentTaps.current.filter((t) => now - t < 2000), now];
@@ -440,17 +600,22 @@ export function MengScreen({ go }: { go: Go }) {
       } else playSfx('meow');
     },
     track: (px: number, py: number) => {
+      touched();
       const m = mengRect.current;
       if (!m.w) return;
       const cx = m.x + m.w / 2;
       const cy = m.y + m.h * 0.4;
-      setLook({ x: (px - cx) / (m.w * 0.6), y: (py - cy) / (m.h * 0.6) });
+      const lx = Math.max(-1, Math.min(1, (px - cx) / (m.w * 0.6)));
+      setLook({ x: lx, y: (py - cy) / (m.h * 0.6) });
+      lean.setValue(lx);
       const near = Math.hypot(px - cx, py - cy) < m.w * 0.9;
       setAntic(!!cur && cur.kind === 'food' && near && !sleeping);
+      if (dozing) setDozing(false);
     },
     endTrack: () => {
       setLook({ x: 0, y: 0 });
       setAntic(false);
+      Animated.spring(lean, { toValue: 0, useNativeDriver: true, speed: 10, bounciness: 8 }).start();
     },
   };
 
@@ -535,85 +700,94 @@ export function MengScreen({ go }: { go: Go }) {
 
   const roomI = ROOMS.findIndex((r) => r.id === room);
   const switchRoom = (d: number) => {
+    touched();
     setRoom(ROOMS[(roomI + d + ROOMS.length) % ROOMS.length].id);
     setIdx(0);
+    setDozing(false);
     if (room === 'bedroom') setLightsOff(false);
   };
   const toggleLights = () => {
+    touched();
     const off = !lightsOff;
     setLightsOff(off);
+    setDozing(false);
     playSfx(off ? 'purr' : 'meow');
     if (off) setState((s) => ({ ...s, pet: { ...s.pet, happiness: Math.min(100, s.pet.happiness + 5) } }));
+    else {
+      setYawn(true);
+      setTimeout(() => setYawn(false), 1100);
+      doStretch();
+    }
     setLine(null);
   };
 
-  const mengSize = Math.max(140, Math.min(size.w * 0.68, size.h * 0.4, 300));
-  const scale = breathe.interpolate({ inputRange: [0, 1], outputRange: [1, 1.025] });
+  const mengSize = Math.max(140, Math.min(stage.w * 0.66, stage.h * 0.66, 300));
+  const scale = breathe.interpolate({ inputRange: [0, 1], outputRange: [1, sleepy ? 1.04 : 1.025] });
   const leftBtn = room === 'kitchen' ? { icon: 'bowl' as IconName, label: 'Pantry' } : room === 'living' ? { icon: 'box' as IconName, label: 'Toys' } : null;
 
   return (
-    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.bg }}>
-      <View
-        ref={rootRef}
-        style={{ flex: 1 }}
-        onLayout={(e) => {
-          setSize({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height });
-          measure();
-        }}
-      >
-        {size.w > 0 ? <RoomArt room={room} w={size.w} h={size.h} dark={dark} lightsOff={lightsOff} /> : null}
-
-        {/* top bar: treats · meters · help */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingHorizontal: space.md, paddingTop: space.sm, flexWrap: 'wrap' }}>
-          <View
-            accessible
-            accessibilityLabel={`${pet.treats} treats`}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.surface, borderRadius: 22, borderWidth: 3, borderColor: colors.brand, paddingHorizontal: 12, paddingVertical: 4 }}
-          >
-            <Icon name="fish" size={26} color={colors.accent} />
-            <Txt bold>{pet.treats}</Txt>
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.surface }}>
+      <View ref={rootRef} style={{ flex: 1 }} onLayout={() => measure()}>
+        {/* status band: treats · meters · help, then the room switcher */}
+        <View style={{ backgroundColor: colors.surface, borderBottomWidth: 2, borderBottomColor: colors.border, paddingHorizontal: space.md, paddingTop: space.xs, paddingBottom: space.sm, gap: space.sm }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+            <View
+              accessible
+              accessibilityLabel={`${pet.treats} treats`}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.brandSoft, borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6 }}
+            >
+              <Icon name="fish" size={24} color={colors.accent} />
+              <Txt bold>{pet.treats}</Txt>
+            </View>
+            <View style={{ flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+              <Meter icon="bowl" value={pet.fullness} label="Tummy" />
+              <Meter icon="heart" value={pet.happiness} label="Happiness" />
+            </View>
+            <RoundBtn icon="help" onPress={() => setSheet('help')} size={44} a11y="How Meng's home works" variant="soft" />
           </View>
-          <View style={{ flexGrow: 1, flexBasis: 160, flexDirection: 'row', gap: space.sm, backgroundColor: colors.surface, borderRadius: 22, borderWidth: 2, borderColor: colors.border, paddingHorizontal: 10, paddingVertical: 8 }}>
-            <Meter icon="bowl" value={pet.fullness} label="Tummy" />
-            <Meter icon="heart" value={pet.happiness} label="Happiness" />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+            <RoundBtn icon="back" onPress={() => switchRoom(-1)} size={44} a11y={`Go to ${ROOMS[(roomI + 2) % 3].name}`} variant="soft" />
+            <View style={{ flex: 1, minWidth: 0, alignItems: 'center' }}>
+              <Txt v="h2" center>{ROOMS[roomI].name}</Txt>
+            </View>
+            <RoundBtn icon="next" onPress={() => switchRoom(1)} size={44} a11y={`Go to ${ROOMS[(roomI + 1) % 3].name}`} variant="soft" />
           </View>
-          <RoundBtn icon="help" onPress={() => setSheet('help')} size={48} a11y="How Meng's home works" />
         </View>
 
-        {/* room switcher */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.md, marginTop: space.sm }}>
-          <RoundBtn icon="back" onPress={() => switchRoom(-1)} size={52} a11y={`Go to ${ROOMS[(roomI + 2) % 3].name}`} />
-          <View style={{ backgroundColor: colors.surface, borderRadius: 18, borderWidth: 3, borderColor: colors.brand, paddingHorizontal: 16, paddingVertical: 6, minWidth: 150 }}>
-            <Txt v="h2" center>{ROOMS[roomI].name}</Txt>
-          </View>
-          <RoundBtn icon="next" onPress={() => switchRoom(1)} size={52} a11y={`Go to ${ROOMS[(roomI + 1) % 3].name}`} />
-        </View>
-
-        {/* Meng + speech */}
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-end', paddingBottom: size.h * 0.05 }}>
-          <View style={{ backgroundColor: colors.surface, borderRadius: 18, borderWidth: 2, borderColor: colors.brand, paddingHorizontal: 14, paddingVertical: 8, marginHorizontal: space.md, marginBottom: 6, maxWidth: 460 }}>
-            <Txt center>{line ?? baseLine}</Txt>
-          </View>
-          <View
-            ref={mengRef}
-            {...rubResponder.panHandlers}
-            accessible
-            accessibilityRole="button"
-            accessibilityLabel={`${MASCOT_NAME}. Rub or tap to pet her.`}
-          >
-            <Animated.View
+        {/* the room */}
+        <View style={{ flex: 1, overflow: 'hidden' }} onLayout={(e) => setStage({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
+          {stage.w > 0 ? <RoomArt room={room} w={stage.w} h={stage.h} dark={dark} lightsOff={lightsOff} /> : null}
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-between', paddingTop: space.sm, paddingBottom: stage.h * 0.04 }}>
+            <View
               style={{
-                transform: [
-                  { translateY: hop.interpolate({ inputRange: [0, 1], outputRange: [0, -22] }) },
-                  { translateX: enter.interpolate({ inputRange: [0, 1], outputRange: [0, 90] }) },
-                  { rotate: wiggle.interpolate({ inputRange: [-1, 1], outputRange: ['-7deg', '7deg'] }) },
-                  { scaleY: Animated.multiply(scale, squash.interpolate({ inputRange: [-1, 0, 1], outputRange: [1.1, 1, 0.82] })) },
-                  { scaleX: squash.interpolate({ inputRange: [-1, 0, 1], outputRange: [0.94, 1, 1.14] }) },
-                ],
+                backgroundColor: colors.surface,
+                borderRadius: 18,
+                borderWidth: 2,
+                borderColor: colors.brand,
+                paddingHorizontal: 14,
+                paddingVertical: 8,
+                marginHorizontal: space.md,
+                maxWidth: 440,
               }}
             >
-              <Mascot mood={mood} size={mengSize} blink={blink} chewOpen={chew || antic} tapToMeow={false} look={look} yawn={yawn} />
-            </Animated.View>
+              <Txt center>{line ?? baseLine}</Txt>
+            </View>
+            <View ref={mengRef} {...rubResponder.panHandlers} accessible accessibilityRole="button" accessibilityLabel={`${MASCOT_NAME}. Rub or tap to pet her.`}>
+              <Animated.View
+                style={{
+                  transform: [
+                    { translateY: hop.interpolate({ inputRange: [0, 1], outputRange: [0, -24] }) },
+                    { translateX: Animated.add(enter.interpolate({ inputRange: [0, 1], outputRange: [0, 90] }), shake.interpolate({ inputRange: [-1, 1], outputRange: [-5, 5] })) },
+                    { rotate: lean.interpolate({ inputRange: [-1, 1], outputRange: ['-9deg', '9deg'] }) },
+                    { rotate: wiggle.interpolate({ inputRange: [-1, 1], outputRange: ['-7deg', '7deg'] }) },
+                    { scaleY: Animated.multiply(scale, squash.interpolate({ inputRange: [-1, 0, 1], outputRange: [1.1, 1, 0.82] })) },
+                    { scaleX: squash.interpolate({ inputRange: [-1, 0, 1], outputRange: [0.94, 1, 1.14] }) },
+                  ],
+                }}
+              >
+                <Mascot mood={mood} size={mengSize} blink={blink} chewOpen={chew || antic} tapToMeow={false} look={look} yawn={yawn} alive />
+              </Animated.View>
+            </View>
           </View>
         </View>
 
@@ -625,56 +799,56 @@ export function MengScreen({ go }: { go: Go }) {
             justifyContent: 'space-between',
             paddingHorizontal: space.md,
             paddingVertical: space.sm,
-            backgroundColor: dark ? 'rgba(27,20,32,0.85)' : 'rgba(255,255,255,0.85)',
-            borderTopWidth: 3,
-            borderTopColor: colors.brand,
+            backgroundColor: colors.surface,
+            borderTopWidth: 2,
+            borderTopColor: colors.border,
             gap: space.xs,
           }}
         >
           {leftBtn ? (
-            <RoundBtn icon={leftBtn.icon} label={leftBtn.label} onPress={() => setSheet('items')} a11y={`Open ${leftBtn.label}`} />
+            <RoundBtn icon={leftBtn.icon} label={leftBtn.label} onPress={() => setSheet('items')} a11y={`Open ${leftBtn.label}`} size={58} />
           ) : (
-            <View style={{ minWidth: 64 }} />
+            <View style={{ minWidth: 58 }} />
           )}
 
           <View style={{ flex: 1, alignItems: 'center' }}>
             {room === 'bedroom' ? (
-              <RoundBtn icon={lightsOff ? 'bulb' : 'moon'} label={lightsOff ? 'Lights on' : 'Lights off'} onPress={toggleLights} size={76} a11y={lightsOff ? 'Turn the lights on' : 'Turn the lights off for a nap'} />
+              <RoundBtn icon={lightsOff ? 'bulb' : 'moon'} label={lightsOff ? 'Lights on' : 'Lights off'} onPress={toggleLights} size={70} a11y={lightsOff ? 'Turn the lights on' : 'Turn the lights off for a nap'} />
             ) : cur ? (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                <RoundBtn icon="back" onPress={() => setIdx((i) => i - 1)} size={44} a11y="Previous item" />
+                <RoundBtn icon="back" onPress={() => setIdx((i) => i - 1)} size={42} a11y="Previous item" variant="soft" />
                 <View
                   {...itemResponder.panHandlers}
                   accessible
                   accessibilityRole="button"
                   accessibilityLabel={`${cur.name}${cur.kind === 'food' ? `, ${inventory[cur.id]} left` : ''}. Tap to give it to Meng, or drag it onto her`}
-                  style={{ alignItems: 'center', minWidth: 96, opacity: drag ? 0.35 : 1 }}
+                  style={{ alignItems: 'center', minWidth: 92, opacity: drag ? 0.35 : 1 }}
                 >
-                  <View style={{ width: 80, height: 80, borderRadius: 24, backgroundColor: colors.brandSoft, borderWidth: 3, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-                    <Icon name={cur.icon} size={46} color={colors.accent} />
+                  <View style={{ width: 76, height: 76, borderRadius: 24, backgroundColor: colors.brandSoft, borderWidth: 3, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+                    <Icon name={cur.icon} size={44} color={colors.accent} />
                   </View>
                   <Txt v="small" bold center>
                     {cur.name}
                     {cur.kind === 'food' ? ` ×${inventory[cur.id]}` : ''}
                   </Txt>
                 </View>
-                <RoundBtn icon="next" onPress={() => setIdx((i) => i + 1)} size={44} a11y="Next item" />
+                <RoundBtn icon="next" onPress={() => setIdx((i) => i + 1)} size={42} a11y="Next item" variant="soft" />
               </View>
             ) : (
               <Txt v="small" center color={colors.textMuted}>{room === 'kitchen' ? 'Pantry is empty' : 'No toys yet'}</Txt>
             )}
           </View>
 
-          <RoundBtn icon="sparkle" label="Shop" onPress={() => setSheet('shop')} a11y="Open the shop" />
+          <RoundBtn icon="sparkle" label="Shop" onPress={() => setSheet('shop')} a11y="Open the shop" size={58} />
         </View>
 
         {particles.map((p) => (
-          <FloatUp key={p.id} p={p} onDone={removeParticle} />
+          <Fx key={p.id} p={p} onDone={removeParticle} />
         ))}
         {drag && cur ? (
-          <View pointerEvents="none" style={{ position: 'absolute', left: drag.x - root.current.x - 40, top: drag.y - root.current.y - 40 }}>
-            <View style={{ width: 80, height: 80, borderRadius: 24, backgroundColor: colors.brandSoft, borderWidth: 3, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-              <Icon name={cur.icon} size={46} color={colors.accent} />
+          <View pointerEvents="none" style={{ position: 'absolute', left: drag.x - root.current.x - 38, top: drag.y - root.current.y - 38 }}>
+            <View style={{ width: 76, height: 76, borderRadius: 24, backgroundColor: colors.brandSoft, borderWidth: 3, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name={cur.icon} size={44} color={colors.accent} />
             </View>
           </View>
         ) : null}
@@ -740,12 +914,13 @@ export function MengScreen({ go }: { go: Go }) {
 
       <Sheet visible={sheet === 'help'} title={`${MASCOT_NAME}'s home`} onClose={() => setSheet(null)}>
         <Card>
-          <Txt>• <Txt bold>Pet:</Txt> rub {MASCOT_NAME} with your finger (or tap her). She purrs!</Txt>
+          <Txt>• <Txt bold>Pet:</Txt> rub {MASCOT_NAME} with your finger (or tap her). She purrs and kneads!</Txt>
           <Txt>• <Txt bold>Feed:</Txt> in the Kitchen, slide the snack at the bottom up onto her, or just tap it. Use ‹ › to pick another snack.</Txt>
           <Txt>• <Txt bold>Play:</Txt> in the Living room, toss her a toy the same way.</Txt>
           <Txt>• <Txt bold>Nap:</Txt> in the Bedroom, tap the lamp.</Txt>
           <Txt>• <Txt bold>Shop:</Txt> spend the treats you earn from lessons.</Txt>
-          <Txt>• <Txt bold>Secrets:</Txt> rub really fast, or tap her a few times quickly…</Txt>
+          <Txt>• <Txt bold>Her own life:</Txt> she stretches, yawns, chases butterflies, and dozes off if you leave her alone for a while.</Txt>
+          <Txt>• <Txt bold>Secrets:</Txt> rub really fast, pet her for a long time, or tap her a few times quickly…</Txt>
         </Card>
         <Card>
           <Kicker icon="bowl">Tummy: {fullnessWord(pet.fullness)} ({pet.fullness}/100)</Kicker>

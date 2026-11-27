@@ -7,6 +7,7 @@ import { LESSONS, STAGES } from '../content';
 import { fullnessWord } from '../pet';
 import {
   addDays,
+  arcadeItems,
   canStartNew,
   currentStreak,
   dayStr,
@@ -170,6 +171,13 @@ export function HomeScreen({ go }: { go: Go }) {
           </Card>
         ) : null}
 
+
+        <BigButton
+          label="Game arcade"
+          sub="Quick games from lessons you've finished"
+          icon="star"
+          onPress={() => go({ name: 'review', items: arcadeItems(state), then: null, mode: 'arcade' })}
+        />
 
         <View style={{ gap: space.sm }}>
           <BigButton

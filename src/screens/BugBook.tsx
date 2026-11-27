@@ -28,6 +28,18 @@ function describe(item: ReviewItem): { prompt: string; answer: string; from: str
   } else if (st.kind === 'build') {
     prompt = st.prompt;
     answer = st.answer.join(' ');
+  } else if (st.kind === 'sort') {
+    prompt = st.prompt;
+    answer = st.items.map(([t, b]) => `${t} → ${st.buckets[b]}`).join(' · ');
+  } else if (st.kind === 'spot') {
+    prompt = `${st.prompt} (${st.tokens.join(' ')})`;
+    answer = `${st.tokens[st.bug]} → ${st.fix}`;
+  } else if (st.kind === 'odd') {
+    prompt = st.prompt;
+    answer = st.items[st.answer];
+  } else if (st.kind === 'chartpick') {
+    prompt = st.prompt;
+    answer = st.answer;
   } else if (st.kind === 'tf') {
     prompt = st.prompt;
     answer = st.statements.map(([s, v]) => `${v ? 'True' : 'False'}: ${s}`).join(' · ');

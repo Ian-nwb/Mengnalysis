@@ -1,4 +1,4 @@
-import { build, match, tf } from '../build';
+import { build, chartpick, match, odd, sort, spot, tf } from '../build';
 import { Step } from '../types';
 
 // Duolingo-style game steps, added near the end of existing lessons (see ../index.ts).
@@ -55,3 +55,31 @@ export const GAMES: Record<string, Step[]> = {
   // Career
   s8l3: [build('Build the STAR order.', ['Situation', '→', 'Task', '→', 'Action', '→', 'Result'], ['Reason', 'Summary'], 'Set the scene, your goal, what YOU did, the result.')],
 };
+
+// More rounds with the newer game types. Merged into GAMES (lessons can have several games).
+const MORE: Record<string, Step[]> = {
+  s1x3: [sort('Numbers or words?', ['Quantitative (numbers)', 'Qualitative (words)'], [['4 out of 5 stars', 0], ['"The coffee was too bitter"', 1], ['Age: 34', 0], ['Favorite color: purple', 1], ['Visits this month: 12', 0]], 'Numbers you can measure vs. descriptions in words.')],
+  s1z2: [sort('Drop, fill or flag?', ['Drop the row', 'Fill a value', 'Flag as unknown'], [['3 of 10,000 rows missing at random', 0], ['Sales on a closed day are blank (should be 0)', 1], ['City is missing, but the order is real', 2]], 'Pick the option that keeps the truth intact.')],
+  s2l6: [odd('Which reference is NOT locked?', ['A1', '$A$1', '$B$2', '$C$9'], 'Only A1 has no $ signs, so it shifts when copied.')],
+  s2l7: [spot('This IF formula shows an error. Tap the bug.', ['=IF(', 'B2>5', ',', 'Big', ',', '"Small"', ')'], 3, '"Big"', 'Text answers need quotes, like "Big".')],
+  s3l3: [chartpick('Tap the most consistent shop (smallest standard deviation).', 'Standard deviation of daily sales', [['Shop A', 1.5], ['Shop B', 45], ['Shop C', 12]], 'Shop A', 'Small SD = sales stay close to the average every day.')],
+  s3x1: [chartpick('Tap the outlier.', 'Daily orders', [['Mon', 52], ['Tue', 48], ['Wed', 55], ['Thu', 210], ['Fri', 50]], 'Thu', 'Thursday is about 4× the other days. Investigate before deleting!')],
+  s4l3: [spot('This query fails. Tap the bug.', ['SELECT', '*', 'FROM', 'sales', 'WHERE', 'drink', '=', 'Latte'], 7, "'Latte'", 'Text values need single quotes in SQL.')],
+  s4l7: [spot('This query is missing something. Tap the bug.', ['SELECT', 'drink,', 'SUM(price)', 'FROM', 'sales', 'GROUP', 'drink'], 5, 'GROUP BY', "It's GROUP BY: two words.")],
+  s4l8: [sort('WHERE or HAVING?', ['WHERE (rows)', 'HAVING (groups)'], [['price > 5', 0], ['COUNT(*) > 2', 1], ["day = 'Mon'", 0], ['SUM(price) > 10', 1]], 'WHERE filters rows before grouping; HAVING filters groups after.')],
+  s4x8: [spot('This query returns nothing. Tap the bug.', ['SELECT', '*', 'FROM', 'users', 'WHERE', 'referrer', '=', 'NULL'], 6, 'IS', '= NULL never matches anything. Use IS NULL.')],
+  s5l2: [chartpick('Tap the best-selling drink.', 'Drinks sold this week', [['Latte', 42], ['Iced Latte', 35], ['Cold Brew', 28], ['Mocha', 19], ['Tea', 11]], 'Latte', 'The longest bar wins: 42.')],
+  s5l4: [odd('Which one is a weak chart choice?', ['A pie chart with 9 slices', 'A sorted bar chart of 9 products', 'A line chart of monthly sales', 'A scatter plot of price vs. sales'], 'Nine slices are hard to compare. Sorted bars are clearer.')],
+  s5x2: [chartpick('Where do most orders fall? Tap it.', 'Order sizes (count of orders)', [['$0–3', 40], ['$3–6', 120], ['$6–9', 60], ['$9–12', 15], ['$12+', 5]], '$3–6', '120 orders: the tallest bin.')],
+  s6l2: [spot('This line crashes. Tap the problem.', ['total', '=', '"5"', '+', '5'], 2, '5', 'Text plus a number is a TypeError. Use the number 5.')],
+  s6l6: [spot('This filter has a bug. Tap it.', ['df[df["drink"]', '=', '"Latte"]'], 1, '==', 'Comparisons use ==. A single = stores a value.')],
+  s7m3: [odd('Which one is NOT a cloud data warehouse?', ['Excel', 'BigQuery', 'Snowflake', 'Databricks'], 'Excel is a spreadsheet; the others hold company-sized data in the cloud.')],
+  s7l1: [sort('BI tool or data warehouse?', ['BI tool (shows data)', 'Warehouse (stores data)'], [['Power BI', 0], ['Looker Studio', 0], ['Tableau', 0], ['BigQuery', 1], ['Snowflake', 1]], 'Warehouses store the data; BI tools show it.')],
+  s9l5: [sort('Safe to paste into a public AI tool?', ['Safe', 'Keep private'], [['Column names', 0], ['A made-up sample row', 0], ['Customer emails', 1], ['Employee salaries', 1], ['A database password', 1]], 'Structure is fine; real or secret data stays private.')],
+  s10l2: [sort('Cost or value?', ['Cost of winning customers', 'Value customers bring'], [['CAC', 0], ['Ad spend', 0], ['LTV', 1], ['Average order value', 1]], 'Healthy businesses keep value well above cost (LTV at least 3× CAC).')],
+  s11l5: [sort('Which check catches each problem?', ['Freshness', 'Volume', 'Schema'], [["Yesterday's data never loaded", 0], ['Only 800 rows instead of 50,000', 1], ['Column "amount" was renamed', 2]], 'Freshness = did it load; volume = how much; schema = did the shape change.')],
+  s12l3: [odd('Which is NOT a P&L (finance) number?', ['Click-through rate', 'Revenue', 'COGS', 'Gross profit'], 'CTR is a marketing metric.')],
+  s13l3: [chartpick('Tap the channel with the best ROAS.', 'ROAS by channel', [['Social', 2.5], ['Search', 4], ['Email', 7]], 'Email', 'Email returns 7 for every 1 spent.')],
+  s8l2: [odd('Which resume bullet is the weak one?', ['Responsible for reports', 'Cut reporting time 80% with a Looker Studio dashboard', 'Found $12K a year in savings with SQL', 'Built a churn analysis used by 3 teams'], 'Strong bullets show action + tool + result.')],
+};
+for (const [k, v] of Object.entries(MORE)) GAMES[k] = [...(GAMES[k] ?? []), ...v];

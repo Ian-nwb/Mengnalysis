@@ -102,6 +102,15 @@ export const GUIDES: { id: string; icon: IconName; title: string; body: string[]
     ],
   },
   {
+    id: 'games',
+    icon: 'star',
+    title: 'Games and the arcade',
+    body: [
+      'Lessons mix in games: match the pairs, build answers from tiles, true or false, sort into groups, find the bug, odd one out, and tap the chart.',
+      'The Game arcade on Today plays a quick mix of games from lessons you have finished, plus a glossary matching round.',
+    ],
+  },
+  {
     id: 'backup',
     icon: 'shield',
     title: 'Backups',

@@ -5,7 +5,7 @@ import { shuffle } from '../engine';
 import { useApp } from '../state';
 import { radius, space, type } from '../theme';
 import { MascotSays } from './Mascot';
-import { BuildStep, MatchStep, TrueFalseStep } from './games';
+import { BuildStep, ChartPickStep, MatchStep, OddStep, SortStep, SpotStep, TrueFalseStep } from './games';
 import { SheetStep } from './sheet';
 import { SqlStep } from './sql';
 import { BigButton, BtnState, Card, ExampleView, exampleSpeech, Feedback, ListenButton, Txt, useAutoRead } from './ui';
@@ -157,6 +157,14 @@ export function StepView({ step, onAnswer, onContinue }: { step: Step; onAnswer:
       return <BuildStep step={step} onAnswer={onAnswer} onContinue={onContinue} />;
     case 'tf':
       return <TrueFalseStep step={step} onAnswer={onAnswer} onContinue={onContinue} />;
+    case 'sort':
+      return <SortStep step={step} onAnswer={onAnswer} onContinue={onContinue} />;
+    case 'spot':
+      return <SpotStep step={step} onAnswer={onAnswer} onContinue={onContinue} />;
+    case 'odd':
+      return <OddStep step={step} onAnswer={onAnswer} onContinue={onContinue} />;
+    case 'chartpick':
+      return <ChartPickStep step={step} onAnswer={onAnswer} onContinue={onContinue} />;
     case 'sheet':
       return <SheetStep step={step} onAnswer={onAnswer} onContinue={onContinue} />;
     case 'sql':

@@ -57,11 +57,12 @@ const PATHS = {
   user: 'M12 12a4 4 0 1 0 0-8a4 4 0 1 0 0 8z M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5',
   music: 'M9 18V5l11-2v13 M9 18a3 3 0 1 1-6 0a3 3 0 1 1 6 0z M20 16a3 3 0 1 1-6 0a3 3 0 1 1 6 0z',
   link: 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1 M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1',
+  butterfly: 'M12 11c-1.5-4.5-6-7.5-8.5-5.5S3 12 8 12.5c-3.5 1-4.5 4.5-2.5 6s4.5-1 6.5-5.5c2 4.5 4.5 7 6.5 5.5s1-5-2.5-6c5-.5 7-5 4.5-7S13.5 6.5 12 11z',
   database: 'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3z M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6 M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3',
 } as const;
 
 export type IconName = keyof typeof PATHS;
-const FILLED: IconName[] = ['play', 'stop', 'star', 'flame', 'sparkle', 'bolt', 'paw'];
+const FILLED: IconName[] = ['play', 'stop', 'star', 'flame', 'sparkle', 'bolt', 'paw', 'butterfly'];
 
 export function Icon({ name, size = 24, color, filled }: { name: IconName; size?: number; color: string; filled?: boolean }) {
   const fill = filled ?? FILLED.includes(name);

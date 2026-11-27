@@ -240,6 +240,17 @@ export const GLOSSARY: Term[] = [
   { term: 'Sample size', stage: 3, def: 'How much data a test needs. Smaller effects need bigger samples.' },
   { term: 'Case study', stage: 13, def: 'A real-world problem worked end to end: question, data, analysis, recommendation.' },
   { term: 'Cleaning log', stage: 13, def: 'A short record of every change you made to the data, so others can trust and repeat it.' },
+  { term: 'Data dictionary', stage: 0, def: 'A guide to a dataset: what each column means, its type and allowed values.' },
+  { term: 'VARCHAR', stage: 0, def: 'A database text type, for values like names and product titles.' },
+  { term: 'Orchestration', stage: 7, def: 'Running pipeline steps in the right order on a schedule (Airflow, Dagster, dbt Cloud jobs).' },
+  { term: 'DAG', stage: 7, def: 'Directed acyclic graph: pipeline steps connected by arrows, with no loops.' },
+  { term: 'Partition (warehouse)', stage: 7, def: 'A chunk of a big table, usually one per day. Filtering on it scans less data.' },
+  { term: 'Data contract', stage: 7, def: 'An agreement about a dataset\'s columns, freshness, meaning and owner.' },
+  { term: 'Few-shot prompting', stage: 9, def: 'Showing an AI one or more example inputs and outputs in your prompt.' },
+  { term: 'Price elasticity', stage: 10, def: 'How strongly demand changes when the price changes.' },
+  { term: 'NPS', stage: 10, def: 'Net Promoter Score: % promoters (9–10) minus % detractors (0–6).' },
+  { term: 'Payback period', stage: 10, def: 'Months until a customer earns back what it cost to win them: CAC ÷ monthly profit.' },
+  { term: 'Completion rate', stage: 12, def: 'The share of people who finish, like a course: completed ÷ enrolled.' },
 ];
 
 export const glossarySorted = () => [...GLOSSARY].sort((a, b) => a.term.localeCompare(b.term, undefined, { sensitivity: 'base' }));

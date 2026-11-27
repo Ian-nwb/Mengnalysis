@@ -58,7 +58,7 @@ export function RewardScreen({
   return (
     <Screen>
       <Stagger step={120}>
-        <MascotSays mood="cheer" size={160}>
+        <MascotSays mood="cheer" size={160} alive>
           <Txt v="h1" center>{retried ? 'Mastered!' : 'Lesson complete!'}</Txt>
           <Txt center color={colors.textMuted}>{title}</Txt>
         </MascotSays>

@@ -377,6 +377,10 @@ function DataCards() {
 }
 
 const WHATS_NEW = [
+  'Meng comes alive: her tail swishes, ears twitch, she kneads when purring, chases butterflies, dozes off and dances after a big meal',
+  'New games: Sort into groups, Find the bug, Odd one out and Tap the chart, plus a Game arcade on Today',
+  '24 new lessons (309 in total) and 11 new glossary terms',
+  "A cleaner Meng's home: one status band on top, no overlapping buttons",
   'New games in lessons: Match the pairs, Build it from word tiles, and True or false',
   'A term-matching game in warm-ups, practice and Learn → Glossary',
   'New stage: Real-World Projects (5 case studies), plus 15 new skill lessons',

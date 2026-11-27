@@ -17,6 +17,7 @@ import { stage12 } from './extra/s12d';
 import { stage2w } from './extra/s2w';
 import { stage4z, stage8z } from './extra/s4z8z';
 import { GAMES } from './extra/games';
+import { stage0w, stage10w, stage11w, stage12w, stage13w, stage14w, stage7w, stage9w } from './extra/s16';
 import { stage13, stage1z, stage2v, stage3z, stage4p, stage5z, stage6z } from './extra/s13';
 
 export const STAGES: Stage[] = [
@@ -109,21 +110,21 @@ function addGames(lessons: Lesson[]): Lesson[] {
 
 // Lesson ids must never change (progress is saved by id). Stage numbers may.
 export const LESSONS: Lesson[] = addGames(addReflections([
-  ...stage0,
+  ...withExtras(stage0, stage0w),
   ...withExtras(stage1, [...stage1x, ...stage1y, ...stage1z]),
   ...withExtras(stage2, [...stage2x, ...stage2w, ...stage2v, ...stage2y]),
   ...withExtras(stage3, [...stage3x, ...stage3y, ...stage3z]),
   ...withExtras(stage4, [...stage4x, ...stage4y, ...stage4z, ...stage4p]),
   ...withExtras(stage5, [...stage5x, ...stage5y, ...stage5z]),
   ...withExtras(stage6, [...stage6x, ...stage6y, ...stage6z]),
-  ...stage7m,
+  ...withExtras(stage7m, stage7w),
   ...withExtras(stage7, [...stage7x, ...stage8y, ...stage8z]),
-  ...stage9,
-  ...stage10,
-  ...stage11,
-  ...stage12,
-  ...stage13,
-  ...withExtras(stage8, [...stage8x, ...stage11y]),
+  ...withExtras(stage9, stage9w),
+  ...withExtras(stage10, stage10w),
+  ...withExtras(stage11, stage11w),
+  ...withExtras(stage12, stage12w),
+  ...withExtras(stage13, stage13w),
+  ...withExtras(stage8, [...stage8x, ...stage11y, ...stage14w]),
 ]));
 
 const cardMap = new Map<string, ReviewCard>();

@@ -42,6 +42,23 @@ export const build = (prompt: string, answer: string[], extras: string[], why: s
 /** Quick true/false round. */
 export const tf = (prompt: string, statements: [string, boolean][], why: string): Step => ({ kind: 'tf', prompt, statements, why });
 
+/** Sort each item into a bucket: items are [text, bucket index]. */
+export const sort = (prompt: string, buckets: string[], items: [string, number][], why: string): Step => ({ kind: 'sort', prompt, buckets, items, why });
+/** Find the bug: tap the wrong token. */
+export const spot = (prompt: string, tokens: string[], bug: number, fix: string, why: string): Step => ({ kind: 'spot', prompt, tokens, bug, fix, why });
+/** Odd one out: write the odd item FIRST; the app shuffles. */
+export const odd = (prompt: string, items: string[], why: string): Step => ({ kind: 'odd', prompt, items, answer: 0, why });
+/** Tap the bar in a chart that answers the question. */
+export const chartpick = (prompt: string, title: string, data: [string, number][], answer: string, why: string, unit?: string): Step => ({
+  kind: 'chartpick',
+  prompt,
+  title,
+  data,
+  answer,
+  why,
+  unit,
+});
+
 export const reflect = (prompt: string, sample: string): Step => ({ kind: 'reflect', prompt, sample });
 
 export const rc = (front: string, options: string[]): Omit<ReviewCard, 'id'> => ({ front, options, answer: 0 });
