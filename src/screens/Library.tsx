@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Linking, Pressable, TextInput, View } from 'react-native';
 import { Icon, IconName } from '../components/Icon';
 import { MascotSays } from '../components/Mascot';
+import { TINTS, Tile } from '../components/kit';
 import { SheetTable } from '../components/sheet';
 import { BigButton, Card, ExampleView, exampleSpeech, Kicker, ListenButton, Screen, TopBar, Txt } from '../components/ui';
 import { lessonById, lessonsInStage, STAGES } from '../content';
@@ -16,12 +17,12 @@ import { useApp } from '../state';
 import { radius, space, type } from '../theme';
 
 type Section = 'notes' | 'guides' | 'reference' | 'glossary' | 'resources';
-const SECTIONS: { id: Section; label: string; icon: IconName }[] = [
-  { id: 'notes', label: 'Lesson notes', icon: 'book' },
-  { id: 'guides', label: 'Study guides', icon: 'bulb' },
-  { id: 'reference', label: 'Quick reference', icon: 'code' },
-  { id: 'glossary', label: 'Glossary', icon: 'text' },
-  { id: 'resources', label: 'Free resources', icon: 'link' },
+const SECTIONS: { id: Section; label: string; icon: IconName; tint: string }[] = [
+  { id: 'notes', label: 'Lesson notes', icon: 'book', tint: TINTS.lavender },
+  { id: 'guides', label: 'Study guides', icon: 'bulb', tint: TINTS.butter },
+  { id: 'reference', label: 'Quick reference', icon: 'code', tint: TINTS.sky },
+  { id: 'glossary', label: 'Glossary', icon: 'text', tint: TINTS.mint },
+  { id: 'resources', label: 'Free resources', icon: 'link', tint: TINTS.peach },
 ];
 
 function GuideList({ go }: { go: Go }) {
@@ -146,9 +147,124 @@ export function StudyScreen({ stage, go }: { stage: number; go: Go }) {
   );
 }
 
+const refCount = REFERENCE.reduce((n, g) => n + g.items.length, 0);
+
+/** The Learn hub: search everything, continue reading, and colorful section tiles. */
+function LearnHub({ q, setQ, open, go }: { q: string; setQ: (v: string) => void; open: (s: Section) => void; go: Go }) {
+  const { state, colors } = useApp();
+  const size = type.body * state.settings.textScale;
+  const lastId = state.completed[state.completed.length - 1];
+  const last = lastId ? lessonById(lastId) : undefined;
+  const guide = last ? STUDY_GUIDES.find((g) => g.stage === last.stage) : STUDY_GUIDES[0];
+  const counts: Record<Section, string> = {
+    notes: `${state.completed.length} ${state.completed.length === 1 ? 'page' : 'pages'}`,
+    guides: `${STUDY_GUIDES.length} guides`,
+    reference: `${refCount} entries`,
+    glossary: `${glossarySorted().length} terms`,
+    resources: `${RESOURCES.length} sites`,
+  };
+  return (
+    <>
+      <Txt v="h1">Learn</Txt>
+      <Txt color={colors.textMuted}>Everything you've learned, ready to look up.</Txt>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm, backgroundColor: colors.surface, borderRadius: radius, borderWidth: 2, borderColor: q ? colors.brand : colors.border, paddingHorizontal: space.md }}>
+        <Icon name="search" size={26} color={colors.accent} />
+        <TextInput
+          value={q}
+          onChangeText={setQ}
+          placeholder="Search terms, formulas, lessons…"
+          placeholderTextColor={colors.textMuted}
+          accessibilityLabel="Search everything in Learn"
+          autoCorrect={false}
+          style={{ flex: 1, fontSize: size, color: colors.text, paddingVertical: 14 }}
+        />
+        {q ? (
+          <Pressable onPress={() => setQ('')} accessibilityRole="button" accessibilityLabel="Clear search" style={{ padding: 8 }}>
+            <Icon name="x" size={24} color={colors.textMuted} />
+          </Pressable>
+        ) : null}
+      </View>
+      {q.trim() ? (
+        <SearchResults q={q.trim().toLowerCase()} go={go} />
+      ) : (
+        <>
+          {last ? (
+            <Card tone="hero">
+              <Kicker icon="book">Pick up where you left off</Kicker>
+              <Txt v="h2">{last.title}</Txt>
+              <BigButton label="Read the notes" icon="book" variant="primary" onPress={() => go({ name: 'reader', id: last.id })} />
+              {guide ? <BigButton label={`Study guide: ${guide.title}`} icon="bulb" variant="ghost" onPress={() => go({ name: 'study', stage: guide.stage })} /> : null}
+            </Card>
+          ) : (
+            <MascotSays mood="think" size={100}>
+              <Txt>Finish your first lesson and its notes will appear here. Meanwhile, the study guides and glossary are open anytime!</Txt>
+            </MascotSays>
+          )}
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
+            {SECTIONS.map((x) => (
+              <Tile key={x.id} icon={x.icon} title={x.label} sub={counts[x.id]} tint={x.tint} onPress={() => open(x.id)} />
+            ))}
+            <Tile
+              icon="link"
+              title="Term match"
+              sub="Quick vocabulary game"
+              tint={TINTS.pink}
+              onPress={() => {
+                const m = termMatchItem(state, 4);
+                if (m) go({ name: 'review', items: [m], then: null, mode: 'practice' });
+              }}
+            />
+          </View>
+        </>
+      )}
+    </>
+  );
+}
+
+function SearchResults({ q, go }: { q: string; go: Go }) {
+  const { state, colors } = useApp();
+  const has = (t: string) => t.toLowerCase().includes(q);
+  const terms = glossarySorted().filter((t) => has(t.term) || has(t.def)).slice(0, 6);
+  const lessons = state.completed.map((id) => lessonById(id)).filter((l): l is Lesson => !!l && has(l.title)).slice(0, 6);
+  const guides = STUDY_GUIDES.filter((g) => has(g.title) || has(g.intro)).slice(0, 4);
+  const refs = REFERENCE.flatMap((g) => g.items.map((it) => ({ ...it, group: g.title }))).filter((it) => has(it.name) || has(it.does) || has(it.syntax)).slice(0, 6);
+  const none = !terms.length && !lessons.length && !guides.length && !refs.length;
+  return (
+    <>
+      {none ? <Txt>Nothing found for "{q}". Try a shorter word.</Txt> : null}
+      {terms.length ? <Kicker icon="text">Glossary</Kicker> : null}
+      {terms.map((t) => (
+        <Card key={t.term}>
+          <Txt bold color={colors.accent}>{t.term}</Txt>
+          <Txt>{t.def}</Txt>
+          {t.example ? <Txt bold style={{ fontFamily: 'monospace' }}>{t.example}</Txt> : null}
+        </Card>
+      ))}
+      {refs.length ? <Kicker icon="code">Quick reference</Kicker> : null}
+      {refs.map((it) => (
+        <Card key={it.group + it.name}>
+          <Txt bold color={colors.accent}>{it.name}</Txt>
+          <Txt bold style={{ fontFamily: 'monospace' }}>{it.syntax}</Txt>
+          <Txt>{it.does}</Txt>
+          <Txt v="small" color={colors.textMuted}>{it.group}</Txt>
+        </Card>
+      ))}
+      {lessons.length ? <Kicker icon="book">Your lesson notes</Kicker> : null}
+      {lessons.map((l) => (
+        <BigButton key={l.id} label={l.title} icon="book" onPress={() => go({ name: 'reader', id: l.id })} />
+      ))}
+      {guides.length ? <Kicker icon="bulb">Study guides</Kicker> : null}
+      {guides.map((g) => (
+        <BigButton key={g.stage} label={g.title} sub={`Stage ${g.stage}`} icon="bulb" onPress={() => go({ name: 'study', stage: g.stage })} />
+      ))}
+    </>
+  );
+}
+
 export function LibraryScreen({ go }: { go: Go }) {
   const { state, colors } = useApp();
-  const [tab, setTab] = useState<Section>('notes');
+  const [tab, setTab] = useState<Section | null>(null);
+  const [hubQ, setHubQ] = useState('');
   const [open, setOpen] = useState<number | null>(null);
   const [q, setQ] = useState('');
   const [stage, setStage] = useState<number | null>(null);
@@ -164,22 +280,20 @@ export function LibraryScreen({ go }: { go: Go }) {
 
   return (
     <Screen>
-      <Txt v="h1">Learn</Txt>
-      <Txt color={colors.textMuted}>Your study corner: notes, guides, quick reference, a glossary and free resources.</Txt>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
-        {SECTIONS.map((x) => (
-          <BigButton
-            key={x.id}
-            label={x.label}
-            icon={x.icon}
-            style={{ flexGrow: 1, flexBasis: 150 }}
-            state={tab === x.id ? 'selected' : 'normal'}
-            a11y={`${x.label}${tab === x.id ? ', selected' : ''}`}
-            onPress={() => setTab(x.id)}
-          />
-        ))}
-      </View>
-      {tab === 'notes' ? (
+      {tab === null ? (
+        <LearnHub q={hubQ} setQ={setHubQ} open={setTab} go={go} />
+      ) : (
+        <>
+          <TopBar onBack={() => setTab(null)} backLabel="Learn" />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+            <View style={{ width: 48, height: 48, borderRadius: 16, backgroundColor: SECTIONS.find((x) => x.id === tab)!.tint, alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name={SECTIONS.find((x) => x.id === tab)!.icon} size={26} color="#1B1420" />
+            </View>
+            <Txt v="h1" style={{ flexShrink: 1 }}>{SECTIONS.find((x) => x.id === tab)!.label}</Txt>
+          </View>
+        </>
+      )}
+      {tab === null ? null : tab === 'notes' ? (
         <>
           <MascotSays mood="think" size={110}>
             <Txt>

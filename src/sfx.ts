@@ -11,6 +11,8 @@ const SOURCES = {
   purr: require('../assets/sfx/purr.wav'),
   chomp: require('../assets/sfx/chomp.wav'),
   boing: require('../assets/sfx/boing.wav'),
+  scratch: require('../assets/sfx/scratch.wav'),
+  squeak: require('../assets/sfx/squeak.wav'),
 };
 export type Sfx = keyof typeof SOURCES;
 

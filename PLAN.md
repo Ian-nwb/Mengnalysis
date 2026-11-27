@@ -126,6 +126,11 @@ Today the native splash shows Meng's face, then a blank plum screen while fonts 
 - Meng's corner rebuilt as a virtual pet: rub to pet, drag-to-feed pantry, toy box, shop; new moods (purr, eat, love, hungry), blinking, breathing, hops, wiggles, floating hearts; purr/chomp/boing sounds
 - Rainy café music regenerated (warm brown-noise rain + soft drips instead of hiss); music generator kept in `scripts/make-music.py`
 
+## v1.6.0 (2026-11-27)
+- Cats: unlockable Tuxedo (10 lessons), Orangina (7-day streak), Whitey (2 bosses), Dost (30 lessons); pick one in Me → Cats
+- Redesigned Today, Me & settings (profile + grouped rows, On/Off switches, slide-up panels) and Learn (hub with search, continue card, tiles)
+- Meng: heart eyes only sometimes; real toy play (fling yarn, feather wand, mouse chase, box scratching) with walking, scratch/squeak sounds
+
 ## v1.5.0 (2026-11-27)
 - Meng animations: layered, native-driven tail/ears/paws/extras; greets, leans toward food, happy dance, hunger rumble, butterfly chase, dozes off and wakes, love burst after long petting, toy drop-and-pounce
 - Meng's home design fixes: solid status band (meters can no longer overlap the help button), room art only below the band, window/shelf moved below the speech bubble, curtains on a rod

@@ -3,7 +3,8 @@ import { Animated, Easing, Modal, PanResponder, Pressable, ScrollView, View } fr
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Ellipse, G, Line, Path, Rect } from 'react-native-svg';
 import { Icon, IconName } from '../components/Icon';
-import { Mascot, MASCOT_NAME, Mood } from '../components/Mascot';
+import { Mascot, Mood } from '../components/Mascot';
+import { currentCat } from '../cats';
 import { BigButton, Card, Kicker, ListenButton, ProgressBar, Txt } from '../components/ui';
 import { buzz } from '../haptics';
 import { useReducedMotion } from '../motion';
@@ -26,7 +27,7 @@ type FxKind = 'float' | 'drop' | 'fly';
 type Particle = { id: number; x: number; y: number; icon: IconName; color: string; kind: FxKind; size?: number; travel?: number };
 type Rect4 = { x: number; y: number; w: number; h: number };
 const PURR_LINES = ['Purrrr…', 'Right behind the ears, please.', 'You are my favorite human.', 'Mrrp! ♡', 'More scritches!', 'Ahh, the best spot.'];
-const IDLE_ACTS = ['look', 'look', 'yawn', 'stretch', 'hop', 'peek', 'butterfly', 'wave'] as const;
+const IDLE_ACTS = ['look', 'look', 'yawn', 'stretch', 'hop', 'peek', 'butterfly', 'wave', 'look', 'love'] as const;
 
 // ---------- room art (drawn only inside the room area, never under the controls) ----------
 function RoomArt({ room, w, h, dark, lightsOff }: { room: Room; w: number; h: number; dark: boolean; lightsOff: boolean }) {
@@ -201,8 +202,8 @@ function Sheet({ visible, title, onClose, children }: { visible: boolean; title:
 }
 
 export function MengScreen({ go }: { go: Go }) {
-  void go;
   const { state, setState, colors } = useApp();
+  const MASCOT_NAME = currentCat(state).name;
   const reduced = useReducedMotion();
   const dark = colors.bg === palettes.dark.bg;
   const pet = state.pet;
@@ -225,6 +226,9 @@ export function MengScreen({ go }: { go: Go }) {
   const [look, setLook] = useState({ x: 0, y: 0 });
   const [yawn, setYawn] = useState(false);
   const [antic, setAntic] = useState(false); // mouth open, waiting for food
+  const [play, setPlay] = useState<null | 'yarn' | 'mouse' | 'feather' | 'box'>(null);
+  const [marks, setMarks] = useState(0);
+  const [mouseLeft, setMouseLeft] = useState(false);
 
   const rootRef = useRef<React.ComponentRef<typeof View> | null>(null);
   const mengRef = useRef<React.ComponentRef<typeof View> | null>(null);
@@ -246,6 +250,17 @@ export function MengScreen({ go }: { go: Go }) {
   const enter = useRef(new Animated.Value(0)).current;
   const lean = useRef(new Animated.Value(0)).current;
   const shake = useRef(new Animated.Value(0)).current;
+  // Toy play: Meng can walk left/right; toys live in room coordinates.
+  const posX = useRef(new Animated.Value(0)).current;
+  const posXv = useRef(0);
+  const toyX = useRef(new Animated.Value(0)).current;
+  const toyY = useRef(new Animated.Value(0)).current;
+  const toyV = useRef({ x: 0, y: 0 });
+  const boxShake = useRef(new Animated.Value(0)).current;
+  const stageRef = useRef<React.ComponentRef<typeof View> | null>(null);
+  const stageO = useRef({ x: 0, y: 0 });
+  const lastSwat = useRef(0);
+  const lastWalk = useRef(0);
 
   // What the bottom bar holds depends on the room.
   const items: PetItem[] =
@@ -258,7 +273,7 @@ export function MengScreen({ go }: { go: Go }) {
 
   const sleeping = room === 'bedroom' && lightsOff;
   const sleepy = sleeping || dozing;
-  const baseMood: Mood = sleepy ? 'sleep' : pet.fullness < 30 ? 'hungry' : pet.happiness >= 85 && pet.fullness >= 70 ? 'love' : 'happy';
+  const baseMood: Mood = sleepy ? 'sleep' : pet.fullness < 30 ? 'hungry' : 'happy';
   const mood: Mood = antic ? 'eat' : tempMood ?? baseMood;
   const baseLine = sleeping
     ? 'Zzz… goodnight. Tap the lamp to turn the lights back on.'
@@ -277,6 +292,8 @@ export function MengScreen({ go }: { go: Go }) {
             : 'Rub me for scritches! Toys from the shop live here.';
 
   // Values the timers need without restarting.
+  const playRef = useRef<string | null>(null);
+  playRef.current = play;
   const life = useRef({ sleeping, dozing, fullness: pet.fullness });
   life.current = { sleeping, dozing, fullness: pet.fullness };
 
@@ -344,7 +361,7 @@ export function MengScreen({ go }: { go: Go }) {
     rootRef.current?.measureInWindow((x, y, w) => (root.current = { x, y, w }));
     mengRef.current?.measureInWindow((x, y, w, h) => (mengRect.current = { x, y, w, h }));
   };
-  const center = () => ({ x: mengRect.current.x - root.current.x + mengRect.current.w / 2, y: mengRect.current.y - root.current.y + mengRect.current.h * 0.3 });
+  const center = () => ({ x: mengRect.current.x - root.current.x + mengRect.current.w / 2 + posXv.current, y: mengRect.current.y - root.current.y + mengRect.current.h * 0.3 });
   const touched = () => {
     lastAct.current = Date.now();
   };
@@ -409,7 +426,7 @@ export function MengScreen({ go }: { go: Go }) {
   useEffect(() => {
     if (reduced) return;
     const t = setInterval(() => {
-      if (busy.current) return;
+      if (busy.current || playRef.current) return;
       const L = life.current;
       if (L.sleeping) {
         Animated.sequence([
@@ -445,6 +462,7 @@ export function MengScreen({ go }: { go: Go }) {
       } else if (a === 'stretch') fns.current.doStretch();
       else if (a === 'hop') fns.current.doHop(0.7);
       else if (a === 'wave') fns.current.feel('wave', 1600);
+      else if (a === 'love') fns.current.feel('love', 1400);
       else if (a === 'butterfly') {
         // A butterfly flutters past; Meng's eyes follow it, then she pounces.
         const m = mengRect.current;
@@ -550,7 +568,7 @@ export function MengScreen({ go }: { go: Go }) {
         if (++n >= 8) {
           clearInterval(t);
           setChew(false);
-          if (after >= 90 || it.cost >= 5) {
+          if ((after >= 90 || it.cost >= 5) && Math.random() < 0.5) {
             feel('love', 2400);
             doDance();
             spawn(c.x, c.y - 10, 'heart', '#E0457B', 3);
@@ -563,22 +581,194 @@ export function MengScreen({ go }: { go: Go }) {
       }, 160);
     } else {
       setState((s) => ({ ...s, pet: { ...s.pet, happiness: Math.min(100, s.pet.happiness + it.happy) } }));
-      // The toy drops and bounces next to her… then she pounces.
-      spawn(c.x + mengRect.current.w * 0.42, c.y + mengRect.current.h * 0.55, it.icon, colors.accent, 1, 'drop', 40);
-      playSfx('boing');
-      busy.current = true;
-      setLook({ x: 1, y: 0.6 });
-      setTimeout(() => {
-        setLook({ x: 0, y: 0 });
-        feel('cheer', 2200);
-        doWiggle();
-        doHop(1.2);
-        buzz('success');
-        spawn(c.x, c.y, 'star', BRAND, 3);
-      }, 650);
+      startPlay(it.id as 'yarn' | 'mouse' | 'feather' | 'box');
+      return;
     }
     setLine(it.line);
   };
+
+  // ---------- toy play ----------
+  const mengSz = Math.max(140, Math.min(stage.w * 0.66, stage.h * 0.66, 300));
+  const floorTop = stage.h * 0.62;
+  const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
+  const measureStage = () => stageRef.current?.measureInWindow((x, y) => (stageO.current = { x, y }));
+  const moveMeng = (x: number, speed = 6) => {
+    const range = Math.max(0, stage.w / 2 - mengSz * 0.42);
+    const t = clamp(x, -range, range);
+    if (Math.abs(t - posXv.current) > 4) setLook({ x: t > posXv.current ? 1 : -1, y: 0.2 });
+    posXv.current = t;
+    Animated.spring(posX, { toValue: t, useNativeDriver: true, speed, bounciness: 4 }).start();
+  };
+  const head = () => ({ x: stage.w / 2 + posXv.current, y: stage.h * 0.96 - mengSz * 0.55 });
+  const toyTo = (x: number, y: number, speed = 5) => {
+    toyV.current = { x, y };
+    Animated.parallel([
+      Animated.spring(toyX, { toValue: x, useNativeDriver: true, speed, bounciness: 8 }),
+      Animated.spring(toyY, { toValue: y, useNativeDriver: true, speed, bounciness: 8 }),
+    ]).start();
+  };
+  const toySet = (x: number, y: number) => {
+    toyV.current = { x, y };
+    toyX.setValue(x);
+    toyY.setValue(y);
+  };
+  const reward = (n = 2) => setState((s) => ({ ...s, pet: { ...s.pet, happiness: Math.min(100, s.pet.happiness + n) } }));
+  const CATCH_LINES = ['Pounce! 🐾', 'Got it!', 'Again, again!', 'Did you see that jump?', 'Too fast for you? 😼'];
+  const caught = (x: number, y: number) => {
+    feel('cheer', 1200);
+    doHop(1.3);
+    doWiggle(0.5);
+    playSfx('boing');
+    buzz('success');
+    reward(2);
+    spawn(x, y, 'star', BRAND, 2);
+    setLine(CATCH_LINES[Math.floor(Math.random() * CATCH_LINES.length)]);
+  };
+  const scratchBox = () => {
+    touched();
+    feel('scratch', 3000);
+    setLook({ x: 1, y: 0.4 });
+    reward(3);
+    [0, 950, 1900].forEach((ms) => setTimeout(() => playSfx('scratch'), ms));
+    [500, 1200, 1900, 2600].forEach((ms) => setTimeout(() => setMarks((m) => Math.min(9, m + 1)), ms));
+    if (!reduced)
+      Animated.sequence(
+        Array.from({ length: 12 }, (_, i) => Animated.timing(boxShake, { toValue: i === 11 ? 0 : i % 2 ? -1 : 1, duration: 240, useNativeDriver: true })),
+      ).start();
+    setTimeout(() => {
+      setLook({ x: 0, y: 0 });
+      setLine(['Scritch scritch… perfect box.', 'Best. Box. Ever. 📦', 'My claws feel amazing now!'][Math.floor(Math.random() * 3)]);
+    }, 3000);
+  };
+  // Yarn: after a throw, Meng runs over and bats it somewhere else.
+  const chaseYarn = () => {
+    const target = toyV.current;
+    setTimeout(() => moveMeng(target.x - stage.w / 2, 5), 250);
+    setTimeout(() => {
+      if (playRef.current !== 'yarn') return;
+      const near = Math.abs(stage.w / 2 + posXv.current - toyV.current.x) < mengSz * 0.55;
+      if (near) {
+        caught(toyV.current.x, toyV.current.y - 30);
+        const away = toyV.current.x > stage.w / 2 ? stage.w * (0.1 + Math.random() * 0.25) : stage.w * (0.65 + Math.random() * 0.25);
+        setTimeout(() => toyTo(away, clamp(floorTop + 40 + Math.random() * (stage.h - floorTop - 80), floorTop + 30, stage.h - 30), 4), 250);
+      } else setLine('Too far! Throw it closer to me 🧶');
+    }, 1150);
+  };
+  function startPlay(id: 'yarn' | 'mouse' | 'feather' | 'box') {
+    touched();
+    setPlay(id);
+    setMarks(0);
+    setTempMood(null);
+    busy.current = false;
+    if (id === 'yarn') {
+      toySet(stage.w / 2 + mengSz * 0.55, stage.h * 0.86);
+      setLine('Fling the yarn ball with your finger! I\'ll chase it 🧶');
+    } else if (id === 'feather') {
+      toySet(stage.w * 0.78, stage.h * 0.3);
+      setLine("Wave the feather around… I'm watching it 👀");
+    } else if (id === 'mouse') {
+      toySet(stage.w * 0.18, stage.h * 0.9);
+      setLine('A mouse!! Tap it to make it run 🐭');
+    } else {
+      moveMeng(-mengSz * 0.2);
+      setTimeout(scratchBox, 450);
+      setLine('A box!! Scritch scritch scritch 📦');
+    }
+  }
+  const endPlay = () => {
+    setPlay(null);
+    moveMeng(0);
+    setTimeout(() => setLook({ x: 0, y: 0 }), 600);
+    setLine('That was fun! Thank you 💕');
+  };
+
+  // The mouse scurries around on its own; Meng chases it.
+  useEffect(() => {
+    if (play !== 'mouse' || !stage.w) return;
+    const t = setInterval(() => {
+      const from = toyV.current.x;
+      const to = clamp(from + (Math.random() < 0.5 ? -1 : 1) * stage.w * (0.25 + Math.random() * 0.35), 30, stage.w - 30);
+      setMouseLeft(to < from);
+      toyV.current = { x: to, y: toyV.current.y };
+      Animated.timing(toyX, { toValue: to, duration: 650, easing: Easing.inOut(Easing.quad), useNativeDriver: true }).start();
+      playSfx('squeak');
+      setTimeout(() => fns2.current.moveMeng(to - stage.w / 2, 4), 250);
+      setTimeout(() => {
+        if (playRef.current !== 'mouse') return;
+        if (Math.abs(stage.w / 2 + posXv.current - toyV.current.x) < mengSz * 0.4) {
+          fns2.current.caught(toyV.current.x, toyV.current.y - 30);
+          setLine('Caught it! …and it slipped away again 🐭');
+        }
+      }, 1100);
+    }, 1700);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [play, stage.w, stage.h]);
+  const fns2 = useRef({ moveMeng, caught });
+  fns2.current = { moveMeng, caught };
+
+  // Yarn ball: drag and fling it.
+  const toyApi = useRef({ chaseYarn, toyTo, toySet, measureStage, head, caught, moveMeng, stage, floorTop, mengSz });
+  toyApi.current = { chaseYarn, toyTo, toySet, measureStage, head, caught, moveMeng, stage, floorTop, mengSz };
+  const yarnGrab = useRef({ moved: 0, sx: 0, sy: 0 });
+  const yarnResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderTerminationRequest: () => false,
+      onPanResponderGrant: (e) => {
+        toyApi.current.measureStage();
+        toyX.stopAnimation();
+        toyY.stopAnimation();
+        yarnGrab.current = { moved: 0, sx: e.nativeEvent.pageX, sy: e.nativeEvent.pageY };
+      },
+      onPanResponderMove: (e) => {
+        const { pageX, pageY } = e.nativeEvent;
+        yarnGrab.current.moved = Math.max(yarnGrab.current.moved, Math.hypot(pageX - yarnGrab.current.sx, pageY - yarnGrab.current.sy));
+        const A = toyApi.current;
+        toySet(Math.max(30, Math.min(A.stage.w - 30, pageX - stageO.current.x)), Math.max(30, Math.min(A.stage.h - 30, pageY - stageO.current.y)));
+      },
+      onPanResponderRelease: (_e, g) => {
+        const A = toyApi.current;
+        let vx = g.vx;
+        let vy = g.vy;
+        if (yarnGrab.current.moved < 10) {
+          vx = (Math.random() < 0.5 ? -1 : 1) * (0.8 + Math.random());
+          vy = -0.3;
+        }
+        const tx = Math.max(30, Math.min(A.stage.w - 30, toyV.current.x + vx * 320));
+        const ty = Math.max(A.floorTop + 30, Math.min(A.stage.h - 30, toyV.current.y + vy * 200));
+        A.toyTo(tx, ty, 4);
+        playSfx('tap');
+        A.chaseYarn();
+      },
+    }),
+  ).current;
+
+  // Feather wand: drag it around; Meng swats when it's near her head.
+  const featherResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderTerminationRequest: () => false,
+      onPanResponderGrant: () => toyApi.current.measureStage(),
+      onPanResponderMove: (e) => {
+        const A = toyApi.current;
+        const x = Math.max(28, Math.min(A.stage.w - 28, e.nativeEvent.pageX - stageO.current.x));
+        const y = Math.max(28, Math.min(A.stage.h - 28, e.nativeEvent.pageY - stageO.current.y));
+        toySet(x, y);
+        const h = A.head();
+        setLook({ x: Math.max(-1, Math.min(1, (x - h.x) / (A.mengSz * 0.5))), y: Math.max(-1, Math.min(1, (y - h.y) / (A.mengSz * 0.5))) });
+        const now = Date.now();
+        if (now - lastWalk.current > 500) {
+          lastWalk.current = now;
+          A.moveMeng((x - A.stage.w / 2) * 0.6, 4);
+        }
+        if (Math.hypot(x - h.x, y - h.y) < A.mengSz * 0.4 && now - lastSwat.current > 1000) {
+          lastSwat.current = now;
+          A.caught(x, y);
+        }
+      },
+    }),
+  ).current;
 
   const latest = useRef({ petTick, give, measure, cur, hopTap: () => {}, track: (_x: number, _y: number) => {}, endTrack: () => {} });
   latest.current = {
@@ -674,7 +864,7 @@ export function MengScreen({ go }: { go: Go }) {
         const { pageX, pageY } = e.nativeEvent;
         const m = mengRect.current;
         if (hold.current.moved <= 10) latest.current.give(it);
-        else if (pageX >= m.x && pageX <= m.x + m.w && pageY >= m.y && pageY <= m.y + m.h) latest.current.give(it);
+        else if (pageX >= m.x + posXv.current && pageX <= m.x + m.w + posXv.current && pageY >= m.y && pageY <= m.y + m.h) latest.current.give(it);
         else setLine('Bring it right up to me!');
       },
       onPanResponderTerminate: () => {
@@ -703,6 +893,10 @@ export function MengScreen({ go }: { go: Go }) {
     touched();
     setRoom(ROOMS[(roomI + d + ROOMS.length) % ROOMS.length].id);
     setIdx(0);
+    if (play) {
+      setPlay(null);
+      moveMeng(0);
+    }
     setDozing(false);
     if (room === 'bedroom') setLightsOff(false);
   };
@@ -755,9 +949,35 @@ export function MengScreen({ go }: { go: Go }) {
         </View>
 
         {/* the room */}
-        <View style={{ flex: 1, overflow: 'hidden' }} onLayout={(e) => setStage({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}>
+        <View
+          ref={stageRef}
+          style={{ flex: 1, overflow: 'hidden' }}
+          onLayout={(e) => {
+            setStage({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height });
+            measureStage();
+          }}
+        >
           {stage.w > 0 ? <RoomArt room={room} w={stage.w} h={stage.h} dark={dark} lightsOff={lightsOff} /> : null}
-          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-between', paddingTop: space.sm, paddingBottom: stage.h * 0.04 }}>
+          {play === 'box' ? (
+            <Pressable
+              onPress={scratchBox}
+              accessibilityRole="button"
+              accessibilityLabel="Cardboard box. Tap for more scratching"
+              style={{ position: 'absolute', left: stage.w / 2 + mengSz * 0.12, bottom: stage.h * 0.04, width: mengSz * 0.55, height: mengSz * 0.48 }}
+            >
+              <Animated.View style={{ flex: 1, transformOrigin: '50% 100%', transform: [{ rotate: boxShake.interpolate({ inputRange: [-1, 1], outputRange: ['-3deg', '3deg'] }) }] }}>
+                <Svg width="100%" height="100%" viewBox="0 0 100 90">
+                  <Path d="M6 30 L50 18 L94 30 L94 84 L50 90 L6 84 Z" fill="#C98B55" stroke="#1B1420" strokeWidth={4} strokeLinejoin="round" />
+                  <Path d="M6 30 L50 42 L94 30 M50 42 L50 90" stroke="#1B1420" strokeWidth={3} fill="none" />
+                  <Path d="M6 30 L-4 16 L40 6 L50 18 Z M94 30 L104 16 L60 6 L50 18 Z" fill="#DDA36D" stroke="#1B1420" strokeWidth={3} strokeLinejoin="round" />
+                  {Array.from({ length: marks }, (_, i) => (
+                    <Line key={i} x1={14 + (i % 3) * 9} y1={50 + Math.floor(i / 3) * 10} x2={22 + (i % 3) * 9} y2={62 + Math.floor(i / 3) * 10} stroke="#1B1420" strokeWidth={2.5} strokeLinecap="round" />
+                  ))}
+                </Svg>
+              </Animated.View>
+            </Pressable>
+          ) : null}
+          <View pointerEvents="box-none" style={{ flex: 1, alignItems: 'center', justifyContent: 'space-between', paddingTop: space.sm, paddingBottom: stage.h * 0.04 }}>
             <View
               style={{
                 backgroundColor: colors.surface,
@@ -777,7 +997,7 @@ export function MengScreen({ go }: { go: Go }) {
                 style={{
                   transform: [
                     { translateY: hop.interpolate({ inputRange: [0, 1], outputRange: [0, -24] }) },
-                    { translateX: Animated.add(enter.interpolate({ inputRange: [0, 1], outputRange: [0, 90] }), shake.interpolate({ inputRange: [-1, 1], outputRange: [-5, 5] })) },
+                    { translateX: Animated.add(Animated.add(enter.interpolate({ inputRange: [0, 1], outputRange: [0, 90] }), shake.interpolate({ inputRange: [-1, 1], outputRange: [-5, 5] })), posX) },
                     { rotate: lean.interpolate({ inputRange: [-1, 1], outputRange: ['-9deg', '9deg'] }) },
                     { rotate: wiggle.interpolate({ inputRange: [-1, 1], outputRange: ['-7deg', '7deg'] }) },
                     { scaleY: Animated.multiply(scale, squash.interpolate({ inputRange: [-1, 0, 1], outputRange: [1.1, 1, 0.82] })) },
@@ -789,6 +1009,42 @@ export function MengScreen({ go }: { go: Go }) {
               </Animated.View>
             </View>
           </View>
+          {play === 'yarn' || play === 'feather' || play === 'mouse' ? (
+            <Animated.View
+              {...(play === 'yarn' ? yarnResponder.panHandlers : play === 'feather' ? featherResponder.panHandlers : {})}
+              accessible
+              accessibilityRole="button"
+              accessibilityLabel={play === 'yarn' ? 'Yarn ball. Drag and fling it, or tap to toss it' : play === 'feather' ? 'Feather wand. Drag it around Meng' : 'Catnip mouse. Tap to make it run'}
+              onTouchEnd={
+                play === 'mouse'
+                  ? () => {
+                      playSfx('squeak');
+                      const to = toyV.current.x < stage.w / 2 ? stage.w - 40 : 40;
+                      setMouseLeft(to < toyV.current.x);
+                      toyV.current = { x: to, y: toyV.current.y };
+                      Animated.timing(toyX, { toValue: to, duration: 500, useNativeDriver: true }).start();
+                      moveMeng(to - stage.w / 2, 5);
+                    }
+                  : undefined
+              }
+              style={{
+                position: 'absolute',
+                left: -32,
+                top: -32,
+                width: 64,
+                height: 64,
+                borderRadius: 32,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: play === 'yarn' ? '#F5B3C8' : play === 'feather' ? colors.brandSoft : 'transparent',
+                borderWidth: play === 'mouse' ? 0 : 3,
+                borderColor: '#1B1420',
+                transform: [{ translateX: toyX }, { translateY: toyY }, { scaleX: play === 'mouse' && mouseLeft ? -1 : 1 }],
+              }}
+            >
+              <Icon name={play === 'yarn' ? 'yarn' : play === 'feather' ? 'feather' : 'mouse'} size={play === 'mouse' ? 52 : 40} color={play === 'mouse' ? colors.text : '#1B1420'} />
+            </Animated.View>
+          ) : null}
         </View>
 
         {/* bottom bar: pantry/toys · held item · shop */}
@@ -812,7 +1068,9 @@ export function MengScreen({ go }: { go: Go }) {
           )}
 
           <View style={{ flex: 1, alignItems: 'center' }}>
-            {room === 'bedroom' ? (
+            {play ? (
+              <RoundBtn icon="box" label="Put the toy away" onPress={endPlay} size={62} a11y="Put the toy away" />
+            ) : room === 'bedroom' ? (
               <RoundBtn icon={lightsOff ? 'bulb' : 'moon'} label={lightsOff ? 'Lights on' : 'Lights off'} onPress={toggleLights} size={70} a11y={lightsOff ? 'Turn the lights on' : 'Turn the lights off for a nap'} />
             ) : cur ? (
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -913,10 +1171,14 @@ export function MengScreen({ go }: { go: Go }) {
       </Sheet>
 
       <Sheet visible={sheet === 'help'} title={`${MASCOT_NAME}'s home`} onClose={() => setSheet(null)}>
+        <BigButton label="Change cat" sub="Unlock new cats as you learn" icon="paw" onPress={() => {
+          setSheet(null);
+          go({ name: 'cats' });
+        }} />
         <Card>
           <Txt>• <Txt bold>Pet:</Txt> rub {MASCOT_NAME} with your finger (or tap her). She purrs and kneads!</Txt>
           <Txt>• <Txt bold>Feed:</Txt> in the Kitchen, slide the snack at the bottom up onto her, or just tap it. Use ‹ › to pick another snack.</Txt>
-          <Txt>• <Txt bold>Play:</Txt> in the Living room, toss her a toy the same way.</Txt>
+          <Txt>• <Txt bold>Play:</Txt> in the Living room, give her a toy, then play! Fling the yarn ball, wave the feather near her, tap the mouse to make it run, or watch her scratch the box.</Txt>
           <Txt>• <Txt bold>Nap:</Txt> in the Bedroom, tap the lamp.</Txt>
           <Txt>• <Txt bold>Shop:</Txt> spend the treats you earn from lessons.</Txt>
           <Txt>• <Txt bold>Her own life:</Txt> she stretches, yawns, chases butterflies, and dozes off if you leave her alone for a while.</Txt>

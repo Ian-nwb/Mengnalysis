@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { Icon } from '../components/Icon';
-import { MascotSays } from '../components/Mascot';
+import { Mascot, MascotSays } from '../components/Mascot';
+import { catById, CatId, currentCat } from '../cats';
 import { BigButton, Card, Screen, Stagger, Txt } from '../components/ui';
 import { STAGES } from '../content';
 import { useReducedMotion } from '../motion';
@@ -37,6 +38,7 @@ export function RewardScreen({
   sheet,
   retried,
   treats,
+  newCat = null,
   go,
 }: {
   xp: number;
@@ -48,9 +50,11 @@ export function RewardScreen({
   sheet: number | null;
   retried: boolean;
   treats: number;
+  newCat?: string | null;
   go: Go;
 }) {
-  const { colors } = useApp();
+  const { colors, state } = useApp();
+  const catName = currentCat(state).name;
   useEffect(() => {
     playSfx('complete');
     if (levelUp) playSfx('levelup', 900);
@@ -80,8 +84,8 @@ export function RewardScreen({
         </View>
         {treats > 0 ? (
           <BigButton
-            label={`+${treats} ${treats === 1 ? 'treat' : 'treats'} for Meng!`}
-            sub="Visit Meng's corner to share them"
+            label={`+${treats} ${treats === 1 ? 'treat' : 'treats'} for ${catName}!`}
+            sub="Visit the cat corner to share them"
             icon="fish"
             onPress={() => go({ name: 'meng' })}
           />
@@ -98,6 +102,14 @@ export function RewardScreen({
             <Icon name="trophy" size={40} color={colors.accent} />
             <Txt v="h2" center>Level up!</Txt>
             <Txt center>You're now a <Txt bold>{levelUp}</Txt></Txt>
+          </Card>
+        ) : null}
+        {newCat ? (
+          <Card tone="hero" style={{ alignItems: 'center' }}>
+            <Mascot cat={newCat as CatId} mood="wave" size={130} />
+            <Txt v="h2" center>New cat unlocked: {catById(newCat).name}!</Txt>
+            <Txt center>{catById(newCat).blurb}</Txt>
+            <BigButton label="Meet the cats" icon="paw" onPress={() => go({ name: 'cats' })} />
           </Card>
         ) : null}
         {sheet !== null ? (

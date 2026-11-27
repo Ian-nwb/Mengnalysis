@@ -17,6 +17,7 @@ export type Route =
       sheet: number | null;
       retried: boolean;
       treats: number;
+      newCat?: string | null;
     }
   | { name: 'path' }
   | { name: 'settings' }
@@ -29,7 +30,8 @@ export type Route =
   | { name: 'meng' }
   | { name: 'library' }
   | { name: 'reader'; id: string }
-  | { name: 'study'; stage: number };
+  | { name: 'study'; stage: number }
+  | { name: 'cats' };
 
 export type Go = (r: Route) => void;
 /** missed = lesson step indexes answered wrong on the first try. */

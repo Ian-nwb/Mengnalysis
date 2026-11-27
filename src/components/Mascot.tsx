@@ -1,8 +1,9 @@
-import React, { useEffect, useId, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useId, useRef } from 'react';
 import { Animated, Easing, Pressable, View } from 'react-native';
 import Svg, { ClipPath, Defs, Ellipse, G, Path, Polygon, Text as SvgText } from 'react-native-svg';
 import { popStyle, useAppear, useReducedMotion } from '../motion';
 import { playSfx } from '../sfx';
+import { CatId, catById, CatLook, CATS, currentCat } from '../cats';
 import { useApp } from '../state';
 import { BRAND, space } from '../theme';
 
@@ -11,7 +12,7 @@ import { BRAND, space } from '../theme';
 // clearly at any zoom level. With `alive`, her tail, ears, paws and little extras move on their own.
 export const MASCOT_NAME = 'Meng';
 
-export type Mood = 'happy' | 'wave' | 'think' | 'cheer' | 'sleep' | 'encourage' | 'purr' | 'eat' | 'love' | 'hungry' | 'dizzy';
+export type Mood = 'happy' | 'wave' | 'think' | 'cheer' | 'sleep' | 'encourage' | 'purr' | 'eat' | 'love' | 'hungry' | 'dizzy' | 'scratch';
 
 const PLUM = '#1B1420';
 const WHITE = '#FFFDF9';
@@ -26,32 +27,93 @@ const heart = (cx: number, cy: number, k = 1) =>
   `M${cx} ${cy + 7 * k} c-7 -5 -11 -9 -11 -14 c0 -5 6 -8 11 -3 c5 -5 11 -2 11 3 c0 5 -4 9 -11 14 z`;
 
 // ---------- drawing pieces (shared by the still and the animated cat) ----------
-const Tail = () => (
-  <>
-    <Path d="M146 176 q34 -6 30 -40 q-2 -10 -10 -8" fill="none" stroke={PLUM} strokeWidth={13} strokeLinecap="round" />
-    <Path d="M146 176 q34 -6 30 -40 q-2 -10 -10 -8" fill="none" stroke={BLACK} strokeWidth={7} strokeLinecap="round" />
-  </>
-);
-const Body = () => (
-  <>
-    <Ellipse cx={100} cy={168} rx={50} ry={30} fill={WHITE} stroke={PLUM} strokeWidth={5} />
-    <Path d="M122 146 q26 4 26 26 q-16 8 -30 -2 q2 -14 4 -24 z" fill={ORANGE} />
-  </>
-);
-const EarLeft = () => (
-  <>
-    <Polygon points="50,66 58,16 94,46" fill={BLACK} stroke={PLUM} strokeWidth={5} strokeLinejoin="round" />
-    <Polygon points="62,52 64,32 79,46" fill={WHITE} opacity={0.9} />
-  </>
-);
-const EarRight = () => (
-  <>
-    <Polygon points="150,66 142,16 106,46" fill={ORANGE} stroke={PLUM} strokeWidth={5} strokeLinejoin="round" />
-    <Polygon points="138,52 136,32 121,46" fill={WHITE} opacity={0.9} />
-  </>
-);
+// Colors and markings come from the chosen cat (see src/cats.ts).
+const LookCtx = createContext<CatLook>(CATS[0].look);
+const useLook = () => useContext(LookCtx);
+
+const Tail = () => {
+  const L = useLook();
+  return (
+    <>
+      <Path d="M146 176 q34 -6 30 -40 q-2 -10 -10 -8" fill="none" stroke={L.line} strokeWidth={13} strokeLinecap="round" />
+      <Path d="M146 176 q34 -6 30 -40 q-2 -10 -10 -8" fill="none" stroke={L.tail} strokeWidth={7} strokeLinecap="round" />
+    </>
+  );
+};
+const Body = () => {
+  const L = useLook();
+  return (
+    <>
+      <Ellipse cx={100} cy={168} rx={50} ry={30} fill={L.fur} stroke={L.line} strokeWidth={5} />
+      {L.patches === 'calico' ? <Path d="M122 146 q26 4 26 26 q-16 8 -30 -2 q2 -14 4 -24 z" fill={ORANGE} /> : null}
+      {L.patches === 'tuxedo' ? <Ellipse cx={100} cy={166} rx={22} ry={24} fill={WHITE} /> : null}
+      {L.patches === 'orange' ? (
+        <>
+          <Ellipse cx={100} cy={164} rx={20} ry={20} fill={WHITE} />
+          <Path d="M78 146 q-26 4 -26 26 q16 8 30 -2 q-2 -14 -4 -24 z" fill={WHITE} />
+          <Path d="M128 156 q8 6 6 16 M140 154 q6 6 4 14" stroke="#D9843A" strokeWidth={4} fill="none" strokeLinecap="round" />
+        </>
+      ) : null}
+    </>
+  );
+};
+const EarLeft = () => {
+  const L = useLook();
+  return (
+    <>
+      <Polygon points="50,66 58,16 94,46" fill={L.earL} stroke={L.line} strokeWidth={5} strokeLinejoin="round" />
+      <Polygon points="62,52 64,32 79,46" fill={L.innerEar} opacity={0.9} />
+    </>
+  );
+};
+const EarRight = () => {
+  const L = useLook();
+  return (
+    <>
+      <Polygon points="150,66 142,16 106,46" fill={L.earR} stroke={L.line} strokeWidth={5} strokeLinejoin="round" />
+      <Polygon points="138,52 136,32 121,46" fill={L.innerEar} opacity={0.9} />
+    </>
+  );
+};
+
+function Markings() {
+  const L = useLook();
+  if (L.patches === 'calico')
+    return (
+      <>
+        <Ellipse cx={62} cy={80} rx={40} ry={42} fill={ORANGE} />
+        <Ellipse cx={138} cy={80} rx={40} ry={42} fill={ORANGE} />
+        <Path d="M90 44 L110 44 L122 104 L78 104 Z" fill={WHITE} />
+        <Ellipse cx={100} cy={120} rx={34} ry={22} fill={WHITE} />
+        <Ellipse cx={62} cy={136} rx={20} ry={14} fill={WHITE} />
+        <Ellipse cx={138} cy={136} rx={20} ry={14} fill={WHITE} />
+        <Path d="M84 44 Q100 36 116 44 Q108 56 100 66 Q92 56 84 44 Z" fill={BLACK} />
+        <Ellipse cx={120} cy={123} rx={11} ry={7} fill={ORANGE} />
+      </>
+    );
+  if (L.patches === 'tuxedo')
+    return (
+      <>
+        {/* white inverted-V blaze and muzzle */}
+        <Path d="M100 76 L124 128 L76 128 Z" fill={WHITE} />
+        <Ellipse cx={100} cy={124} rx={30} ry={20} fill={WHITE} />
+        <Ellipse cx={100} cy={142} rx={22} ry={10} fill={WHITE} />
+      </>
+    );
+  if (L.patches === 'orange')
+    return (
+      <>
+        {/* white mouth and chin, soft tabby stripes */}
+        <Ellipse cx={100} cy={124} rx={28} ry={18} fill={WHITE} />
+        <Path d="M90 46 q2 10 0 18 M100 44 v20 M110 46 q-2 10 0 18" stroke="#D9843A" strokeWidth={4} fill="none" strokeLinecap="round" />
+        <Path d="M46 84 q10 2 16 8 M44 98 q10 0 16 4 M154 84 q-10 2 -16 8 M156 98 q-10 0 -16 4" stroke="#D9843A" strokeWidth={4} fill="none" strokeLinecap="round" />
+      </>
+    );
+  return null;
+}
 
 function Head({ mood, blink, chewOpen, look, yawn, clip }: Face) {
+  const L = useLook();
   const closed = mood === 'cheer' || mood === 'purr' || mood === 'eat' || blink || yawn;
   const lx = Math.max(-1, Math.min(1, look.x)) * 4;
   const ly = Math.max(-1, Math.min(1, look.y)) * 4;
@@ -65,18 +127,11 @@ function Head({ mood, blink, chewOpen, look, yawn, clip }: Face) {
         </ClipPath>
       </Defs>
       {/* head: orange on both sides, white blaze down the middle, black forehead spot */}
-      <Ellipse cx={100} cy={92} rx={56} ry={48} fill={WHITE} />
+      <Ellipse cx={100} cy={92} rx={56} ry={48} fill={L.fur} />
       <G clipPath={`url(#${clip})`}>
-        <Ellipse cx={62} cy={80} rx={40} ry={42} fill={ORANGE} />
-        <Ellipse cx={138} cy={80} rx={40} ry={42} fill={ORANGE} />
-        <Path d="M90 44 L110 44 L122 104 L78 104 Z" fill={WHITE} />
-        <Ellipse cx={100} cy={120} rx={34} ry={22} fill={WHITE} />
-        <Ellipse cx={62} cy={136} rx={20} ry={14} fill={WHITE} />
-        <Ellipse cx={138} cy={136} rx={20} ry={14} fill={WHITE} />
-        <Path d="M84 44 Q100 36 116 44 Q108 56 100 66 Q92 56 84 44 Z" fill={BLACK} />
-        <Ellipse cx={120} cy={123} rx={11} ry={7} fill={ORANGE} />
+        <Markings />
       </G>
-      <Ellipse cx={100} cy={92} rx={56} ry={48} fill="none" stroke={PLUM} strokeWidth={5} />
+      <Ellipse cx={100} cy={92} rx={56} ry={48} fill="none" stroke={L.line} strokeWidth={5} />
 
       {/* cheeks */}
       <Ellipse cx={64} cy={112} rx={9} ry={5} fill={BRAND} opacity={0.7} />
@@ -91,8 +146,8 @@ function Head({ mood, blink, chewOpen, look, yawn, clip }: Face) {
       {/* eyes: golden, like hers */}
       {mood === 'dizzy' ? (
         <>
-          <Path d="M78 94 m-1 0 a1 1 0 1 1 2 0 a3 3 0 1 1 -6 0 a5 5 0 1 1 10 0 a7 7 0 1 1 -14 0" stroke={PLUM} strokeWidth={3} fill="none" strokeLinecap="round" />
-          <Path d="M122 94 m-1 0 a1 1 0 1 1 2 0 a3 3 0 1 1 -6 0 a5 5 0 1 1 10 0 a7 7 0 1 1 -14 0" stroke={PLUM} strokeWidth={3} fill="none" strokeLinecap="round" />
+          <Path d="M78 94 m-1 0 a1 1 0 1 1 2 0 a3 3 0 1 1 -6 0 a5 5 0 1 1 10 0 a7 7 0 1 1 -14 0" stroke={L.lid} strokeWidth={3} fill="none" strokeLinecap="round" />
+          <Path d="M122 94 m-1 0 a1 1 0 1 1 2 0 a3 3 0 1 1 -6 0 a5 5 0 1 1 10 0 a7 7 0 1 1 -14 0" stroke={L.lid} strokeWidth={3} fill="none" strokeLinecap="round" />
         </>
       ) : mood === 'love' && !blink ? (
         <>
@@ -101,18 +156,18 @@ function Head({ mood, blink, chewOpen, look, yawn, clip }: Face) {
         </>
       ) : closed ? (
         <>
-          <Path d="M68 98 q10 -12 20 0" stroke={PLUM} strokeWidth={5} fill="none" strokeLinecap="round" />
-          <Path d="M112 98 q10 -12 20 0" stroke={PLUM} strokeWidth={5} fill="none" strokeLinecap="round" />
+          <Path d="M68 98 q10 -12 20 0" stroke={L.lid} strokeWidth={5} fill="none" strokeLinecap="round" />
+          <Path d="M112 98 q10 -12 20 0" stroke={L.lid} strokeWidth={5} fill="none" strokeLinecap="round" />
         </>
       ) : sleeping ? (
         <>
-          <Path d="M68 94 q10 9 20 0" stroke={PLUM} strokeWidth={5} fill="none" strokeLinecap="round" />
-          <Path d="M112 94 q10 9 20 0" stroke={PLUM} strokeWidth={5} fill="none" strokeLinecap="round" />
+          <Path d="M68 94 q10 9 20 0" stroke={L.lid} strokeWidth={5} fill="none" strokeLinecap="round" />
+          <Path d="M112 94 q10 9 20 0" stroke={L.lid} strokeWidth={5} fill="none" strokeLinecap="round" />
         </>
       ) : (
         <>
-          <Ellipse cx={78} cy={eyeY} rx={11} ry={12} fill={GOLD} stroke={PLUM} strokeWidth={3} />
-          <Ellipse cx={122} cy={eyeY} rx={11} ry={12} fill={GOLD} stroke={PLUM} strokeWidth={3} />
+          <Ellipse cx={78} cy={eyeY} rx={11} ry={12} fill={L.iris} stroke={PLUM} strokeWidth={3} />
+          <Ellipse cx={122} cy={eyeY} rx={11} ry={12} fill={L.iris} stroke={PLUM} strokeWidth={3} />
           <Ellipse cx={78 + lx} cy={eyeY + 1 + ly} rx={5} ry={9} fill={PLUM} />
           <Ellipse cx={122 + lx} cy={eyeY + 1 + ly} rx={5} ry={9} fill={PLUM} />
           <Ellipse cx={81 + lx} cy={eyeY - 4 + ly} rx={2.8} ry={3.2} fill={WHITE} />
@@ -121,54 +176,65 @@ function Head({ mood, blink, chewOpen, look, yawn, clip }: Face) {
       )}
 
       {/* nose + mouth */}
-      <Polygon points="94,108 106,108 100,115" fill={PINK} stroke={PLUM} strokeWidth={2.5} strokeLinejoin="round" />
+      <Polygon points="94,108 106,108 100,115" fill={L.nose} stroke={L.ink} strokeWidth={2.5} strokeLinejoin="round" />
       {yawn ? (
-        <Ellipse cx={100} cy={125} rx={10} ry={11} fill="#B4466A" stroke={PLUM} strokeWidth={3} />
+        <Ellipse cx={100} cy={125} rx={10} ry={11} fill="#B4466A" stroke={L.ink} strokeWidth={3} />
       ) : mood === 'dizzy' ? (
-        <Path d="M90 121 q5 -5 10 0 q5 5 10 0" stroke={PLUM} strokeWidth={3} fill="none" strokeLinecap="round" />
+        <Path d="M90 121 q5 -5 10 0 q5 5 10 0" stroke={L.ink} strokeWidth={3} fill="none" strokeLinecap="round" />
       ) : mood === 'eat' ? (
         chewOpen ? (
-          <Ellipse cx={100} cy={123} rx={9} ry={7} fill="#B4466A" stroke={PLUM} strokeWidth={3} />
+          <Ellipse cx={100} cy={123} rx={9} ry={7} fill="#B4466A" stroke={L.ink} strokeWidth={3} />
         ) : (
-          <Path d="M90 119 q5 5 10 0 q5 5 10 0" stroke={PLUM} strokeWidth={3.5} fill="none" strokeLinecap="round" />
+          <Path d="M90 119 q5 5 10 0 q5 5 10 0" stroke={L.ink} strokeWidth={3.5} fill="none" strokeLinecap="round" />
         )
       ) : mood === 'hungry' ? (
         <>
-          <Path d="M90 117 q5 6 10 0 q5 6 10 0" stroke={PLUM} strokeWidth={3} fill="none" strokeLinecap="round" />
-          <Path d="M97 121 q3 9 6 0 z" fill="#F07A9A" stroke={PLUM} strokeWidth={2} />
+          <Path d="M90 117 q5 6 10 0 q5 6 10 0" stroke={L.ink} strokeWidth={3} fill="none" strokeLinecap="round" />
+          <Path d="M97 121 q3 9 6 0 z" fill="#F07A9A" stroke={L.ink} strokeWidth={2} />
         </>
       ) : mood === 'cheer' || mood === 'love' ? (
-        <Path d="M88 118 q12 18 24 0 z" fill="#B4466A" stroke={PLUM} strokeWidth={3} strokeLinejoin="round" />
+        <Path d="M88 118 q12 18 24 0 z" fill="#B4466A" stroke={L.ink} strokeWidth={3} strokeLinejoin="round" />
       ) : mood === 'think' ? (
-        <Ellipse cx={100} cy={122} rx={4} ry={4} fill="none" stroke={PLUM} strokeWidth={3} />
+        <Ellipse cx={100} cy={122} rx={4} ry={4} fill="none" stroke={L.ink} strokeWidth={3} />
       ) : sleeping ? (
-        <Path d="M95 121 h10" stroke={PLUM} strokeWidth={3} strokeLinecap="round" />
+        <Path d="M95 121 h10" stroke={L.ink} strokeWidth={3} strokeLinecap="round" />
       ) : (
-        <Path d="M90 117 q5 6 10 0 q5 6 10 0" stroke={PLUM} strokeWidth={3} fill="none" strokeLinecap="round" />
+        <Path d="M90 117 q5 6 10 0 q5 6 10 0" stroke={L.ink} strokeWidth={3} fill="none" strokeLinecap="round" />
       )}
 
       {/* whiskers */}
-      <Path d="M38 106 l22 3 M40 118 l21 -3 M162 106 l-22 3 M160 118 l-21 -3" stroke={PLUM} strokeWidth={2.5} strokeLinecap="round" />
+      <Path d="M38 106 l22 3 M40 118 l21 -3 M162 106 l-22 3 M160 118 l-21 -3" stroke={L.whisker} strokeWidth={2.5} strokeLinecap="round" />
 
       {/* collar with tag */}
-      <Path d="M66 132 q34 20 68 0" stroke={BRAND} strokeWidth={9} fill="none" strokeLinecap="round" />
-      <Ellipse cx={100} cy={146} rx={7} ry={7} fill={BRAND} stroke={PLUM} strokeWidth={3} />
+      {L.collar ? (
+        <>
+          <Path d="M66 132 q34 20 68 0" stroke={L.collar} strokeWidth={9} fill="none" strokeLinecap="round" />
+          <Ellipse cx={100} cy={146} rx={7} ry={7} fill={L.collar} stroke={PLUM} strokeWidth={3} />
+        </>
+      ) : null}
     </>
   );
 }
 
-const Foot = ({ cx }: { cx: number }) => <Ellipse cx={cx} cy={190} rx={14} ry={9} fill={WHITE} stroke={PLUM} strokeWidth={4} />;
-const Arm = ({ d }: { d: string }) => (
-  <>
-    <Path d={d} stroke={PLUM} strokeWidth={22} strokeLinecap="round" fill="none" />
-    <Path d={d} stroke={WHITE} strokeWidth={13} strokeLinecap="round" fill="none" />
-  </>
-);
+const Foot = ({ cx }: { cx: number }) => {
+  const L = useLook();
+  return <Ellipse cx={cx} cy={190} rx={14} ry={9} fill={L.feet} stroke={L.line} strokeWidth={4} />;
+};
+const Arm = ({ d }: { d: string }) => {
+  const L = useLook();
+  return (
+    <>
+      <Path d={d} stroke={L.line} strokeWidth={22} strokeLinecap="round" fill="none" />
+      <Path d={d} stroke={L.feet} strokeWidth={13} strokeLinecap="round" fill="none" />
+    </>
+  );
+};
 const ARM = {
   wave: 'M140 150 q20 -20 26 -46',
   cheerL: 'M62 152 q-20 -18 -24 -44',
   cheerR: 'M138 152 q20 -18 24 -44',
   think: 'M118 160 q4 -14 -6 -28',
+  scratch: 'M140 150 q22 2 36 -10',
 };
 
 function Paws({ mood }: { mood: Mood }) {
@@ -176,6 +242,13 @@ function Paws({ mood }: { mood: Mood }) {
     return (
       <>
         <Arm d={ARM.wave} />
+        <Foot cx={80} />
+      </>
+    );
+  if (mood === 'scratch')
+    return (
+      <>
+        <Arm d={ARM.scratch} />
         <Foot cx={80} />
       </>
     );
@@ -209,6 +282,9 @@ function Extras({ mood }: { mood: Mood }) {
           <Polygon points="24,40 29,52 42,54 32,62 35,75 24,68 13,75 16,62 6,54 19,52" fill={BRAND} stroke={PLUM} strokeWidth={2.5} />
           <Polygon points="176,30 180,40 190,41 182,48 185,58 176,52 167,58 170,48 162,41 172,40" fill={BRAND} stroke={PLUM} strokeWidth={2.5} />
         </>
+      ) : null}
+      {mood === 'scratch' ? (
+        <SvgText x={136} y={34} fontSize={20} fontWeight="900" fill={BRAND} stroke={PLUM} strokeWidth={1.2}>scritch!</SvgText>
       ) : null}
       {mood === 'think' ? (
         <SvgText x={168} y={48} fontSize={40} fontWeight="900" fill={BRAND} stroke={PLUM} strokeWidth={2}>?</SvgText>
@@ -308,6 +384,7 @@ function AliveCat({ size, face }: { size: number; face: Face }) {
         ]),
       );
     else if (mood === 'wave') a = loop(pawA, 620);
+    else if (mood === 'scratch') a = loop(pawA, 230);
     else if (mood === 'cheer') a = Animated.parallel([loop(pawA, 420), loop(pawB, 420)]);
     a?.start();
     return () => a?.stop();
@@ -341,7 +418,16 @@ function AliveCat({ size, face }: { size: number; face: Face }) {
       <Layer size={size}>
         <Head {...face} />
       </Layer>
-      {mood === 'wave' ? (
+      {mood === 'scratch' ? (
+        <>
+          <Layer size={size}>
+            <Foot cx={80} />
+          </Layer>
+          <Layer size={size} style={{ transformOrigin: '70% 75%', transform: [rot(pawA, -24, 16)] }}>
+            <Arm d={ARM.scratch} />
+          </Layer>
+        </>
+      ) : mood === 'wave' ? (
         <>
           <Layer size={size}>
             <Foot cx={80} />
@@ -396,9 +482,12 @@ export function Mascot({
   look = { x: 0, y: 0 },
   yawn = false,
   alive = false,
+  cat,
 }: {
   mood?: Mood;
   size?: number;
+  /** which cat to draw (defaults to the one chosen in Cats) */
+  cat?: CatId;
   /** eyes briefly closed (idle blinking) */
   blink?: boolean;
   /** mouth open while chewing */
@@ -414,10 +503,13 @@ export function Mascot({
   const raw = useId().replace(/[^a-zA-Z0-9]/g, '');
   const face: Face = { mood, blink, chewOpen, look, yawn, clip: `head${raw}` };
   const v = useAppear(380);
+  const { state } = useApp();
+  const c = cat ? catById(cat) : currentCat(state);
 
   return (
+    <LookCtx.Provider value={c.look}>
     <Animated.View style={popStyle(v)}>
-      <Pressable disabled={!tapToMeow} onPress={() => playSfx('meow')} accessibilityRole="imagebutton" accessibilityLabel={`${MASCOT_NAME} the cat. Tap to say hi.`}>
+      <Pressable disabled={!tapToMeow} onPress={() => playSfx('meow')} accessibilityRole="imagebutton" accessibilityLabel={`${c.name} the cat. Tap to say hi.`}>
         {alive ? (
           <AliveCat size={size} face={face} />
         ) : (
@@ -433,6 +525,7 @@ export function Mascot({
         )}
       </Pressable>
     </Animated.View>
+    </LookCtx.Provider>
   );
 }
 

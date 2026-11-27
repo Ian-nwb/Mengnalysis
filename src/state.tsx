@@ -21,6 +21,8 @@ export type Settings = {
   musicTrack: string;
   musicVolume: number;
   textScale: number;
+  /** which cat is shown (see src/cats.ts) */
+  cat: string;
   autoRead: boolean;
   speechRate: number;
   reminderHour: number;
@@ -101,6 +103,7 @@ export const defaultState: AppState = {
     musicTrack: 'cozy',
     musicVolume: 0.25,
     textScale: 1,
+    cat: 'meng',
     autoRead: false,
     speechRate: 0.95,
     reminderHour: 19,

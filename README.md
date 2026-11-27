@@ -37,12 +37,12 @@ Tori is an offline Android app built around one idea: **a small dose of data ski
 **Habit & fun**
 - A winding, game-style **path** with lesson nodes, practice stars, boss crowns and cheat-sheet chests
 - **Notes from Meng:** daily reminders in Meng's voice, an optional second reminder and evening streak saver, days off, and tap-to-open
-- Bottom tabs: **Today · Path · Learn · Meng · Me**
+- Bottom tabs: **Today · Path · Learn · Meng · Cats · Me**
 - **Study music:** three original background tracks that soften while lessons are read aloud, plus a cozy loading screen
 - Daily streaks with a weekly streak freeze, and **Lite days** (2-minute review) for busy days
 - Max two new lessons a day, so the journey stays a steady habit
 - XP and level titles (*Data Curious → Spreadsheet Sorcerer → … → Analyst*)
-- **Meng's home:** a little virtual pet with a Living room, Kitchen and Bedroom. Rub Meng to pet her, slide snacks and toys up to her, tuck her in for naps. She watches your snack, opens her mouth, squishes, yawns, stretches, gets dizzy and giggles. Treats come from learning
+- **Meng's home:** a little virtual pet with a Living room, Kitchen and Bedroom. Rub Meng to pet her, slide snacks up to her, play with toys (fling the yarn ball, wave the feather, chase the mouse, watch her scratch the box), tuck her in for naps. Unlock more cats (Tuxedo, Orangina, Whitey and Dost) as you learn and pick who keeps you company. She watches your snack, opens her mouth, squishes, yawns, stretches, gets dizzy and giggles. Treats come from learning
 - A game-style first launch, a replayable tour, help guides and one-time tips
 - Gentle animations, sound effects and haptics
 

@@ -2,21 +2,24 @@ import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { buzz } from '../haptics';
+import { currentCat } from '../cats';
 import { useApp } from '../state';
 import { fonts } from '../theme';
 import { Icon, IconName } from './Icon';
 
-export type Tab = 'home' | 'path' | 'library' | 'meng' | 'settings';
+export type Tab = 'home' | 'path' | 'library' | 'meng' | 'cats' | 'settings';
 const TABS: { id: Tab; label: string; icon: IconName }[] = [
   { id: 'home', label: 'Today', icon: 'home' },
   { id: 'path', label: 'Path', icon: 'map' },
   { id: 'library', label: 'Learn', icon: 'book' },
   { id: 'meng', label: 'Meng', icon: 'paw' },
+  { id: 'cats', label: 'Cats', icon: 'heart' },
   { id: 'settings', label: 'Me', icon: 'user' },
 ];
 
 export function TabBar({ active, onTab }: { active: Tab; onTab: (t: Tab) => void }) {
   const { colors, state } = useApp();
+  const catName = currentCat(state).name;
   const insets = useSafeAreaInsets();
   const scale = Math.min(state.settings.textScale, 1.2);
   return (
@@ -44,7 +47,7 @@ export function TabBar({ active, onTab }: { active: Tab; onTab: (t: Tab) => void
             }}
             accessibilityRole="tab"
             accessibilityState={{ selected: on }}
-            accessibilityLabel={t.label}
+            accessibilityLabel={t.id === 'meng' ? catName : t.label}
             style={{
               flex: 1,
               minHeight: 64,
@@ -59,7 +62,7 @@ export function TabBar({ active, onTab }: { active: Tab; onTab: (t: Tab) => void
           >
             <Icon name={t.icon} size={Math.round(28 * scale)} color={on ? colors.accent : colors.textMuted} />
             <Text style={{ fontSize: Math.round(15 * scale), fontFamily: on ? fonts.bold : fonts.body, color: on ? colors.accent : colors.textMuted }}>
-              {t.label}
+              {t.id === 'meng' ? catName : t.label}
             </Text>
           </Pressable>
         );

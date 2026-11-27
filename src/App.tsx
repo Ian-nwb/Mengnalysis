@@ -12,6 +12,8 @@ import { lessonById } from './content';
 import { addBugs, addLessonCards, addTreats, bossOf, dayStr, levelFor, markDayDone, newLessonsToday, refreshFreezes, tickPet, XP } from './engine';
 import { MengScreen } from './screens/Meng';
 import { LibraryScreen, ReaderScreen, StudyScreen } from './screens/Library';
+import { CatsScreen } from './screens/Cats';
+import { CATS, unlockedCats } from './cats';
 import { Finish, Route } from './nav';
 import * as Notifications from 'expo-notifications';
 import { syncReminders } from './reminders';
@@ -96,6 +98,7 @@ function Root() {
 
   const finish: Finish = (lessonId, xp, missed = [], retried = false) => {
     let s = refreshFreezes(state);
+    const catsBefore = unlockedCats(s);
     const before = levelFor(s.xp).title;
     const lesson = lessonId ? lessonById(lessonId) : undefined;
     const firstTime = !!lesson && !s.completed.includes(lesson.id);
@@ -117,6 +120,7 @@ function Root() {
       (after !== before ? 3 : 0) +
       (day.newDay && [7, 14, 30, 50, 100, 200, 365].includes(s.streak) ? 5 : 0);
     s = addTreats(s, treats);
+    const newCat = unlockedCats(s).find((id) => !catsBefore.includes(id)) ?? null;
     setState(() => s);
     syncReminders(s);
     go({
@@ -130,6 +134,7 @@ function Root() {
       sheet,
       retried,
       treats,
+      newCat: newCat ? CATS.find((c) => c.id === newCat)!.id : null,
     });
   };
 
@@ -178,6 +183,9 @@ function Root() {
       case 'meng':
         screen = <MengScreen go={go} />;
         break;
+      case 'cats':
+        screen = <CatsScreen go={go} />;
+        break;
       case 'playground':
         screen = (
           <Screen>
@@ -195,7 +203,7 @@ function Root() {
     }
 
   const tab: Tab | null =
-    state.onboarded && (route.name === 'home' || route.name === 'path' || route.name === 'library' || route.name === 'meng' || route.name === 'settings') ? route.name : null;
+    state.onboarded && (route.name === 'home' || route.name === 'path' || route.name === 'library' || route.name === 'meng' || route.name === 'cats' || route.name === 'settings') ? route.name : null;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
