@@ -5,7 +5,7 @@ import { Lesson } from './types';
 export const stage8: Lesson[] = [
   {
     id: 's8l1',
-    stage: 13,
+    stage: 14,
     title: 'Your portfolio',
     minutes: 5,
     steps: [
@@ -45,7 +45,7 @@ export const stage8: Lesson[] = [
   },
   {
     id: 's8l2',
-    stage: 13,
+    stage: 14,
     title: 'Writing your resume',
     minutes: 5,
     steps: [
@@ -89,7 +89,7 @@ export const stage8: Lesson[] = [
   },
   {
     id: 's8l3',
-    stage: 13,
+    stage: 14,
     title: 'Behavioral interviews',
     minutes: 5,
     steps: [
@@ -121,7 +121,7 @@ export const stage8: Lesson[] = [
   },
   {
     id: 's8l4',
-    stage: 13,
+    stage: 14,
     title: 'SQL interview questions',
     minutes: 6,
     steps: [
@@ -159,7 +159,7 @@ export const stage8: Lesson[] = [
   },
   {
     id: 's8l5',
-    stage: 13,
+    stage: 14,
     title: 'Case interviews',
     minutes: 5,
     steps: [
@@ -196,7 +196,7 @@ export const stage8: Lesson[] = [
   },
   {
     id: 's8l6',
-    stage: 13,
+    stage: 14,
     title: 'Take-home tests',
     minutes: 4,
     steps: [
@@ -226,7 +226,7 @@ export const stage8: Lesson[] = [
   },
   {
     id: 's8l7',
-    stage: 13,
+    stage: 14,
     title: 'Final boss: you\'re an analyst',
     minutes: 5,
     steps: [

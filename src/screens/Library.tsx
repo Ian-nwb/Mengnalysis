@@ -10,7 +10,7 @@ import { REFERENCE } from '../content/reference';
 import { RESOURCES } from '../content/resources';
 import { STUDY_GUIDES } from '../content/studyguides';
 import { Lesson, Step } from '../content/types';
-import { focusItems } from '../engine';
+import { focusItems, termMatchItem } from '../engine';
 import { Go } from '../nav';
 import { useApp } from '../state';
 import { radius, space, type } from '../theme';
@@ -216,6 +216,16 @@ export function LibraryScreen({ go }: { go: Go }) {
         </>
       ) : tab === 'glossary' ? (
         <>
+          <BigButton
+            label="Play term match"
+            sub="Match 4 terms to their meanings"
+            icon="link"
+            variant="primary"
+            onPress={() => {
+              const m = termMatchItem({ ...state, completed: state.completed.length ? state.completed : [] }, 4);
+              if (m) go({ name: 'review', items: [m], then: null, mode: 'practice' });
+            }}
+          />
           <TextInput
             value={q}
             onChangeText={(t) => {
@@ -305,6 +315,12 @@ function stepText(st: Step): string {
       return `Practice: ${st.prompt} Formula: ${st.formula}. ${st.why}`;
     case 'reflect':
       return `Summary: ${st.prompt} Example: ${st.sample}`;
+    case 'match':
+      return `Match: ${st.pairs.map(([a, b]) => `${a} goes with ${b}`).join('. ')}. ${st.why}`;
+    case 'build':
+      return `Build: ${st.prompt} Answer: ${st.answer.join(' ')}. ${st.why}`;
+    case 'tf':
+      return `True or false: ${st.statements.map(([s, v]) => `${s} ${v ? 'True' : 'False'}`).join('. ')}. ${st.why}`;
   }
 }
 
@@ -371,6 +387,38 @@ export function ReaderScreen({ id, go }: { id: string; go: Go }) {
               <SheetTable table={st.table} />
               <Txt bold color={colors.accent} style={{ fontFamily: 'monospace' }}>{st.formula}</Txt>
               <Txt>{st.why}</Txt>
+            </Card>
+          );
+        if (st.kind === 'match')
+          return (
+            <Card key={i} tone="inset">
+              <Kicker icon="link">Pairs</Kicker>
+              <Txt bold>{st.prompt}</Txt>
+              {st.pairs.map(([a, b]) => (
+                <Txt key={a}>
+                  <Txt bold>{a}</Txt> → {b}
+                </Txt>
+              ))}
+            </Card>
+          );
+        if (st.kind === 'build')
+          return (
+            <Card key={i} tone="inset">
+              <Kicker icon="pencil">Build it</Kicker>
+              <Txt bold>{st.prompt}</Txt>
+              <Txt bold color={colors.accent} style={{ fontFamily: 'monospace' }}>{st.answer.join(' ')}</Txt>
+              <Txt>{st.why}</Txt>
+            </Card>
+          );
+        if (st.kind === 'tf')
+          return (
+            <Card key={i} tone="inset">
+              <Kicker icon="check">True or false</Kicker>
+              {st.statements.map(([s, v]) => (
+                <Txt key={s}>
+                  <Txt bold color={v ? colors.good : colors.bad}>{v ? 'True' : 'False'}</Txt> · {s}
+                </Txt>
+              ))}
             </Card>
           );
         return (

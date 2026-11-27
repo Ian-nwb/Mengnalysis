@@ -11,7 +11,7 @@ import { BRAND, space } from '../theme';
 // clearly at any zoom level.
 export const MASCOT_NAME = 'Meng';
 
-export type Mood = 'happy' | 'wave' | 'think' | 'cheer' | 'sleep' | 'encourage' | 'purr' | 'eat' | 'love' | 'hungry';
+export type Mood = 'happy' | 'wave' | 'think' | 'cheer' | 'sleep' | 'encourage' | 'purr' | 'eat' | 'love' | 'hungry' | 'dizzy';
 
 const PLUM = '#1B1420';
 const WHITE = '#FFFDF9';
@@ -26,6 +26,8 @@ export function Mascot({
   blink = false,
   chewOpen = false,
   tapToMeow = true,
+  look = { x: 0, y: 0 },
+  yawn = false,
 }: {
   mood?: Mood;
   size?: number;
@@ -34,11 +36,17 @@ export function Mascot({
   /** mouth open while chewing */
   chewOpen?: boolean;
   tapToMeow?: boolean;
+  /** where she's looking, -1..1 on each axis (pupils follow) */
+  look?: { x: number; y: number };
+  /** big sleepy yawn */
+  yawn?: boolean;
 }) {
   const raw = useId().replace(/[^a-zA-Z0-9]/g, '');
   const clip = `head${raw}`;
   const v = useAppear(380);
-  const closed = mood === 'cheer' || mood === 'purr' || mood === 'eat' || blink;
+  const closed = mood === 'cheer' || mood === 'purr' || mood === 'eat' || blink || yawn;
+  const lx = Math.max(-1, Math.min(1, look.x)) * 4;
+  const ly = Math.max(-1, Math.min(1, look.y)) * 4;
   const sleeping = mood === 'sleep';
   const eyeY = mood === 'think' ? 90 : mood === 'hungry' ? 97 : 94;
   const heart = (cx: number, cy: number, k = 1) =>
@@ -87,7 +95,12 @@ export function Mascot({
         <Ellipse cx={136} cy={112} rx={9} ry={5} fill={BRAND} opacity={0.7} />
 
         {/* eyes: golden, like hers */}
-        {mood === 'love' && !blink ? (
+        {mood === 'dizzy' ? (
+          <>
+            <Path d="M78 94 m-1 0 a1 1 0 1 1 2 0 a3 3 0 1 1 -6 0 a5 5 0 1 1 10 0 a7 7 0 1 1 -14 0" stroke={PLUM} strokeWidth={3} fill="none" strokeLinecap="round" />
+            <Path d="M122 94 m-1 0 a1 1 0 1 1 2 0 a3 3 0 1 1 -6 0 a5 5 0 1 1 10 0 a7 7 0 1 1 -14 0" stroke={PLUM} strokeWidth={3} fill="none" strokeLinecap="round" />
+          </>
+        ) : mood === 'love' && !blink ? (
           <>
             <Path d={heart(78, 92)} fill="#E0457B" stroke={PLUM} strokeWidth={2.5} />
             <Path d={heart(122, 92)} fill="#E0457B" stroke={PLUM} strokeWidth={2.5} />
@@ -106,16 +119,20 @@ export function Mascot({
           <>
             <Ellipse cx={78} cy={eyeY} rx={11} ry={12} fill={GOLD} stroke={PLUM} strokeWidth={3} />
             <Ellipse cx={122} cy={eyeY} rx={11} ry={12} fill={GOLD} stroke={PLUM} strokeWidth={3} />
-            <Ellipse cx={78} cy={eyeY + 1} rx={5} ry={9} fill={PLUM} />
-            <Ellipse cx={122} cy={eyeY + 1} rx={5} ry={9} fill={PLUM} />
-            <Ellipse cx={81} cy={eyeY - 4} rx={2.8} ry={3.2} fill={WHITE} />
-            <Ellipse cx={125} cy={eyeY - 4} rx={2.8} ry={3.2} fill={WHITE} />
+            <Ellipse cx={78 + lx} cy={eyeY + 1 + ly} rx={5} ry={9} fill={PLUM} />
+            <Ellipse cx={122 + lx} cy={eyeY + 1 + ly} rx={5} ry={9} fill={PLUM} />
+            <Ellipse cx={81 + lx} cy={eyeY - 4 + ly} rx={2.8} ry={3.2} fill={WHITE} />
+            <Ellipse cx={125 + lx} cy={eyeY - 4 + ly} rx={2.8} ry={3.2} fill={WHITE} />
           </>
         )}
 
         {/* nose + mouth */}
         <Polygon points="94,108 106,108 100,115" fill={PINK} stroke={PLUM} strokeWidth={2.5} strokeLinejoin="round" />
-        {mood === 'eat' ? (
+        {yawn ? (
+          <Ellipse cx={100} cy={125} rx={10} ry={11} fill="#B4466A" stroke={PLUM} strokeWidth={3} />
+        ) : mood === 'dizzy' ? (
+          <Path d="M90 121 q5 -5 10 0 q5 5 10 0" stroke={PLUM} strokeWidth={3} fill="none" strokeLinecap="round" />
+        ) : mood === 'eat' ? (
           chewOpen ? (
             <Ellipse cx={100} cy={123} rx={9} ry={7} fill="#B4466A" stroke={PLUM} strokeWidth={3} />
           ) : (

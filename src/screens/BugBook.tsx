@@ -8,6 +8,7 @@ import { Go } from '../nav';
 import { useApp } from '../state';
 
 function describe(item: ReviewItem): { prompt: string; answer: string; from: string } {
+  if (item.kind === 'step') return { prompt: '', answer: '', from: 'Game' };
   if (item.kind === 'card') {
     return { prompt: item.card.front, answer: item.card.options[item.card.answer], from: 'Review card' };
   }
@@ -21,6 +22,15 @@ function describe(item: ReviewItem): { prompt: string; answer: string; from: str
   } else if (st.kind === 'order') {
     prompt = st.prompt;
     answer = st.items.join(' → ');
+  } else if (st.kind === 'match') {
+    prompt = st.prompt;
+    answer = st.pairs.map(([a, b]) => `${a} → ${b}`).join(' · ');
+  } else if (st.kind === 'build') {
+    prompt = st.prompt;
+    answer = st.answer.join(' ');
+  } else if (st.kind === 'tf') {
+    prompt = st.prompt;
+    answer = st.statements.map(([s, v]) => `${v ? 'True' : 'False'}: ${s}`).join(' · ');
   } else if (st.kind === 'sheet') {
     prompt = st.prompt;
     answer = st.formula;

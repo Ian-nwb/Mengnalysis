@@ -142,7 +142,7 @@ export const stage8y = [
 
 // Stage 11 (Career) additions
 export const stage11y = [
-  L('s11y1', 13, 'Domain fluency', 5, [
+  L('s11y1', 14, 'Domain fluency', 5, [
     ex('Speak the business language', 'Each industry has its favorite metrics. Knowing them makes you sound like you belong.', list([
       'E-commerce: conversion rate, AOV, CAC, LTV, churn',
       'SaaS (subscriptions): MRR, retention, net revenue retention',
@@ -153,7 +153,7 @@ export const stage11y = [
     mc('Before a job interview at a shop, learn...', ['Their likely metrics (AOV, conversion, CAC)', 'Their logo colors', 'Nothing'], 'Domain fluency stands out.'),
   ], [rc('MRR stands for...', ['Monthly recurring revenue', 'Max revenue rate', 'Market risk ratio'])]),
 
-  L('s11y2', 13, 'Saying no (nicely)', 5, [
+  L('s11y2', 14, 'Saying no (nicely)', 5, [
     ex('Push back with a better option', 'Sometimes a boss asks for a vanity metric ("show total signups ever!"). Don\'t just say no: offer something more useful. "Happy to! Could we also show weekly active users? It tells us if people stay."'),
     mc('Your boss wants a chart that hides a bad month. You...', ['Explain the risk and offer an honest version', 'Do it silently', 'Quit'], 'Trust is an analyst\'s most valuable asset.'),
     ord('A good pushback, in order.', ['Acknowledge the goal', 'Explain the concern', 'Offer a better metric', 'Let them decide'], 'Respectful, clear, helpful.'),

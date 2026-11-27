@@ -126,6 +126,12 @@ Today the native splash shows Meng's face, then a blank plum screen while fonts 
 - Meng's corner rebuilt as a virtual pet: rub to pet, drag-to-feed pantry, toy box, shop; new moods (purr, eat, love, hungry), blinking, breathing, hops, wiggles, floating hearts; purr/chomp/boing sounds
 - Rainy café music regenerated (warm brown-noise rain + soft drips instead of hiss); music generator kept in `scripts/make-music.py`
 
+## v1.4.0 (2026-11-27)
+- Games: match the pairs, build from word tiles, true/false (mixed into ~35 lessons) + glossary term-match in warm-ups, practice and Learn
+- New content: Stage 13 Real-World Projects (5 case studies, Career is now 14), cleaning chapter, Formula Lab 2, sample size & forecasting, SQL practice sets (self joins, GROUP_CONCAT, OFFSET), chart critique, pandas practice. 285 lessons, 209 glossary terms
+- Meng's home redesigned Pou-style: one screen, three rooms, top status bar, bottom item bar with drag-or-tap, Shop/Pantry/Help sheets, illustrated rooms
+- Meng behaves like a pet: idle routine, eye tracking, anticipation, squish, dizzy, giggle, yawn, walk-in
+
 ## Recommended order
 1. Phase 3 items 1–4 (test on her phone, signing key, OTA updates)
 2. Phase 4 items 1 & 6 (spreadsheet sandbox, adaptive review)

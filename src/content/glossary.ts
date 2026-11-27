@@ -223,12 +223,23 @@ export const GLOSSARY: Term[] = [
   { term: 'Lead time', stage: 12, def: 'Time from ordering stock to receiving it.' },
   { term: 'Inventory turnover', stage: 12, def: 'COGS ÷ average inventory: how often stock sells through.' },
 
-  // Stage 13: Career
-  { term: 'Portfolio', stage: 13, def: 'A collection of projects that show your skills, usually 3 strong ones.' },
-  { term: 'STAR method', stage: 13, def: 'Answer behavioral questions with Situation, Task, Action, Result.' },
-  { term: 'Case interview', stage: 13, def: 'A business problem to think through out loud. Clarify first, then break it down.' },
-  { term: 'Take-home test', stage: 13, def: 'A dataset and questions to complete at home. Lead with a short summary.' },
-  { term: 'Stakeholder', stage: 13, def: 'Anyone who uses or cares about your analysis, like a manager or team.' },
+  // Stage 14: Career
+  { term: 'Portfolio', stage: 14, def: 'A collection of projects that show your skills, usually 3 strong ones.' },
+  { term: 'STAR method', stage: 14, def: 'Answer behavioral questions with Situation, Task, Action, Result.' },
+  { term: 'Case interview', stage: 14, def: 'A business problem to think through out loud. Clarify first, then break it down.' },
+  { term: 'Take-home test', stage: 14, def: 'A dataset and questions to complete at home. Lead with a short summary.' },
+  { term: 'Stakeholder', stage: 14, def: 'Anyone who uses or cares about your analysis, like a manager or team.' },
+
+  // Stage 13: Real-World Projects (and new skills)
+  { term: 'OFFSET', stage: 4, def: 'Skips the first N rows of a result, often with LIMIT for "second highest" questions.' },
+  { term: 'Self join', stage: 4, def: 'Joining a table to itself with two aliases, like employees and their managers.' },
+  { term: 'GROUP_CONCAT / STRING_AGG', stage: 4, def: 'Joins values from a group into one text, like all song titles per artist.' },
+  { term: 'AVERAGEIF', stage: 2, def: 'Averages only the rows that match a rule.', example: '=AVERAGEIF(B2:B6, "North", C2:C6)' },
+  { term: 'TEXTJOIN', stage: 2, def: 'Joins many cells into one text with a separator.', example: '=TEXTJOIN(", ", TRUE, A2:A5)' },
+  { term: 'Forecast', stage: 3, def: 'An estimate of future values. Start with simple baselines like naive or moving average.' },
+  { term: 'Sample size', stage: 3, def: 'How much data a test needs. Smaller effects need bigger samples.' },
+  { term: 'Case study', stage: 13, def: 'A real-world problem worked end to end: question, data, analysis, recommendation.' },
+  { term: 'Cleaning log', stage: 13, def: 'A short record of every change you made to the data, so others can trust and repeat it.' },
 ];
 
 export const glossarySorted = () => [...GLOSSARY].sort((a, b) => a.term.localeCompare(b.term, undefined, { sensitivity: 'base' }));

@@ -22,7 +22,8 @@ Tori is an offline Android app built around one idea: **a small dose of data ski
 ## Features
 
 **Learning**
-- **265 lessons in 14 stages**: short, friendly, one concept per lesson
+- **285 lessons in 15 stages**: short, friendly, one concept per lesson
+- **Duolingo-style games:** match the pairs, build answers from word tiles, true/false rounds, plus a glossary term-match game
 - **Real practice, not just quizzes**
   - **SQL sandbox:** write real queries against built-in datasets, checked by comparing results
   - **Spreadsheet sandbox:** type real formulas (SUM, IF, SUMIFS, XLOOKUP, …) into a practice sheet, checked by a built-in formula engine
@@ -30,7 +31,7 @@ Tori is an offline Android app built around one idea: **a small dose of data ski
 - **Bug Book:** every mistake is saved and comes back about a week later until it's squashed
 - **Adaptive review:** weak topics show up more often, and Home suggests a *Focus topic*
 - **Boss levels** end every stage with a real-world case, plus an *"Explain it like I'm your boss"* summary
-- **Learn tab:** re-read every finished lesson as notes, study guides for each stage, quick reference (Excel/Sheets, SQL, pandas, DAX, shortcuts), a 200-term glossary and free resources
+- **Learn tab:** re-read every finished lesson as notes, study guides for each stage, quick reference (Excel/Sheets, SQL, pandas, DAX, shortcuts), a 209-term glossary and free resources
 - **Cheat sheets:** a one-page summary unlocks for each stage, and you can save it as a PDF
 
 **Habit & fun**
@@ -41,7 +42,7 @@ Tori is an offline Android app built around one idea: **a small dose of data ski
 - Daily streaks with a weekly streak freeze, and **Lite days** (2-minute review) for busy days
 - Max two new lessons a day, so the journey stays a steady habit
 - XP and level titles (*Data Curious → Spreadsheet Sorcerer → … → Analyst*)
-- **Meng's corner:** a little virtual pet. Rub Meng to pet her, drag snacks and toys onto her, and watch her purr, blink, chew and show hearts. Treats come from learning
+- **Meng's home:** a little virtual pet with a Living room, Kitchen and Bedroom. Rub Meng to pet her, slide snacks and toys up to her, tuck her in for naps. She watches your snack, opens her mouth, squishes, yawns, stretches, gets dizzy and giggles. Treats come from learning
 - A game-style first launch, a replayable tour, help guides and one-time tips
 - Gentle animations, sound effects and haptics
 
@@ -68,7 +69,8 @@ Tori is an offline Android app built around one idea: **a small dose of data ski
 | 10 | Business Analytics | Funnels, CAC & LTV, churn, RFM, forecasting, root-cause analysis |
 | 11 | Industry Workflows | Parquet, DuckDB/Polars, Git & PRs, observability, lineage, GA4 & UTMs |
 | 12 | Industry Packs | Marketing, finance, e-commerce, SaaS, people analytics, operations |
-| 13 | Career | Portfolio, resume, LinkedIn, interviews, offers, first 90 days |
+| 13 | Real-World Projects | Café review, subscription health, marketing budget, music insights, your portfolio piece |
+| 14 | Career | Portfolio, resume, LinkedIn, interviews, offers, first 90 days |
 
 ## Install
 

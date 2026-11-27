@@ -16,6 +16,8 @@ import { stage11 } from './extra/s11';
 import { stage12 } from './extra/s12d';
 import { stage2w } from './extra/s2w';
 import { stage4z, stage8z } from './extra/s4z8z';
+import { GAMES } from './extra/games';
+import { stage13, stage1z, stage2v, stage3z, stage4p, stage5z, stage6z } from './extra/s13';
 
 export const STAGES: Stage[] = [
   { n: 0, title: 'Data Foundations', blurb: 'Files, keys and how data is stored' },
@@ -31,7 +33,8 @@ export const STAGES: Stage[] = [
   { n: 10, title: 'Business Analytics', blurb: 'Funnels, CAC, LTV, root causes' },
   { n: 11, title: 'Industry Workflows', blurb: 'Git, lineage, events, DuckDB' },
   { n: 12, title: 'Industry Packs', blurb: 'Marketing, finance, SaaS, ops & more' },
-  { n: 13, title: 'Career', blurb: 'Portfolio and interviews' },
+  { n: 13, title: 'Real-World Projects', blurb: 'End-to-end case studies' },
+  { n: 14, title: 'Career', blurb: 'Portfolio and interviews' },
 ];
 
 /** Puts extra lessons right before the stage's boss level. */
@@ -91,23 +94,37 @@ function addReflections(lessons: Lesson[]): Lesson[] {
   });
 }
 
+/** Mixes Duolingo-style games (match, build, true/false) into lessons, before the closing step. */
+function addGames(lessons: Lesson[]): Lesson[] {
+  return lessons.map((l) => {
+    const g = GAMES[l.id];
+    if (!g) return l;
+    const steps = [...l.steps];
+    const reflectAt = steps.findIndex((s) => s.kind === 'reflect');
+    const at = reflectAt >= 0 ? reflectAt : steps[steps.length - 1].kind === 'explain' ? steps.length - 1 : steps.length;
+    steps.splice(at, 0, ...g);
+    return { ...l, steps };
+  });
+}
+
 // Lesson ids must never change (progress is saved by id). Stage numbers may.
-export const LESSONS: Lesson[] = addReflections([
+export const LESSONS: Lesson[] = addGames(addReflections([
   ...stage0,
-  ...withExtras(stage1, [...stage1x, ...stage1y]),
-  ...withExtras(stage2, [...stage2x, ...stage2w, ...stage2y]),
-  ...withExtras(stage3, [...stage3x, ...stage3y]),
-  ...withExtras(stage4, [...stage4x, ...stage4y, ...stage4z]),
-  ...withExtras(stage5, [...stage5x, ...stage5y]),
-  ...withExtras(stage6, [...stage6x, ...stage6y]),
+  ...withExtras(stage1, [...stage1x, ...stage1y, ...stage1z]),
+  ...withExtras(stage2, [...stage2x, ...stage2w, ...stage2v, ...stage2y]),
+  ...withExtras(stage3, [...stage3x, ...stage3y, ...stage3z]),
+  ...withExtras(stage4, [...stage4x, ...stage4y, ...stage4z, ...stage4p]),
+  ...withExtras(stage5, [...stage5x, ...stage5y, ...stage5z]),
+  ...withExtras(stage6, [...stage6x, ...stage6y, ...stage6z]),
   ...stage7m,
   ...withExtras(stage7, [...stage7x, ...stage8y, ...stage8z]),
   ...stage9,
   ...stage10,
   ...stage11,
   ...stage12,
+  ...stage13,
   ...withExtras(stage8, [...stage8x, ...stage11y]),
-]);
+]));
 
 const cardMap = new Map<string, ReviewCard>();
 const cardLesson = new Map<string, string>();

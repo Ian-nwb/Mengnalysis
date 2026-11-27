@@ -67,7 +67,8 @@ export const GUIDES: { id: string; icon: IconName; title: string; body: string[]
     title: "Meng's corner",
     body: [
       'Lessons earn treats: +2 for a new lesson, +1 for a replay or review, +5 for a boss level, +3 for a level-up, and +5 at streak milestones.',
-      'Buy snacks for the pantry and toys for the toy box in the shop. Then drag a snack or toy onto Meng, or tap it and then tap Meng.',
+      'Meng lives in three rooms: Living room (toys), Kitchen (snacks) and Bedroom (naps). Switch rooms with the arrows at the top.',
+      'Buy snacks and toys in the Shop. The item you are holding sits at the bottom: slide it up onto Meng, or just tap it. Use the arrows to pick another.',
       "Rub Meng with your finger to pet her (a tap works too). She purrs, blinks and shows hearts. She gets a little peckish over time, but never sad.",
     ],
   },

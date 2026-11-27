@@ -35,6 +35,13 @@ export const sheet = (
   mustUse?: string[],
 ): Step => ({ kind: 'sheet', prompt, table, formula, hint, why, mustUse });
 
+/** Match the pairs: [left, right] in correct pairing; the app shuffles the right side. */
+export const match = (prompt: string, pairs: [string, string][], why: string): Step => ({ kind: 'match', prompt, pairs, why });
+/** Build the answer from word tiles: `answer` in order, `extras` are decoy tiles. */
+export const build = (prompt: string, answer: string[], extras: string[], why: string): Step => ({ kind: 'build', prompt, answer, extras, why });
+/** Quick true/false round. */
+export const tf = (prompt: string, statements: [string, boolean][], why: string): Step => ({ kind: 'tf', prompt, statements, why });
+
 export const reflect = (prompt: string, sample: string): Step => ({ kind: 'reflect', prompt, sample });
 
 export const rc = (front: string, options: string[]): Omit<ReviewCard, 'id'> => ({ front, options, answer: 0 });

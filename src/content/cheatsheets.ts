@@ -123,6 +123,15 @@ export const SHEETS: Sheet[] = [
   },
   {
     stage: 13,
+    title: 'Project Playbook',
+    sections: [
+      { heading: 'Every project', lines: ['Brief: question + who will use it', 'Save raw data; clean a copy', 'Cleaning log: what changed and why', 'Analyze with the simplest tool', '1–3 charts with takeaway titles', 'One clear recommendation'] },
+      { heading: 'Useful patterns', lines: ['Top N: GROUP BY + ORDER BY DESC + LIMIT', 'Second highest: LIMIT 1 OFFSET 1', 'Growth: (new − old) ÷ old', 'Baseline forecast: average of last 3 periods'] },
+      { heading: 'Sharing', lines: ['README: question, finding, recommendation first', 'GitHub or Tableau Public link on your resume'] },
+    ],
+  },
+  {
+    stage: 14,
     title: 'Career',
     sections: [
       { heading: 'Portfolio', lines: ['3 projects: spreadsheet, SQL, dashboard', 'Clear question → clean work → recommendation'] },

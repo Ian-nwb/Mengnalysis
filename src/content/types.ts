@@ -22,6 +22,10 @@ export type Step =
   | { kind: 'reflect'; prompt: string; sample: string }
   // Spreadsheet sandbox: type a real formula; checked against `formula`'s result
   | { kind: 'sheet'; prompt: string; table: (string | number)[][]; formula: string; hint: string; why: string; mustUse?: string[] }
+  // Duolingo-style games
+  | { kind: 'match'; prompt: string; pairs: [string, string][]; why: string }
+  | { kind: 'build'; prompt: string; answer: string[]; extras: string[]; why: string }
+  | { kind: 'tf'; prompt: string; statements: [string, boolean][]; why: string }
   | { kind: 'sql'; prompt: string; dataset: 'coffee' | 'shop' | 'music' | 'app'; answer: string; hint: string; why: string; starter?: string };
 
 export type ReviewCard = { id: string; front: string; options: string[]; answer: number };

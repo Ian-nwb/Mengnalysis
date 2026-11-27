@@ -40,6 +40,12 @@ for (const l of LESSONS) {
     const where = `${l.id} step ${i + 1}`;
     if ((st.kind === 'choice' || st.kind === 'blank') && new Set(st.options).size !== st.options.length) problems.push(`${where}: duplicate options`);
     if ((st.kind === 'choice' || st.kind === 'blank') && !(st.answer >= 0 && st.answer < st.options.length)) problems.push(`${where}: answer out of range`);
+    if (st.kind === 'match') {
+      if (st.pairs.length < 3) problems.push(`${where}: match needs at least 3 pairs`);
+      if (new Set(st.pairs.map((p) => p[0])).size !== st.pairs.length || new Set(st.pairs.map((p) => p[1])).size !== st.pairs.length) problems.push(`${where}: match labels must be unique`);
+    }
+    if (st.kind === 'build' && st.extras.some((e) => st.answer.includes(e))) problems.push(`${where}: build decoy repeats an answer tile`);
+    if (st.kind === 'tf' && st.statements.length < 2) problems.push(`${where}: true/false needs 2+ statements`);
     if (st.kind === 'sheet') {
       sheetCount++;
       try {

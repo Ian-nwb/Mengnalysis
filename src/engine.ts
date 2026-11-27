@@ -1,4 +1,5 @@
 import { cardById, lessonById, lessonOfCard, LESSONS, lessonsInStage } from './content';
+import { GLOSSARY } from './content/glossary';
 import { Lesson, ReviewCard, Step } from './content/types';
 import { AppState } from './state';
 
@@ -183,7 +184,8 @@ export function resolveBug(s: AppState, key: string, correct: boolean): AppState
 /** Item shown in warm-ups / practice: a review card or a past mistake. */
 export type ReviewItem =
   | { kind: 'card'; card: ReviewCard; key: string }
-  | { kind: 'bug'; key: string; lessonId: string; step: number; cardId?: string };
+  | { kind: 'bug'; key: string; lessonId: string; step: number; cardId?: string }
+  | { kind: 'step'; key: string; step: Step };
 
 export function bugItem(key: string, s: AppState): ReviewItem | null {
   const b = s.bugs[key];
@@ -224,10 +226,30 @@ export function warmupItems(s: AppState, total = 3): ReviewItem[] {
     const extra = weak.review.find((c) => !items.some((it) => it.kind === 'card' && it.card.id === c.id));
     if (extra) items.push({ kind: 'card', card: extra, key: extra.id });
   }
+  // Every other day, a quick term-matching game keeps vocabulary fresh.
+  if (s.completed.length >= 3 && new Date().getDate() % 2 === 0) {
+    const m = termMatchItem(s);
+    if (m) items.push(m);
+  }
   return items;
 }
 
-export const practiceItems = (s: AppState, n = 5) => asItems(practiceCards(s, n));
+/** A Duolingo-style matching round from glossary terms of stages she has reached. */
+export function termMatchItem(s: AppState, n = 4): ReviewItem | null {
+  const reached = Math.max(0, ...LESSONS.filter((l) => s.completed.includes(l.id)).map((l) => l.stage));
+  const pool = shuffle(GLOSSARY.filter((t) => t.stage <= reached && t.def.length <= 70));
+  const picked: typeof pool = [];
+  for (const t of pool) if (!picked.some((p) => p.def === t.def)) picked.push(t);
+  if (picked.length < n) return null;
+  const pairs = picked.slice(0, n).map((t) => [t.term, t.def] as [string, string]);
+  return { kind: 'step', key: `match-${dayStr()}-${pairs[0][0]}`, step: { kind: 'match', prompt: 'Match each term to its meaning.', pairs, why: 'Look them up anytime in Learn → Glossary.' } };
+}
+
+export const practiceItems = (s: AppState, n = 5) => {
+  const items = asItems(practiceCards(s, n));
+  const m = s.completed.length >= 3 ? termMatchItem(s) : null;
+  return m ? [...items, m] : items;
+};
 
 /** Lite day: a 2-minute review that still counts for the streak. */
 export function liteItems(s: AppState): ReviewItem[] {

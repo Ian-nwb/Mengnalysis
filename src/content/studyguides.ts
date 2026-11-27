@@ -152,6 +152,18 @@ export const STUDY_GUIDES: Guide[] = [
   },
   {
     stage: 13,
+    title: 'Working real projects',
+    intro: 'Projects are where skills turn into proof. Every project follows the same shape.',
+    sections: [
+      { heading: 'Start with the brief', body: ['Write the question in one sentence and who will use the answer. A clear brief keeps you from drowning in data.'] },
+      { heading: 'Clean and document', body: ['Keep the raw data, clean a copy, and write a short cleaning log: what you removed, filled or fixed, and why.'] },
+      { heading: 'Analyze, then decide', body: ['Use the simplest tool that answers the question: a pivot table, a SQL GROUP BY, a moving average. Then turn numbers into one recommendation someone can act on.'] },
+      { heading: 'Share it', body: ['Lead with the finding, show one to three clear charts, and mention limits honestly. Put it on GitHub or Tableau Public so it becomes part of your portfolio.'] },
+    ],
+    takeaways: ['One-sentence brief', 'Keep a cleaning log', 'Simplest tool that works', 'End with a recommendation'],
+  },
+  {
+    stage: 14,
     title: 'From learner to analyst',
     intro: 'Getting hired is about showing your thinking, not knowing everything.',
     sections: [

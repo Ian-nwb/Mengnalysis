@@ -377,6 +377,11 @@ function DataCards() {
 }
 
 const WHATS_NEW = [
+  'New games in lessons: Match the pairs, Build it from word tiles, and True or false',
+  'A term-matching game in warm-ups, practice and Learn → Glossary',
+  'New stage: Real-World Projects (5 case studies), plus 15 new skill lessons',
+  "Meng's home: a Living room, Kitchen and Bedroom with everything on one screen",
+  'Meng watches your snack, opens her mouth for food, squishes when poked, yawns, stretches, gets dizzy and giggles',
   "Meng's corner is now a real little pet: rub her to pet her, drag snacks and toys onto her",
   'Meng blinks, breathes, purrs, chews and shows hearts',
   'Softer Rainy café music',

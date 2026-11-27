@@ -185,6 +185,7 @@ export function ReviewScreen({
   const item = items[i];
   const answered = (ok: boolean) => {
     setState((s) => {
+      if (item.kind === 'step') return s;
       let out = recordStat(s, item.kind === 'card' ? statLessonForCard(item.card.id) : item.lessonId, ok);
       if (item.kind === 'card') {
         out = gradeCard(out, item.card.id, ok);
@@ -203,7 +204,7 @@ export function ReviewScreen({
       <ProgressBar value={i / items.length} label={`Question ${i + 1} of ${items.length}`} />
       <View style={{ gap: space.xs }}>
         <Txt v="small" bold color={colors.accent}>
-          {item.kind === 'bug' || item.key.startsWith('card#') ? 'From your Bug Book' : text.title}
+          {item.kind === 'step' ? 'Game time' : item.kind === 'bug' || item.key.startsWith('card#') ? 'From your Bug Book' : text.title}
         </Txt>
       </View>
       {item.kind === 'card' ? (
@@ -215,6 +216,8 @@ export function ReviewScreen({
           onAnswer={answered}
           onContinue={next}
         />
+      ) : item.kind === 'step' ? (
+        <StepView key={item.key} step={item.step} onAnswer={answered} onContinue={next} />
       ) : (
         <StepView key={item.key} step={lessonById(item.lessonId)!.steps[item.step]} onAnswer={answered} onContinue={next} />
       )}
